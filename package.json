@@ -1,0 +1,31 @@
+{
+  "name": "haijiao-web",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "cf:dev": "wrangler dev",
+    "cf:deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "vue": "^3.5.12",
+    "vue-router": "^4.4.5",
+    "vant": "^4.9.7",
+    "pinia": "^2.2.6"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@vitejs/plugin-vue": "^5.2.0",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "sass": "^1.86.3",
+    "tailwindcss": "^3.4.16",
+    "typescript": "5.6.3",
+    "vite": "^6.0.3",
+    "vue-tsc": "^2.1.10",
+    "wrangler": "^3.99.0"
+  }
+}
