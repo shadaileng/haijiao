@@ -1,11 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { Toast } from 'vant'
 
 const route = useRoute()
-const router = useRouter()
-
 const imageUrl = ref('')
 const loading = ref(true)
 
@@ -15,7 +13,7 @@ onMounted(() => {
     imageUrl.value = url
   } else {
     Toast('没有图片URL')
-    router.back()
+    history.back()
   }
 })
 
@@ -31,7 +29,11 @@ function downloadImage() {
 
 <template>
   <div class="image-viewer-page">
-    <van-nav-bar title="图片查看" left-arrow @click-left="router.back()" />
+    <van-nav-bar title="图片查看" left-arrow :fixed="true" :placeholder="true">
+      <template #right>
+        <van-icon name="down" size="20" @click="downloadImage" />
+      </template>
+    </van-nav-bar>
 
     <div class="image-container">
       <van-loading v-if="loading" size="24px" vertical>加载中...</van-loading>

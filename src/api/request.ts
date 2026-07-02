@@ -1,3 +1,5 @@
+import type { ApiResult } from '@/types'
+
 const API_BASE = '/api'
 
 interface RequestOptions {
@@ -41,13 +43,12 @@ export async function request(options: RequestOptions): Promise<any> {
 
   try {
     const response = await fetch(fullUrl, fetchOptions)
-    const data = await response.json()
+    const data: ApiResult = await response.json()
 
     if (!data.success) {
       throw new Error(data.message || '请求失败')
     }
 
-    // Handle encrypted data
     let result = data.data
     if (data.isEncrypted) {
       try {
@@ -121,7 +122,7 @@ async function loadVideoSrc(id: string, resourceId: string): Promise<any> {
     }),
   })
 
-  const data = await response.json()
+  const data: ApiResult = await response.json()
   if (!data.success) {
     throw new Error(data.message || '视频加载失败')
   }
@@ -188,7 +189,6 @@ export async function processImages(items: any[]): Promise<any[]> {
 
 function customDecode(str: string): string {
   let decoded = str
-  // Reverse of the obfuscated encode function
   decoded = decoded.replace(/[^A-Za-z0-9\*\#]/g, '')
   const chars = 'ABCD*EFGHIJKLMNOPQRSTUVWX#YZabcdefghijklmnopqrstuvwxyz1234567890'
   let result = ''

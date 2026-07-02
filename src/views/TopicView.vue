@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
-import { getTopic, getTopicAttachments, processImages } from '@/utils/request'
+import { getTopic, getTopicAttachments } from '@/api/request'
 import { Toast } from 'vant'
 
 const route = useRoute()
@@ -15,16 +15,16 @@ const topicData = ref<any>(null)
 const attachments = ref<any[]>([])
 const contentHtml = ref('')
 
-const topicIds = ref<string[]>(store.topicIds)
+const defaultPid = computed(() => route.params.pid as string || '')
 
 onMounted(() => {
   const routePid = route.params.pid as string
   if (routePid) {
     pid.value = routePid
     loadTopic(routePid)
-  } else if (topicIds.value.length > 0) {
-    pid.value = topicIds.value[0]
-    loadTopic(topicIds.value[0])
+  } else if (store.topicIds.length > 0) {
+    pid.value = store.topicIds[0]
+    loadTopic(store.topicIds[0])
   }
 })
 
@@ -35,9 +35,9 @@ watch(pid, (newPid) => {
 })
 
 async function loadTopic(topicPid: string) {
+  if (!topicPid) return
   loading.value = true
   try {
-    // Check cache first
     if (store.topicCache[topicPid]) {
       topicData.value = store.topicCache[topicPid]
       contentHtml.value = topicData.value.content || ''
@@ -54,8 +54,8 @@ async function loadTopic(topicPid: string) {
     topicData.value = data
     contentHtml.value = data.content || ''
     store.cacheTopic(topicPid, data)
-    if (!topicIds.value.includes(topicPid)) {
-      topicIds.value.unshift(topicPid)
+    if (!store.topicIds.includes(topicPid)) {
+      store.topicIds.unshift(topicPid)
     }
 
     await loadAttachments(topicPid)
@@ -108,126 +108,93 @@ function copyText(text: string) {
 </script>
 
 <template>
-  <div class="topic-page">
-    <van-nav-bar title="海角助手" left-arrow @click-left="router.back()" />
+  <div class="topic-view">
+    <van-nav-bar title="帖子详情" left-arrow @click-left="router.back()" />
 
-    <van-pull-refresh v-model="loading" @refresh="() => loadTopic(pid)">
-      <!-- Search PID -->
-      <van-cell-group inset class="search-section">
-        <van-field
-          v-model="pid"
-          placeholder="输入帖子ID"
-          :readonly="false"
-          clearable
-        >
-          <template #button>
-            <van-button type="primary" size="small" :loading="loading" @click="loadTopic(pid)">
-              查找
-            </van-button>
-          </template>
-        </van-field>
+    <van-search
+      v-model="pid"
+      placeholder="输入帖子ID"
+      shape="round"
+      @search="loadTopic(pid)"
+      class="search-bar"
+    />
 
-        <van-button
-          type="primary"
-          block
-          round
-          :disabled="!pid || loading"
-          @click="loadTopic(pid)"
-          class="search-btn"
-        >
-          查找帖子
-        </van-button>
+    <van-button
+      type="primary"
+      block
+      round
+      :loading="loading"
+      @click="loadTopic(pid)"
+      class="search-btn"
+    >
+      查找帖子
+    </van-button>
 
-        <van-button
-          type="success"
-          block
-          round
-          :disabled="attachments.length === 0"
-          @click="openImages"
-          class="search-btn"
-          style="margin-top: 8px;"
-        >
-          查看所有图片
-        </van-button>
+    <van-button
+      v-if="attachments.length > 0"
+      type="success"
+      block
+      round
+      @click="openImages"
+      class="open-images-btn"
+    >
+      查看所有图片 ({{ attachments.filter((a: any) => a.category === 'images').length }})
+    </van-button>
+
+    <div v-if="topicData" class="topic-detail">
+      <van-cell-group inset>
+        <van-cell :title="topicData.title || '无标题'" />
+        <van-cell label="ID: " :value="topicData.topicId || topicData.id" />
+        <van-cell label="用户: " :value="topicData.user?.nickname || '未知'" />
+        <van-cell label="时间: " :value="topicData.create_time || topicData.createTime || ''" />
       </van-cell-group>
 
-      <!-- Topic Content -->
-      <div v-if="topicData" class="topic-content" inset>
-        <van-card
-          :title="topicData.title || '无标题'"
-          :desc="topicData.desc || ''"
-          :price="'ID: ' + topicData.topicId"
+      <div v-if="contentHtml" class="topic-body" v-html="contentHtml"></div>
+
+      <van-cell-group v-if="attachments.length > 0" inset class="attachments-group">
+        <van-cell title="附件资源" :label="`${attachments.length} 个文件`" />
+        <van-cell
+          v-for="item in attachments"
+          :key="item.id"
+          :title="item.name || '附件'"
+          :label="item.category"
+          is-link
+          @click="openAttachment(item)"
         >
-          <template #thumb>
-            <van-icon name="question-o" size="30" color="#999" />
+          <template #icon>
+            <van-icon
+              :name="item.category === 'images' ? 'photo-o' : item.category === 'video' ? 'play-o' : 'download-o'"
+            />
           </template>
-          <template #footer>
-            <div class="card-footer">
-              <span v-if="topicData.user?.nickname" @click="copyText(topicData.user.id || topicData.user.nickname)">
-                {{ topicData.user.nickname }}
-              </span>
-              <span v-if="topicData.create_time">{{ topicData.create_time }}</span>
-            </div>
-          </template>
-        </van-card>
+        </van-cell>
+      </van-cell-group>
+    </div>
 
-        <!-- Topic Body -->
-        <div v-if="contentHtml" class="topic-body" v-html="contentHtml"></div>
-
-        <!-- Attachments -->
-        <div v-if="attachments.length > 0" class="attachments-section">
-          <van-divider content-position="left">附件资源 ({{ attachments.length }})</van-divider>
-          <van-cell-group inset>
-            <van-cell
-              v-for="item in attachments"
-              :key="item.id"
-              :title="item.name || '附件'"
-              :label="item.category"
-              is-link
-              @click="openAttachment(item)"
-            >
-              <template #icon>
-                <van-icon
-                  :name="item.category === 'images' ? 'photo-o' : item.category === 'video' ? 'play-o' : 'download-o'"
-                />
-              </template>
-            </van-cell>
-          </van-cell-group>
-        </div>
-      </div>
-
-      <van-empty v-else-if="!loading" description="输入帖子ID开始查找" />
-    </van-pull-refresh>
+    <van-empty v-else-if="!loading" description="输入帖子ID开始查找" />
   </div>
 </template>
 
 <style scoped>
-.topic-page {
+.topic-view {
   min-height: 100vh;
   background: #f7f8fa;
 }
 
-.search-section {
+.search-bar {
   margin: 12px;
+  background: #f7f8fa;
 }
 
 .search-btn {
   margin: 8px 12px;
 }
 
-.topic-content {
+.open-images-btn {
   margin: 12px;
 }
 
-.card-footer {
-  display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-  color: #999;
-}
-
-.card-footer span {
-  cursor: pointer;
+.topic-detail {
+  margin-top: 12px;
 }
 
 .topic-body {
@@ -247,7 +214,7 @@ function copyText(text: string) {
   border-radius: 4px;
 }
 
-.attachments-section {
+.attachments-group {
   margin: 12px;
 }
 </style>

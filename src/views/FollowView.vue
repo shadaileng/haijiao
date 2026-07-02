@@ -2,7 +2,7 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
-import { getFollowList } from '@/utils/request'
+import { getFollowList } from '@/api/request'
 import { Toast } from 'vant'
 
 const route = useRoute()
@@ -18,6 +18,17 @@ onMounted(() => {
   const routeUid = route.params.userId as string
   if (routeUid) {
     uid.value = routeUid
+  }
+  if (store.followMap[uid.value]) {
+    followList.value = store.followMap[uid.value]
+  }
+})
+
+watch(uid, (newUid) => {
+  if (store.followMap[newUid]) {
+    followList.value = store.followMap[newUid]
+  } else {
+    followList.value = []
   }
 })
 
@@ -51,13 +62,19 @@ function goToUser(userId: string) {
 function openUserProfile(userId: string) {
   window.open(`https://haijiao.com/homepage/last/${userId}`, '_blank')
 }
+
+function copyText(text: string) {
+  navigator.clipboard.writeText(text).then(() => {
+    Toast.success('已复制')
+  })
+}
 </script>
 
 <template>
-  <div class="follow-page">
+  <div class="follow-view">
     <van-nav-bar title="关注用户" left-arrow @click-left="router.back()" />
 
-    <van-cell-group inset class="input-section">
+    <van-cell-group inset class="input-group">
       <van-field v-model="uid" label="UID" placeholder="输入用户ID" clearable />
       <van-field v-model="token" label="Token" placeholder="输入登录Token" type="password" clearable />
       <van-button
@@ -108,12 +125,12 @@ function openUserProfile(userId: string) {
 </template>
 
 <style scoped>
-.follow-page {
+.follow-view {
   min-height: 100vh;
   background: #f7f8fa;
 }
 
-.input-section {
+.input-group {
   margin: 12px;
 }
 

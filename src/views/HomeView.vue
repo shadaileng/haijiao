@@ -1,13 +1,20 @@
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
+import { Toast } from 'vant'
 
 const router = useRouter()
 const store = useUserStore()
+const isLoggedIn = ref(store.isLoggedIn)
+
+onMounted(() => {
+  isLoggedIn.value = store.isLoggedIn
+})
 </script>
 
 <template>
-  <div class="home-page">
+  <div class="home-view">
     <van-nav-bar title="海角助手">
       <template #right>
         <van-icon name="setting-o" size="22" @click="router.push('/settings')" />
@@ -15,88 +22,63 @@ const store = useUserStore()
     </van-nav-bar>
 
     <div class="content-area">
-      <!-- Quick Stats -->
-      <van-cell-group inset class="stats-group">
-        <van-cell title="登录状态" :value="store.isLoggedIn ? '已登录' : '未登录'" :label="store.isLoggedIn ? `UID: ${store.uid}` : '请在设置中填写UID和Token'" />
+      <van-cell-group inset class="status-group">
+        <van-cell
+          title="登录状态"
+          :value="isLoggedIn ? '已登录' : '未登录'"
+          :label="isLoggedIn ? `UID: ${store.uid}` : '请在设置中填写UID和Token'"
+        />
       </van-cell-group>
 
-      <!-- Feature Grid -->
       <van-cell-group inset class="feature-group">
         <van-grid :column-num="2" :border="false">
-          <van-grid-item
-            icon="wap-home-o"
-            text="帖子详情"
-            @click="router.push('/topic')"
-          />
-          <van-grid-item
-            icon="search"
-            text="搜索帖子"
-            @click="router.push('/search')"
-          />
-          <van-grid-item
-            icon="friends-o"
-            text="关注列表"
-            @click="router.push('/follow')"
-          />
-          <van-grid-item
-            icon="user-o"
-            text="用户帖子"
-            @click="router.push('/user')"
-          />
+          <van-grid-item icon="wap-home-o" text="帖子详情" to="/topic" />
+          <van-grid-item icon="search" text="搜索帖子" to="/search" />
+          <van-grid-item icon="friends-o" text="关注列表" to="/follow" />
+          <van-grid-item icon="user-o" text="用户帖子" to="/user" />
         </van-grid>
       </van-cell-group>
 
-      <!-- Recent Topics -->
-      <van-cell-group inset v-if="store.topicIds.length > 0" class="recent-group">
-        <van-cell title="最近查看的帖子" />
+      <van-cell-group v-if="store.topicIds.length > 0" inset class="recent-group">
+        <van-cell title="最近帖子" />
         <van-cell
           v-for="pid in store.topicIds.slice(0, 5)"
           :key="pid"
           :title="pid"
           is-link
-          @click="router.push(`/topic/${pid}`)"
+          to="/topic"
         >
-          <template #right-icon>
-            <van-icon name="arrow" />
-          </template>
+          <template #right-icon><van-icon name="arrow" /></template>
         </van-cell>
       </van-cell-group>
 
-      <!-- Recent Users -->
-      <van-cell-group inset v-if="store.userIds.length > 0" class="recent-group">
-        <van-cell title="最近查看的用户" />
+      <van-cell-group v-if="store.userIds.length > 0" inset class="recent-group">
+        <van-cell title="最近用户" />
         <van-cell
           v-for="uid in store.userIds.slice(0, 5)"
           :key="uid"
           :title="uid"
           is-link
-          @click="router.push(`/user/${uid}`)"
+          to="/user"
         >
-          <template #right-icon>
-            <van-icon name="arrow" />
-          </template>
+          <template #right-icon><van-icon name="arrow" /></template>
         </van-cell>
       </van-cell-group>
 
-      <!-- Recent Searches -->
-      <van-cell-group inset v-if="store.searchKeys.length > 0" class="recent-group">
-        <van-cell title="最近搜索关键字" />
+      <van-cell-group v-if="store.searchKeys.length > 0" inset class="recent-group">
+        <van-cell title="最近搜索" />
         <van-cell
           v-for="key in store.searchKeys.slice(0, 5)"
           :key="key"
           :title="key"
           is-link
-          @click="router.push({ path: '/search', query: { q: key } })"
         >
-          <template #right-icon>
-            <van-icon name="arrow" />
-          </template>
+          <template #right-icon><van-icon name="arrow" /></template>
         </van-cell>
       </van-cell-group>
     </div>
 
-    <!-- Tab Bar -->
-    <van-tabbar v-model="activeTab" @change="onTabChange" :fixed="true" :border="true" route>
+    <van-tabbar v-model="active" @change="onTabChange" :fixed="true" :border="true" route>
       <van-tabbar-item name="home" icon="wap-home" to="/">首页</van-tabbar-item>
       <van-tabbar-item name="search" icon="search" to="/search">搜索</van-tabbar-item>
       <van-tabbar-item name="user" icon="friends-o" to="/follow">关注</van-tabbar-item>
@@ -109,17 +91,17 @@ const store = useUserStore()
 import { ref } from 'vue'
 export default {
   setup() {
-    const activeTab = ref('home')
+    const active = ref('home')
     const onTabChange = (name: string) => {
-      activeTab.value = name
+      active.value = name
     }
-    return { activeTab, onTabChange }
+    return { active, onTabChange }
   },
 }
 </script>
 
 <style scoped>
-.home-page {
+.home-view {
   min-height: 100vh;
   background: #f7f8fa;
 }
@@ -128,7 +110,7 @@ export default {
   padding: 12px 0;
 }
 
-.stats-group {
+.status-group {
   margin-bottom: 12px;
 }
 

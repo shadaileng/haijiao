@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
-import { searchTopics } from '@/utils/request'
+import { searchTopics } from '@/api/request'
 import { Toast } from 'vant'
 
+const route = useRoute()
 const router = useRouter()
 const store = useUserStore()
 
@@ -53,7 +54,9 @@ async function doSearch() {
     }
 
     store.cacheSearchTopics(searchKey.value, data)
-    store.addSearchKey(searchKey.value)
+    if (!store.searchKeys.includes(searchKey.value)) {
+      store.searchKeys.unshift(searchKey.value)
+    }
 
     const total = data.page?.total || 0
     finished.value = topicList.value.length >= total
@@ -83,7 +86,7 @@ function copyText(text: string) {
 </script>
 
 <template>
-  <div class="search-page">
+  <div class="search-view">
     <van-nav-bar title="搜索帖子" left-arrow @click-left="router.back()" />
 
     <van-search
@@ -126,7 +129,7 @@ function copyText(text: string) {
 </template>
 
 <style scoped>
-.search-page {
+.search-view {
   min-height: 100vh;
   background: #f7f8fa;
 }

@@ -2,7 +2,7 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
-import { getUserTopics } from '@/utils/request'
+import { getUserTopics } from '@/api/request'
 import { Toast } from 'vant'
 
 const route = useRoute()
@@ -55,7 +55,9 @@ async function loadUserTopics() {
     }
 
     store.cacheUserTopics(userId.value, data)
-    store.addUserUid(userId.value)
+    if (!store.userIds.includes(userId.value)) {
+      store.userIds.unshift(userId.value)
+    }
 
     const total = data.page?.total || 0
     finished.value = topicList.value.length >= total
@@ -89,16 +91,27 @@ function copyText(text: string) {
 </script>
 
 <template>
-  <div class="user-page">
+  <div class="user-view">
     <van-nav-bar title="用户帖子" left-arrow @click-left="router.back()" />
 
     <van-search
       v-model="userId"
       placeholder="输入用户ID"
       shape="round"
-      @search="() => { pageNum = 1; topicList = []; loadUserTopics(); }"
+      @search="loadUserTopics"
       class="search-bar"
     />
+
+    <van-button
+      type="primary"
+      block
+      round
+      :loading="loading"
+      @click="loadUserTopics"
+      class="search-btn"
+    >
+      查找用户帖子
+    </van-button>
 
     <van-list
       v-model:loading="loading"
@@ -110,18 +123,25 @@ function copyText(text: string) {
         <van-cell
           v-for="item in topicList"
           :key="item.topicId || item.id"
-          :title="item.title || '无标题'"
           is-link
           @click="goToTopic(item.topicId || item.id)"
         >
-          <template #label>
-            <div class="cell-label">
-              <span @click.stop="copyText(item.user?.id || '')">{{ item.user?.nickname || '未知用户' }}</span>
-              <span v-if="item.create_time">{{ item.create_time }}</span>
+          <template #title>
+            <div class="topic-item-inner">
+              <div class="topic-header">
+                <h5 class="topic-id" @click="copyText(item.topicId || '')">
+                  {{ item.topicId || item.id }}
+                </h5>
+                <van-icon name="arrow" size="18" @click="openTopic(item.topicId || item.id)" />
+              </div>
+              <p class="topic-title">{{ item.title || '无标题' }}</p>
+              <div class="topic-meta">
+                <span class="user-name" @click="copyText(item.user?.id || '')">
+                  {{ item.user?.nickname || '未知用户' }}
+                </span>
+                <span class="create-time">{{ item.create_time || item.createTime || '' }}</span>
+              </div>
             </div>
-          </template>
-          <template #right-icon>
-            <van-icon name="arrow" />
           </template>
           <template #extra>
             <van-button
@@ -141,7 +161,7 @@ function copyText(text: string) {
 </template>
 
 <style scoped>
-.user-page {
+.user-view {
   min-height: 100vh;
   background: #f7f8fa;
 }
@@ -150,14 +170,45 @@ function copyText(text: string) {
   background: #f7f8fa;
 }
 
-.cell-label {
-  font-size: 12px;
-  color: #999;
-  display: flex;
-  gap: 12px;
+.search-btn {
+  margin: 12px;
 }
 
-.cell-label span {
+.topic-item-inner {
+  padding: 4px 0;
+}
+
+.topic-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.topic-id {
+  margin: 0;
+  font-size: 14px;
+  color: #07c160;
+  cursor: pointer;
+}
+
+.topic-title {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: #323233;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.topic-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #969799;
+}
+
+.user-name {
   cursor: pointer;
 }
 </style>

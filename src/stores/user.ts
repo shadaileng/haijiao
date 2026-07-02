@@ -1,16 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 
-export interface UserInfo {
-  uid: string
-  token: string
-  nickname?: string
-}
-
-export interface FollowUser {
-  userId: string
-  nickname: string
-}
+import type { UserInfo, FollowUser } from '@/types'
 
 export interface UserState {
   uid: string

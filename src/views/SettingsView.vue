@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { Toast } from 'vant'
@@ -9,6 +9,11 @@ const store = useUserStore()
 
 const uid = ref(store.uid || '')
 const token = ref(store.token || '')
+
+onMounted(() => {
+  uid.value = store.uid
+  token.value = store.token
+})
 
 function save() {
   if (!uid.value || !token.value) {
@@ -33,44 +38,29 @@ function viewSource() {
 </script>
 
 <template>
-  <div class="settings-page">
+  <div class="settings-view">
     <van-nav-bar title="设置" left-arrow @click-left="router.back()" />
 
     <van-cell-group inset class="setting-group">
-      <van-cell title="UID" :value="uid" is-link @click="uid = prompt('请输入UID') || ''" />
-      <van-cell title="Token" :value="token ? '******' : ''" is-link @click="token = prompt('请输入Token') || ''" />
+      <van-field v-model="uid" label="UID" placeholder="输入用户ID" clearable />
+      <van-field v-model="token" label="Token" placeholder="输入登录Token" type="password" clearable />
     </van-cell-group>
 
-    <van-button
-      type="primary"
-      block
-      round
-      class="save-btn"
-      @click="save"
-    >
+    <van-button type="primary" block round class="save-btn" @click="save">
       保存凭证
     </van-button>
 
-    <van-button
-      type="warning"
-      block
-      round
-      class="clear-btn"
-      @click="clear"
-    >
+    <van-button type="warning" block round class="clear-btn" @click="clear">
       清除凭证
     </van-button>
 
-    <van-cell-group inset class="setting-group">
+    <van-cell-group inset class="info-group">
       <van-cell title="数据来源" label="haijiao.com" is-link @click="viewSource" />
-    </van-cell-group>
-
-    <van-cell-group inset class="setting-group">
       <van-cell title="使用说明">
         <template #label>
           <div class="tips-text">
             <p>1. 先在设置中填写UID和Token</p>
-            <p>2. 在"用户"页面查看关注列表</p>
+            <p>2. 在"关注"页面查看关注列表</p>
             <p>3. 在"首页"输入帖子ID查看帖子详情</p>
             <p>4. 在"搜索"页面搜索帖子</p>
           </div>
@@ -81,7 +71,7 @@ function viewSource() {
 </template>
 
 <style scoped>
-.settings-page {
+.settings-view {
   min-height: 100vh;
   background: #f7f8fa;
 }
@@ -96,6 +86,10 @@ function viewSource() {
 
 .clear-btn {
   margin: 0 12px 16px;
+}
+
+.info-group {
+  margin: 12px;
 }
 
 .tips-text {
