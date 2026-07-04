@@ -18,6 +18,7 @@ export interface UserState {
 export const useUserStore = defineStore('user', () => {
   const uid = ref('')
   const token = ref('')
+  const apiBase = ref('haijiao.com')
   const followMap = ref<Record<string, FollowUser[]>>({})
   const topicIds = ref<string[]>([])
   const topicCache = ref<Record<string, any>>({})
@@ -35,6 +36,7 @@ export const useUserStore = defineStore('user', () => {
         const data = JSON.parse(raw)
         uid.value = data.uid || ''
         token.value = data.token || ''
+        apiBase.value = data.apiBase || 'haijiao.com'
       }
       const topicRaw = localStorage.getItem('haijiao_topic')
       if (topicRaw) {
@@ -65,7 +67,11 @@ export const useUserStore = defineStore('user', () => {
   }
 
   function saveUser() {
-    localStorage.setItem('haijiao_user', JSON.stringify({ uid: uid.value, token: token.value }))
+    localStorage.setItem('haijiao_user', JSON.stringify({ 
+      uid: uid.value, 
+      token: token.value,
+      apiBase: apiBase.value,
+    }))
   }
 
   function saveTopic() {
@@ -98,6 +104,11 @@ export const useUserStore = defineStore('user', () => {
   function setCredentials(newUid: string, newToken: string) {
     uid.value = newUid
     token.value = newToken
+    saveUser()
+  }
+
+  function setApiBase(newApiBase: string) {
+    apiBase.value = newApiBase
     saveUser()
   }
 
@@ -145,10 +156,10 @@ export const useUserStore = defineStore('user', () => {
   loadFromStorage()
 
   return {
-    uid, token, followMap, topicIds, topicCache,
+    uid, token, apiBase, followMap, topicIds, topicCache,
     userIds, userTopicsCache, searchKeys, searchTopicsCache,
     isLoggedIn,
-    setCredentials, addTopicId, cacheTopic, addUserUid,
+    setCredentials, setApiBase, addTopicId, cacheTopic, addUserUid,
     cacheUserTopics, addSearchKey, cacheSearchTopics, cacheFollow,
   }
 })

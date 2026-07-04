@@ -1,6 +1,31 @@
 import type { ApiResult } from '@/types'
+import { useUserStore } from '@/stores/user'
 
 const API_BASE = '/api'
+
+// Get current API host from store
+function getApiHost(): string {
+  const store = useUserStore()
+  return store.apiBase || 'haijiao.com'
+}
+
+// Build proxied URL using /api prefix
+function buildProxiedUrl(path: string, params?: Record<string, any>): string {
+  const url = `${API_BASE}${path}`
+  if (!params || Object.keys(params).length === 0) return url
+  const search = new URLSearchParams()
+  for (const [k, v] of Object.entries(params)) {
+    if (v !== undefined && v !== null) search.append(k, String(v))
+  }
+  const qs = search.toString()
+  return qs ? `${url}?${qs}` : url
+}
+
+// Build direct URL (for external resources like images/videos)
+function buildDirectUrl(path: string): string {
+  const host = getApiHost()
+  return `https://${host}${path}`
+}
 
 interface RequestOptions {
   url: string
@@ -11,14 +36,7 @@ interface RequestOptions {
 }
 
 function buildUrl(path: string, params?: Record<string, any>): string {
-  const url = `${API_BASE}${path}`
-  if (!params || Object.keys(params).length === 0) return url
-  const search = new URLSearchParams()
-  for (const [k, v] of Object.entries(params)) {
-    if (v !== undefined && v !== null) search.append(k, String(v))
-  }
-  const qs = search.toString()
-  return qs ? `${url}?${qs}` : url
+  return buildProxiedUrl(path, params)
 }
 
 function getHeaders(extra?: Record<string, string>): Record<string, string> {
@@ -107,7 +125,7 @@ async function loadVideoSrc(id: string, resourceId: string): Promise<any> {
   const { useUserStore } = await import('@/stores/user')
   const store = useUserStore()
 
-  const response = await fetch(`${API_BASE}/attachment`, {
+  const response = await fetch(buildDirectUrl('/api/attachment'), {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -171,7 +189,8 @@ export async function processImages(items: any[]): Promise<any[]> {
   const props = items.map(async (item: any) => {
     if (!item.remoteUrl) return item
     try {
-      const resp = await fetch(item.remoteUrl)
+      const directUrl = buildDirectUrl(item.remoteUrl)
+      const resp = await fetch(directUrl)
       const text = await resp.text()
       if (!text) return item
       const result = customDecode(text)
