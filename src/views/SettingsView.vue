@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
-import { Toast } from 'vant'
+import { Toast, showDialog } from 'vant'
 
 const router = useRouter()
 const store = useUserStore()
@@ -45,6 +45,19 @@ function clear() {
   Toast.success('已清除')
 }
 
+function handleLogout() {
+  showDialog({
+    title: '退出登录',
+    message: '确定要退出登录吗？',
+    showCancelButton: true,
+  }).then(() => {
+    store.logout()
+    uid.value = ''
+    token.value = ''
+    Toast.success('已退出')
+  }).catch(() => {})
+}
+
 function viewSource() {
   window.open(`https://${apiBase.value}`, '_blank')
 }
@@ -54,7 +67,32 @@ function viewSource() {
   <div class="settings-view">
     <van-nav-bar title="设置" left-arrow @click-left="router.back()" />
 
+    <van-cell-group v-if="store.isLoggedIn" inset class="status-group">
+      <van-cell title="登录状态" value="已登录" is-link>
+        <template #label>
+          <div class="login-info">
+            <p v-if="store.nickname">昵称: {{ store.nickname }}</p>
+            <p>UID: {{ store.uid }}</p>
+          </div>
+        </template>
+      </van-cell>
+      <van-cell title="退出登录" is-link @click="handleLogout">
+        <template #right-icon>
+          <van-icon name="warning-o" color="#ee0a24" />
+        </template>
+      </van-cell>
+    </van-cell-group>
+
+    <van-cell-group v-else inset class="status-group">
+      <van-cell title="登录状态" value="未登录" is-link @click="router.push('/login')">
+        <template #label>
+          <span>点击前往登录</span>
+        </template>
+      </van-cell>
+    </van-cell-group>
+
     <van-cell-group inset class="setting-group">
+      <van-cell title="高级配置" label="手动设置 UID、Token 和数据源" />
       <van-field v-model="uid" label="UID" placeholder="输入用户ID" clearable />
       <van-field v-model="token" label="Token" placeholder="输入登录Token" type="password" clearable />
       <van-field v-model="apiBase" label="数据源" placeholder="例如: haijiao.com" clearable />
@@ -73,10 +111,11 @@ function viewSource() {
       <van-cell title="使用说明">
         <template #label>
           <div class="tips-text">
-            <p>1. 在设置中填写UID、Token和数据源</p>
-            <p>2. 在"关注"页面查看关注列表</p>
-            <p>3. 在"首页"输入帖子ID查看帖子详情</p>
-            <p>4. 在"搜索"页面搜索帖子</p>
+            <p>1. 推荐使用登录功能自动获取认证信息</p>
+            <p>2. 也可在下方手动填写 UID、Token 和数据源</p>
+            <p>3. 在"关注"页面查看关注列表</p>
+            <p>4. 在"首页"输入帖子ID查看帖子详情</p>
+            <p>5. 在"搜索"页面搜索帖子</p>
           </div>
         </template>
       </van-cell>
@@ -88,6 +127,16 @@ function viewSource() {
 .settings-view {
   min-height: 100vh;
   background: #f7f8fa;
+}
+
+.status-group {
+  margin: 12px;
+}
+
+.login-info p {
+  margin: 2px 0;
+  font-size: 12px;
+  color: #666;
 }
 
 .setting-group {

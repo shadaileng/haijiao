@@ -76,3 +76,36 @@ export interface ApiResult<T = any> {
   isEncrypted?: boolean
   message?: string
 }
+
+export interface LoginParams {
+  username: string
+  password: string
+  captchaCode?: string
+  captchaId?: string
+  ref?: string
+}
+
+export interface LoginResponse {
+  token: string
+  user: {
+    id: number
+    nickname: string
+    avatar: string
+    email: string
+    username: string
+    description: string
+    topicCount: number
+    commentCount: number
+    fansCount: number
+    favoriteCount: number
+    createTime: string
+    lastLoginTime: string
+    [key: string]: any
+  }
+  domain: string
+  domainAbroad: string
+  customerService: string
+  ref: string
+  type: number
+  vip_domain: string
+}

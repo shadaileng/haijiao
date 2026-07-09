@@ -7,9 +7,11 @@ import { Toast } from 'vant'
 const router = useRouter()
 const store = useUserStore()
 const isLoggedIn = ref(store.isLoggedIn)
+const nickname = ref(store.nickname)
 
 onMounted(() => {
   isLoggedIn.value = store.isLoggedIn
+  nickname.value = store.nickname
 })
 </script>
 
@@ -26,7 +28,9 @@ onMounted(() => {
         <van-cell
           title="登录状态"
           :value="isLoggedIn ? '已登录' : '未登录'"
-          :label="isLoggedIn ? `UID: ${store.uid}` : '请在设置中填写UID和Token'"
+          :label="isLoggedIn ? (nickname ? `${nickname} | UID: ${store.uid}` : `UID: ${store.uid}`) : '请前往登录或在设置中填写UID和Token'"
+          is-link
+          @click="router.push(isLoggedIn ? '/settings' : '/login')"
         />
       </van-cell-group>
 

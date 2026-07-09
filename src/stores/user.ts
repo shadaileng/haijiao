@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 
-import type { UserInfo, FollowUser } from '@/types'
+import type { UserInfo, FollowUser, LoginResponse } from '@/types'
 
 export interface UserState {
   uid: string
@@ -18,6 +18,7 @@ export interface UserState {
 export const useUserStore = defineStore('user', () => {
   const uid = ref('')
   const token = ref('')
+  const nickname = ref('')
   const apiBase = ref('haijiao.com')
   const followMap = ref<Record<string, FollowUser[]>>({})
   const topicIds = ref<string[]>([])
@@ -36,6 +37,7 @@ export const useUserStore = defineStore('user', () => {
         const data = JSON.parse(raw)
         uid.value = data.uid || ''
         token.value = data.token || ''
+        nickname.value = data.nickname || ''
         apiBase.value = data.apiBase || 'haijiao.com'
       }
       const topicRaw = localStorage.getItem('haijiao_topic')
@@ -67,9 +69,10 @@ export const useUserStore = defineStore('user', () => {
   }
 
   function saveUser() {
-    localStorage.setItem('haijiao_user', JSON.stringify({ 
-      uid: uid.value, 
+    localStorage.setItem('haijiao_user', JSON.stringify({
+      uid: uid.value,
       token: token.value,
+      nickname: nickname.value,
       apiBase: apiBase.value,
     }))
   }
@@ -109,6 +112,27 @@ export const useUserStore = defineStore('user', () => {
 
   function setApiBase(newApiBase: string) {
     apiBase.value = newApiBase
+    saveUser()
+  }
+
+  function loginFromApi(data: LoginResponse) {
+    uid.value = String(data.user.id)
+    token.value = data.token
+    nickname.value = data.user.nickname
+    if (data.domain) {
+      try {
+        apiBase.value = new URL(data.domain).host
+      } catch {
+        // 忽略无效域名
+      }
+    }
+    saveUser()
+  }
+
+  function logout() {
+    uid.value = ''
+    token.value = ''
+    nickname.value = ''
     saveUser()
   }
 
@@ -156,10 +180,10 @@ export const useUserStore = defineStore('user', () => {
   loadFromStorage()
 
   return {
-    uid, token, apiBase, followMap, topicIds, topicCache,
+    uid, token, nickname, apiBase, followMap, topicIds, topicCache,
     userIds, userTopicsCache, searchKeys, searchTopicsCache,
     isLoggedIn,
-    setCredentials, setApiBase, addTopicId, cacheTopic, addUserUid,
+    setCredentials, setApiBase, loginFromApi, logout, addTopicId, cacheTopic, addUserUid,
     cacheUserTopics, addSearchKey, cacheSearchTopics, cacheFollow,
   }
 })

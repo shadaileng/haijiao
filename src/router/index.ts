@@ -1,10 +1,16 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useUserStore } from '@/stores/user'
 
 const routes = [
   {
     path: '/',
     name: 'Home',
     component: () => import('@/views/HomeView.vue'),
+  },
+  {
+    path: '/login',
+    name: 'Login',
+    component: () => import('@/views/LoginView.vue'),
   },
   {
     path: '/topic/:pid?',
@@ -38,10 +44,21 @@ const routes = [
   },
 ]
 
+const publicPages = ['Login', 'Settings', 'ImageViewer']
+
 const router = createRouter({
   history: createWebHistory(),
   routes,
   scrollBehavior: () => ({ top: 0 }),
+})
+
+router.beforeEach((to, from, next) => {
+  const store = useUserStore()
+  if (store.isLoggedIn || publicPages.includes(to.name as string)) {
+    next()
+  } else {
+    next({ name: 'Login' })
+  }
 })
 
 export default router
