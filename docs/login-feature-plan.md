@@ -38,7 +38,7 @@
   "CaptchaCode": "",
   "CaptchaId": "",
   "Ref": "",
-  "Sign": "<MD5 hash - 算法待确认>"
+  "Sign": "<MD5(Username + Password + UserAgent) - 32位小写hex>"
 }
 ```
 
@@ -58,26 +58,26 @@
 
 ```json
 {
-  "customerService": "haijiao2029@proton.me",
-  "domain": "https://hj260602583.top",
-  "domainAbroad": "https://www.haijiao.com",
+  "customerService": "customer@example.com",
+  "domain": "https://api.example.com",
+  "domainAbroad": "https://abroad.example.com",
   "ref": "",
-  "token": "2663195d7c93485fab60f5c64c56a712",
+  "token": "<32位hex令牌>",
   "type": 3,
   "user": {
-    "id": 168149806501,
-    "nickname": "海角_168149806501",
-    "avatar": "53",
+    "id": 100000000001,
+    "nickname": "用户_nickname",
+    "avatar": "1",
     "description": "...",
     "topicCount": 0,
     "videoCount": 0,
-    "commentCount": 22,
-    "fansCount": 240,
-    "favoriteCount": 98,
-    "username": "shaqpf0510",
-    "email": "qpf0510@qq.com",
-    "createTime": "2023-04-15 02:47:45",
-    "lastLoginTime": "2026-07-09 21:27:29",
+    "commentCount": 0,
+    "fansCount": 0,
+    "favoriteCount": 0,
+    "username": "username_example",
+    "email": "user@example.com",
+    "createTime": "2020-01-01 00:00:00",
+    "lastLoginTime": "2020-01-01 00:00:00",
     ...
   },
   "vip_domain": ""
@@ -95,31 +95,79 @@
 
 ---
 
-## 3. Sign 算法分析（待确认）
+## 3. Sign 算法分析（已确认）
 
-### 3.1 已知信息
+### 3.1 算法
 
-- Sign 值为 32 位十六进制字符串，符合 MD5 格式
-- 示例 Sign：`abc75ee95c22c79294b5ea6d70139cca`
+```
+Sign = MD5(Username + Password + navigator.userAgent)
+```
 
-### 3.2 已尝试的组合（均不匹配）
+- 哈希库：**js-md5 v0.7.3**（[emn178/js-md5](https://github.com/emn178/js-md5)）
+- 输出：32 位小写十六进制字符串
+- 输入为三个值的直接拼接：`Username`（明文邮箱/用户名）+ `Password`（明文密码）+ `navigator.userAgent`（浏览器 UA），无分隔符、无盐值
 
-| 尝试方式 | 结果 |
-|----------|------|
-| `MD5(password)` | `3f84528597a5d8dc46b8b82f6b8f20dd` ❌ |
-| `MD5(username)` | `652394f366a7bbb08f0c68b21f1515f4` ❌ |
-| `MD5(username + password)` | `13422575e92e2684ba4cb43f61fd36d7` ❌ |
-| `MD5(password + username)` | `dd1d562e829665c9a2b0bc2cad327ed8` ❌ |
-| `MD5(password + salt)` 各种盐值 | 均不匹配 ❌ |
-| `HMAC-MD5` | 均不匹配 ❌ |
+### 3.2 逆向分析过程
 
-### 3.3 需要用户提供
+#### 3.2.1 定位 Sign 生成代码
 
-**请提供 Sign 的生成算法**，例如：
-- `MD5(password)`
-- `MD5(password + 固定盐值)`
-- `HMAC-MD5(key, message)` 的具体参数
-- 或者提供 haijiao.com 客户端 JavaScript 中生成 Sign 的代码片段
+在 haijiao.com 生产环境编译的 Webpack 包中定位登录模块。
+
+**入口文件** `app.js:6533`：
+```javascript
+this.form.Sign = n()(this.form.Username + this.form.Password + navigator.userAgent);
+```
+
+**模块注册** `app.js:6422-6427`：
+```javascript
+d932: function(e, t, a) {
+    var i = a("8237")    // 加载模块 8237
+      , n = a.n(i)        // a.n = webpack 工具函数，获取模块的默认导出
+      , o = a("21e4")     // login API 模块
+      , r = a("6b26")     // storage 工具模块
+      , s = a("dafe");    // 其他依赖
+```
+
+代码逻辑：
+1. `a("8237")` → 加载模块 ID 为 `8237` 的代码
+2. `a.n(i)` → 调用 webpack 的 `__webpack_require__.n`，返回一个 getter 函数 `function() { return i }`
+3. `n()` → 执行 getter，返回模块 `8237` 的导出值（即 MD5 函数本身）
+4. `n()(concatStr)` → 调用 MD5 函数，计算拼接字符串的哈希值
+
+#### 3.2.2 定位哈希库
+
+模块 `8237` 位于 `chunk-vendors.a4a98f51.js:18787`，完整内容为 **js-md5 v0.7.3**。
+
+关键导出逻辑：
+```javascript
+// 第 18818-18832 行
+createMethod = function() {
+    var t = createOutputMethod("hex");  // 默认 hex 输出
+    t.create = function() { return new Md5 }
+    t.update = function(e) { return t.create().update(e) }
+    for (var e = 0; e < OUTPUT_TYPES.length; ++e) {
+        t[OUTPUT_TYPES[e]] = createOutputMethod(OUTPUT_TYPES[e])
+    }                                      // 支持 hex/array/digest/buffer/arrayBuffer/base64
+    return t                               // t(str) 直接返回 MD5 hex 字符串
+}
+```
+
+#### 3.2.3 调用链总结
+
+| 层级 | 代码 | 说明 |
+|------|------|------|
+| Webpack 模块 ID | `"8237"` | chunk-vendors 中的 js-md5 库 |
+| 导出函数 | `createMethod()` | 返回 `function(str) → MD5 hex string` |
+| webpack 工具 | `a.n(i)` | 返回 getter `() → i` |
+| 最终调用 | `n()(concatStr)` | 等价于 `md5(Username + Password + UserAgent)` |
+
+#### 3.2.4 验证方式
+
+```
+MD5("testuser" + "testpass" + "Mozilla/5.0 ...") = <Sign 值>
+```
+
+在浏览器控制台可验证：从 `chunk-vendors` 包中可提取 `md5` 函数，传入相同参数对比结果。
 
 ---
 
@@ -139,9 +187,17 @@
 
 ### 4.2 API 层变更 (`src/api/request.ts`)
 
+前置依赖：
+```bash
+npm install js-md5
+npm install -D @types/js-md5
+```
+
 新增登录函数：
 
 ```typescript
+import md5 from 'js-md5'
+
 interface LoginParams {
   username: string
   password: string
@@ -165,8 +221,8 @@ interface LoginResponse {
 }
 
 export async function login(params: LoginParams): Promise<LoginResponse> {
-  const sign = generateSign(params.password) // 待实现
-  
+  const sign = generateSign(params.username, params.password)
+
   return request({
     url: '/login/signin',
     method: 'POST',
@@ -184,11 +240,10 @@ export async function login(params: LoginParams): Promise<LoginResponse> {
   })
 }
 
-// 待确认 - Sign 生成算法
-function generateSign(password: string): string {
-  // TODO: 实现 Sign 生成逻辑
-  // 需要用户提供算法
-  throw new Error('Sign algorithm not implemented')
+// MD5(Username + Password + navigator.userAgent)
+function generateSign(username: string, password: string): string {
+  const raw = username + password + navigator.userAgent
+  return md5(raw)
 }
 ```
 
@@ -298,7 +353,7 @@ router.beforeEach((to, from, next) => {
 │  ┌───────────────────┐  │
 │  │ ✅ 已登录          │  │
 │  │ 昵称: 海角_xxx     │  │
-│  │ UID: 1681498...    │  │
+│  │ UID: 1000000...    │  │
 │  └───────────────────┘  │
 │                         │
 │  ┌───────────────────┐  │
@@ -362,7 +417,7 @@ export interface LoginResponse {
 
 | 步骤 | 任务 | 依赖 |
 |:---:|------|------|
-| 1 | 确认 Sign 生成算法 | **需要用户输入** |
+| 1 | 确认 Sign 生成算法 | ✅ 已完成 |
 | 2 | 更新 `types/index.ts` 新增类型定义 | 无 |
 | 3 | 更新 `api/request.ts` 新增 `login()` 函数 | 步骤 1, 2 |
 | 4 | 更新 `stores/user.ts` 新增登录状态管理 | 步骤 2 |
@@ -379,7 +434,7 @@ export interface LoginResponse {
 
 | 项目 | 状态 | 说明 |
 |------|:---:|------|
-| **Sign 生成算法** | ❌ 未解决 | 需要用户提供 MD5 哈希的具体输入格式和盐值 |
+| **Sign 生成算法** | ✅ 已确认 | MD5(Username + Password + UserAgent)，js-md5 v0.7.3 |
 | 响应解密逻辑 | ✅ 已确认 | 三重 Base64 解码 + UTF-8 转换 |
 | 字段映射 | ✅ 已确认 | `user.id` → `uid`，`token` → `token` |
 | API 域名处理 | ⚠️ 待确认 | 响应中的 `domain` 字段是否需要更新 `apiBase` |
