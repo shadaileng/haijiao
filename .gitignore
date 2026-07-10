@@ -8,3 +8,18 @@ dist/
 .env.*
 !.env.example
 
+# IDE
+.vscode
+.idea/
+*.swp
+*.swo
+
+# TypeScript
+*.tsbuildinfo
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# OS
+Thumbs.db
