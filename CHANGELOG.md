@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.2] - 2026-07-10
+
+### Fixed
+
+- 修复 Sign 生成算法：实现 MD5(Username + Password + UserAgent)，使用 js-md5 库匹配服务器校验逻辑
+
 ## [1.4.1] - 2026-07-10
 
 ### Fixed
@@ -39,10 +45,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - 设置页面重构：区分登录状态区和高级配置区
 - Pinia Store 新增 `nickname`、`loginFromApi()`、`logout()` 方法
-
-### Known Issues
-
-- 登录 API 的 Sign 生成算法待确认，当前 `generateSign()` 为占位实现
 
 ## [1.2.0] - 2026-07-04
 

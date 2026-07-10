@@ -1,3 +1,4 @@
+import { md5 } from 'js-md5'
 import type { ApiResult, LoginParams, LoginResponse } from '@/types'
 import { useUserStore } from '@/stores/user'
 
@@ -198,7 +199,7 @@ export async function searchTopics(key: string, page: number, nodeId: number = 0
 
 // Login API
 export async function login(params: LoginParams): Promise<LoginResponse> {
-  const sign = generateSign(params.password)
+  const sign = generateSign(params.username, params.password)
 
   const response = await fetch(`${getApiPrefix()}/login/signin`, {
     method: 'POST',
@@ -236,13 +237,8 @@ export async function login(params: LoginParams): Promise<LoginResponse> {
   return result
 }
 
-// TODO: 需要用户提供 Sign 生成算法
-// 当前传入的是密码的 MD5，但实际值不匹配
-// 需要确认：MD5(password)、MD5(password + salt)、还是其他算法
-function generateSign(password: string): string {
-  // 暂时直接返回空字符串，等待用户提供算法
-  // 实际使用时需要替换为正确的 Sign 生成逻辑
-  return password
+function generateSign(username: string, password: string): string {
+  return md5(username + password + navigator.userAgent)
 }
 
 // Image processing
