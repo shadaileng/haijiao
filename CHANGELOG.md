@@ -5,6 +5,38 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] - 2026-07-10
+
+### Added
+
+- 参考 haijiao-wxt 界面布局：热点列表页 `/hot` 替换首页功能网格
+- 用户主页 `/homepage/:userId/:nickname`（用户信息 + 帖子分页）
+- Topics 通用帖子列表组件（单图/多图布局、用户栏、统计信息）
+- UserInfo 用户信息卡片组件（头像、昵称、统计、签名）
+- Comment 评论列表组件（分页）
+- TopicContent 富文本渲染组件（IntersectionObserver 图片懒加载）
+- v-headicon 图片懒加载指令（IntersectionObserver 实现）
+- 全局 van-back-top 返回顶部按钮
+- 全局 overlay 浮层用于图片大图查看
+- 全局 TabBar 统一导航栏（主页/搜索/关注/配置）
+
+### Changed
+
+- App.vue 重构为主布局容器：TabBar + overlay + back-top
+- 路由调整：`/` 重定向到 `/hot`，新增 `/hot`、`/homepage` 路由，路由元 `showTabBar` 控制 TabBar 显隐
+- TopicView 重构：元信息行（标签/评论/点赞）、用户栏（头像/昵称/时间、可跳转主页）、评论区
+- FollowView 改用 Vant 列表卡片样式（头像 + 昵称 + 粉丝 + 签名）
+- SearchView 改用 Topics 组件渲染搜索结果
+- SettingsView 添加当前用户信息卡片展示
+- 全局样式增加 `hv-` utility classes（from haijiao-wxt）
+- 新增 `getHotTopics()` API 函数
+
+### Fixed
+
+- HomeView 重复 `ref` 声明和 Options API 混用导致编译错误
+- main.ts `Toast()` 不可调用警告
+- 各组件/视图未使用的 import 清理
+
 ## [1.5.0] - 2026-07-10
 
 ### Changed

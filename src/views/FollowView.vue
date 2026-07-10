@@ -1,144 +1,125 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { ref, reactive, onMounted } from 'vue'
+import { showToast } from 'vant'
 import { useUserStore } from '@/stores/user'
 import { getFollowList } from '@/api/request'
-import { showToast, showSuccessToast } from 'vant'
+import type { FollowUser } from '@/types'
 
-const route = useRoute()
-const router = useRouter()
+const LOADING_URL = 'https://haijiao.com/images/common/project/loading.gif'
+
 const store = useUserStore()
 
-const uid = ref(store.uid || '')
-const token = ref(store.token || '')
+const username = ref('')
+const itemsAll = reactive<FollowUser[]>([])
+const items = ref<FollowUser[]>([])
 const loading = ref(false)
-const followList = ref<any[]>([])
+const finished = ref(false)
 
-onMounted(() => {
-  const routeUid = route.params.userId as string
-  if (routeUid) {
-    uid.value = routeUid
+onMounted(async () => {
+  if (store.followMap[store.uid]) {
+    itemsAll.splice(0, itemsAll.length, ...store.followMap[store.uid])
+    filterItems()
   }
-  if (store.followMap[uid.value]) {
-    followList.value = store.followMap[uid.value]
-  }
-})
-
-watch(uid, (newUid) => {
-  if (store.followMap[newUid]) {
-    followList.value = store.followMap[newUid]
-  } else {
-    followList.value = []
+  if (store.isLoggedIn) {
+    await loadFollow()
   }
 })
 
-async function loadFollow() {
-  if (!uid.value || !token.value) {
-    showToast('请先在设置中填写UID和Token')
-    return
-  }
-
+const loadFollow = async () => {
   loading.value = true
   try {
-    const data = await getFollowList(token.value, uid.value)
+    const data = await getFollowList(store.token, store.uid)
     if (!data || !Array.isArray(data)) {
-      showToast('获取关注列表失败')
+      showToast('加载关注列表失败')
       return
     }
-
-    followList.value = data
-    store.cacheFollow(uid.value, data)
-  } catch (error: any) {
-    showToast(error.message || '加载失败')
+    itemsAll.splice(0, itemsAll.length, ...data)
+    store.cacheFollow(store.uid, data)
+    filterItems()
+  } catch (e: any) {
+    showToast(e.message || '加载关注列表失败')
   } finally {
     loading.value = false
+    finished.value = true
   }
 }
 
-function goToUser(userId: string) {
-  router.push(`/user/${userId}`)
+const filterItems = () => {
+  if (!username.value) {
+    items.value = [...itemsAll]
+  } else {
+    items.value = itemsAll.filter(item =>
+      (item as any).nickname?.includes(username.value)
+    )
+  }
 }
 
-function openUserProfile(userId: string) {
-  window.open(`https://haijiao.com/homepage/last/${userId}`, '_blank')
-}
-
-function copyText(text: string) {
-  navigator.clipboard.writeText(text).then(() => {
-    showSuccessToast('已复制')
-  })
-}
 </script>
 
 <template>
-  <div class="follow-view">
-    <van-nav-bar title="关注用户" left-arrow @click-left="router.back()" />
-
-    <van-cell-group inset class="input-group">
-      <van-field v-model="uid" label="UID" placeholder="输入用户ID" clearable />
-      <van-field v-model="token" label="Token" placeholder="输入登录Token" type="password" clearable />
-      <van-button
-        type="primary"
-        block
-        round
-        :loading="loading"
-        @click="loadFollow"
-        class="load-btn"
-      >
-        加载关注列表
-      </van-button>
-    </van-cell-group>
-
+  <van-search
+    v-model="username"
+    @search="filterItems"
+    placeholder="输入昵称搜索"
+  />
+  <van-pull-refresh v-model="loading">
     <van-list
-      v-model:loading="loading"
-      :finished="followList.length === 0"
-      finished-text="暂无数据"
-      class="list-section"
+      :loading="loading"
+      :finished="finished"
+      finished-text="没有更多了"
+      @load="loadFollow"
     >
-      <van-cell-group inset v-if="followList.length > 0">
-        <van-cell
-          v-for="item in followList"
-          :key="item.userId"
-          :title="item.nickname"
-          :label="'ID: ' + item.userId"
-          is-link
-          @click="goToUser(item.userId)"
-        >
-          <template #right-icon>
-            <van-icon name="arrow" />
-          </template>
-          <template #extra>
-            <van-button
-              size="mini"
-              type="success"
-              @click.stop="openUserProfile(item.userId)"
-            >
-              主页
-            </van-button>
-          </template>
-        </van-cell>
-      </van-cell-group>
-
-      <van-empty v-else-if="!loading" description="输入UID和Token加载关注列表" />
+      <van-cell v-for="item in items" :key="(item as any).userId">
+        <template #value>
+          <div class="card">
+            <van-row>
+              <van-col span="6">
+                <van-image
+                  round
+                  width="4rem"
+                  height="4rem"
+                  :src="LOADING_URL"
+                  v-headicon="(item as any).avatar"
+                />
+              </van-col>
+              <van-col span="16" class="hv-text-start">
+                <van-row>
+                  <van-col span="16">
+                    <a
+                      class="hv-link"
+                      @click="$router.push(`/homepage/${(item as any).userId}/${(item as any).nickname}`)"
+                    >
+                      {{ (item as any).nickname }}
+                    </a>
+                  </van-col>
+                  <van-col span="8">
+                    <van-tag plain type="primary">{{ (item as any).fansCount }}</van-tag>
+                  </van-col>
+                </van-row>
+                <van-row>
+                  <van-col span="24" class="hv-sign">
+                    签名:{{ (item as any).description || '这家伙很懒什么也没留下' }}
+                  </van-col>
+                </van-row>
+              </van-col>
+            </van-row>
+          </div>
+        </template>
+      </van-cell>
     </van-list>
-  </div>
+    <van-back-top />
+  </van-pull-refresh>
 </template>
 
 <style scoped>
-.follow-view {
-  min-height: 100vh;
-  background: #f7f8fa;
+.card {
+  text-align: center;
+  padding: 0;
 }
-
-.input-group {
-  margin: 12px;
-}
-
-.load-btn {
-  margin: 12px;
-}
-
-.list-section {
-  margin-top: 12px;
+.hv-link {
+  color: #29253b;
+  text-decoration: none;
+  cursor: pointer;
+  color: #505050;
 }
 </style>

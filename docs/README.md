@@ -31,6 +31,7 @@ docs/
 | `01-登录功能实施方案.md` | v1.0.0 | 方案 | `plans/` | 登录功能完整方案 | 🏁 |
 | `02-功能新增与改善方案.md` | v1.0.0 | 方案 | `plans/` | 11 项新功能方案 | 📋 |
 | `03-配置代理地址功能方案.md` | v1.0.0 | 方案 | `plans/` | 首页+登录页代理地址配置 | 🏁 |
+| `04-参考haijiao-wxt界面布局方案.md` | v1.1.0 | 方案 | `plans/` | 参考 haijiao-wxt dev 分支布局调整 Web 界面 | 🏁 |
 | `01-架构概览.md` | v1.0.0 | 架构 | `architecture/` | 系统架构与请求链路 | 🏁 |
 | `01-API 参考.md` | v1.0.0 | 参考 | `references/` | 所有 API 端点定义 | 🏁 |
 | `02-数据字典.md` | v1.0.0 | 参考 | `references/` | 核心类型定义 | 🏁 |
@@ -103,6 +104,26 @@ docs/
 | 4 | `src/views/LoginView.vue` | 添加配置入口 + 对话框模板 | ✅ |
 | 5 | `src/views/HomeView.vue` | 添加配置入口 + 对话框模板 | ✅ |
 | 6 | 验证 | `vite build` 构建验证 | ✅ |
+
+### 04-参考haijiao-wxt界面布局方案
+
+| 阶段 | 步骤 | 操作 | 状态 |
+|:----:|:----:|:-----|:----:|
+| 一 | 1 | 补充 Topic/Comment 等类型定义 | ✅ |
+| 一 | 2 | 新增 `/hot`、`/homepage` 路由 | ✅ |
+| 一 | 3 | App.vue 添加 back-top + overlay + TabBar | ✅ |
+| 一 | 4 | 全局样式补充 utility classes | ✅ |
+| 二 | 5 | 创建 Topics 帖子列表组件 | ✅ |
+| 二 | 6 | 创建 UserInfo 用户信息卡片 | ✅ |
+| 二 | 7 | 创建 Comment 评论列表组件 | ✅ |
+| 二 | 8 | 创建 TopicContent 内容渲染组件 (IntersectionObserver) | ✅ |
+| 三 | 9 | 创建 HotTopicsView 热门列表页 | ✅ |
+| 三 | 10 | 重写 TopicView 帖子详情 | ✅ |
+| 三 | 11 | 创建 UserHomeView 用户主页 | ✅ |
+| 三 | 12 | 调整 FollowView 列表项样式 | ✅ |
+| 三 | 13 | 调整 SearchView 列表项样式 | ✅ |
+| 三 | 14 | 调整 SettingsView 添加用户信息 | ✅ |
+| 四 | 15 | 构建验证 | ✅ |
 
 ## 参考代码
 

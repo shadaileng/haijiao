@@ -175,6 +175,14 @@ async function loadVideoSrc(id: string, resourceId: string): Promise<any> {
   return result
 }
 
+// Hot topics API
+export async function getHotTopics(page: number, limit: number = 20): Promise<any> {
+  return request({
+    url: '/topic/hot/topics',
+    params: { page, limit },
+  })
+}
+
 // User/Follow APIs
 export async function getFollowList(token: string, uid: string): Promise<any[]> {
   return request({

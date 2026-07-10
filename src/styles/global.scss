@@ -52,3 +52,53 @@ body {
 .safe-area-bottom {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
+
+/* Layout utility classes (from haijiao-wxt) */
+.hv-text-start { text-align: left; }
+.hv-text-end { text-align: right; }
+.hv-text-center { text-align: center; }
+.hv-box-padding { padding: 1.5em; }
+.hv-box-padding-tb { padding: 1.5em 0; }
+.hv-box-padding-lt { padding: 0 1.5em; }
+.hv-pointer { cursor: pointer; }
+.hv-sign { font-size: 0.7rem; color: #a6a6a6; }
+.hv-center { display: flex; justify-content: center; align-items: center; }
+.hv-of-hidden { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.hv-nickname { color: #505050; font-weight: 500; }
+.hv-title { font-size: 1.2rem; font-weight: bold; color: #000; padding-bottom: 5px; }
+.hv-topic-state { text-align: left; font-size: 0.75rem; color: #969799; }
+.hv-user-icon { display: inline-block; vertical-align: middle; margin-right: 4px; }
+.hv-door-span { font-weight: bold; cursor: pointer; }
+
+/* Video overlay */
+.hv-video-div {
+  width: 100%;
+  position: relative;
+  cursor: pointer;
+}
+.hv-video-div::after {
+  content: '';
+  display: block;
+  padding-bottom: 56.25%;
+}
+.hv-video-container {
+  width: 90vw;
+  margin: auto;
+}
+.hv-img-view {
+  width: 90%;
+  margin: auto;
+}
+
+/* Content rendering */
+.content p { margin: 0; }
+.content img { width: 100%; height: auto; }
+
+/* Overlay wrapper */
+.overlay-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  overflow: scroll;
+}

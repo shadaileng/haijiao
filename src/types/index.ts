@@ -9,6 +9,56 @@ export interface FollowUser {
   nickname: string
 }
 
+export interface Page {
+  index: number
+  size: number
+  total: number
+}
+
+export interface TopicUser {
+  id: number
+  nickname: string
+  avatar: string
+}
+
+export interface Node {
+  nodeId: string
+  name: string
+  icon: string
+}
+
+export interface Attachment {
+  id: number
+  remoteUrl: string
+  category: string
+  status: number
+  coverUrl: string
+  video_time_length: number
+  keyPath: string
+}
+
+export interface Topic {
+  topicId: number
+  title: string
+  user: TopicUser | null
+  content: string
+  attachments: Attachment[]
+  likeCount: number
+  createTime: string
+  node: Node | null
+  commentCount: number
+  doors: number[]
+}
+
+export interface LiteTopic extends Topic {
+  liteContent: string
+}
+
+export interface LiteTopicPage {
+  results: LiteTopic[]
+  page: Page
+}
+
 export interface TopicItem {
   topicId: string
   id: string
@@ -61,6 +111,24 @@ export interface AttachmentItem {
   video_url?: string
   url?: string
   [key: string]: any
+}
+
+export interface CommentItem {
+  user_id: number
+  nickname: string
+  floor: number
+  avatar: string
+  attachments: string
+  certVideo: boolean
+  reply_id: number
+  create_time: string
+  content: string
+  commend_list: CommentItem[]
+}
+
+export interface CommentPage {
+  results: CommentItem[]
+  page: Page
 }
 
 export interface PaginationProps {

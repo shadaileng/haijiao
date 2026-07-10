@@ -45,83 +45,36 @@ onMounted(() => {
       <van-cell-group v-if="store.topicIds.length > 0" inset class="recent-group">
         <van-cell title="最近帖子" />
         <van-cell
-          v-for="pid in store.topicIds.slice(0, 5)"
-          :key="pid"
-          :title="pid"
-          is-link
-          to="/topic"
-        >
-          <template #right-icon><van-icon name="arrow" /></template>
-        </van-cell>
+          v-for="pid in store.topicIds.slice(0, 5)" :key="pid"
+          :title="pid" is-link to="/topic"
+        />
       </van-cell-group>
 
       <van-cell-group v-if="store.userIds.length > 0" inset class="recent-group">
         <van-cell title="最近用户" />
         <van-cell
-          v-for="uid in store.userIds.slice(0, 5)"
-          :key="uid"
-          :title="uid"
-          is-link
-          to="/user"
-        >
-          <template #right-icon><van-icon name="arrow" /></template>
-        </van-cell>
+          v-for="uid in store.userIds.slice(0, 5)" :key="uid"
+          :title="uid" is-link to="/user"
+        />
       </van-cell-group>
 
       <van-cell-group v-if="store.searchKeys.length > 0" inset class="recent-group">
         <van-cell title="最近搜索" />
         <van-cell
-          v-for="key in store.searchKeys.slice(0, 5)"
-          :key="key"
-          :title="key"
-          is-link
-        >
-          <template #right-icon><van-icon name="arrow" /></template>
-        </van-cell>
+          v-for="key in store.searchKeys.slice(0, 5)" :key="key" :title="key" is-link
+        />
       </van-cell-group>
     </div>
-
-    <van-tabbar v-model="active" @change="onTabChange" :fixed="true" :border="true" route>
-      <van-tabbar-item name="home" icon="wap-home" to="/">首页</van-tabbar-item>
-      <van-tabbar-item name="search" icon="search" to="/search">搜索</van-tabbar-item>
-      <van-tabbar-item name="user" icon="friends-o" to="/follow">关注</van-tabbar-item>
-      <van-tabbar-item name="settings" icon="setting-o" to="/settings">设置</van-tabbar-item>
-    </van-tabbar>
   </div>
 </template>
-
-<script lang="ts">
-import { ref } from 'vue'
-export default {
-  setup() {
-    const active = ref('home')
-    const onTabChange = (name: string) => {
-      active.value = name
-    }
-    return { active, onTabChange }
-  },
-}
-</script>
 
 <style scoped>
 .home-view {
   min-height: 100vh;
   background: #f7f8fa;
 }
-
-.content-area {
-  padding: 12px 0;
-}
-
-.status-group {
-  margin-bottom: 12px;
-}
-
-.feature-group {
-  margin-bottom: 12px;
-}
-
-.recent-group {
-  margin-bottom: 12px;
-}
+.content-area { padding: 12px 0; }
+.status-group { margin-bottom: 12px; }
+.feature-group { margin-bottom: 12px; }
+.recent-group { margin-bottom: 12px; }
 </style>
