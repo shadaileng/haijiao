@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { login } from '@/api/request'
 import { useProxyConfig } from '@/composables/useProxyConfig'
-import { Toast } from 'vant'
+import { showToast, showSuccessToast } from 'vant'
 
 const router = useRouter()
 const store = useUserStore()
@@ -17,11 +17,11 @@ const showPassword = ref(false)
 
 async function handleLogin() {
   if (!username.value.trim()) {
-    Toast('请输入邮箱或用户名')
+    showToast('请输入邮箱或用户名')
     return
   }
   if (!password.value) {
-    Toast('请输入密码')
+    showToast('请输入密码')
     return
   }
 
@@ -32,10 +32,10 @@ async function handleLogin() {
       password: password.value,
     })
     store.loginFromApi(data)
-    Toast.success('登录成功')
+    showSuccessToast('登录成功')
     router.replace('/')
   } catch (e: any) {
-    Toast(e.message || '登录失败')
+    showToast(e.message || '登录失败')
   } finally {
     loading.value = false
   }

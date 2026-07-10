@@ -7,6 +7,14 @@ function getProxyBase(): string {
   return store.proxyBase || '/api'
 }
 
+// Get full API prefix, appending /api when proxyBase is a full URL
+function getApiPrefix(): string {
+  const base = getProxyBase()
+  if (base === '/api') return base
+  if (base.startsWith('http')) return `${base}/api`
+  return base
+}
+
 // Get current API host from store
 function getApiHost(): string {
   const store = useUserStore()
@@ -15,7 +23,7 @@ function getApiHost(): string {
 
 // Build proxied URL using proxy base prefix
 function buildProxiedUrl(path: string, params?: Record<string, any>): string {
-  const url = `${getProxyBase()}${path}`
+  const url = `${getApiPrefix()}${path}`
   if (!params || Object.keys(params).length === 0) return url
   const search = new URLSearchParams()
   for (const [k, v] of Object.entries(params)) {
@@ -192,7 +200,7 @@ export async function searchTopics(key: string, page: number, nodeId: number = 0
 export async function login(params: LoginParams): Promise<LoginResponse> {
   const sign = generateSign(params.password)
 
-  const response = await fetch(`${getProxyBase()}/login/signin`, {
+  const response = await fetch(`${getApiPrefix()}/login/signin`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

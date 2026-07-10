@@ -3,7 +3,7 @@ import { ref, onMounted, watch, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { getTopic, getTopicAttachments } from '@/api/request'
-import { Toast } from 'vant'
+import { showToast, showSuccessToast } from 'vant'
 
 const route = useRoute()
 const router = useRouter()
@@ -47,7 +47,7 @@ async function loadTopic(topicPid: string) {
 
     const data = await getTopic(topicPid)
     if (!data) {
-      Toast('获取帖子失败')
+      showToast('获取帖子失败')
       return
     }
 
@@ -60,7 +60,7 @@ async function loadTopic(topicPid: string) {
 
     await loadAttachments(topicPid)
   } catch (error: any) {
-    Toast(error.message || '加载失败')
+    showToast(error.message || '加载失败')
   } finally {
     loading.value = false
   }
@@ -79,7 +79,7 @@ async function loadAttachments(topicPid: string) {
 function openImages() {
   const imageItems = attachments.value.filter((a: any) => a.category === 'images')
   if (imageItems.length === 0) {
-    Toast('没有图片资源')
+    showToast('没有图片资源')
     return
   }
   router.push({ path: '/images', query: { items: JSON.stringify(imageItems) } })
@@ -102,7 +102,7 @@ function openAttachment(item: any) {
 
 function copyText(text: string) {
   navigator.clipboard.writeText(text).then(() => {
-    Toast.success('已复制')
+    showSuccessToast('已复制')
   })
 }
 </script>

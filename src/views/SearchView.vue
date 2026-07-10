@@ -3,7 +3,7 @@ import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { searchTopics } from '@/api/request'
-import { Toast } from 'vant'
+import { showToast, showSuccessToast } from 'vant'
 
 const route = useRoute()
 const router = useRouter()
@@ -34,7 +34,7 @@ watch(searchKey, (newKey) => {
 
 async function doSearch() {
   if (!searchKey.value.trim()) {
-    Toast('请输入搜索关键字')
+    showToast('请输入搜索关键字')
     return
   }
 
@@ -42,7 +42,7 @@ async function doSearch() {
   try {
     const data = await searchTopics(searchKey.value, pageNum.value)
     if (!data?.results) {
-      Toast('未找到相关内容')
+      showToast('未找到相关内容')
       finished.value = true
       return
     }
@@ -61,7 +61,7 @@ async function doSearch() {
     const total = data.page?.total || 0
     finished.value = topicList.value.length >= total
   } catch (error: any) {
-    Toast(error.message || '搜索失败')
+    showToast(error.message || '搜索失败')
   } finally {
     loading.value = false
   }
@@ -80,7 +80,7 @@ function goToTopic(pid: string) {
 
 function copyText(text: string) {
   navigator.clipboard.writeText(text).then(() => {
-    Toast.success('已复制')
+    showSuccessToast('已复制')
   })
 }
 </script>

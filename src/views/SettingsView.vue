@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
-import { Toast, showDialog } from 'vant'
+import { showToast, showSuccessToast, showDialog } from 'vant'
 
 const router = useRouter()
 const store = useUserStore()
@@ -19,20 +19,20 @@ onMounted(() => {
 
 function save() {
   if (!uid.value) {
-    Toast('UID不能为空')
+    showToast('UID不能为空')
     return
   }
   if (!token.value) {
-    Toast('Token不能为空')
+    showToast('Token不能为空')
     return
   }
   if (!apiBase.value) {
-    Toast('数据源不能为空')
+    showToast('数据源不能为空')
     return
   }
   store.setCredentials(uid.value, token.value)
   store.setApiBase(apiBase.value)
-  Toast.success('保存成功')
+  showSuccessToast('保存成功')
   router.back()
 }
 
@@ -42,7 +42,7 @@ function clear() {
   apiBase.value = 'haijiao.com'
   store.setCredentials('', '')
   store.setApiBase('haijiao.com')
-  Toast.success('已清除')
+  showSuccessToast('已清除')
 }
 
 function handleLogout() {
@@ -54,7 +54,7 @@ function handleLogout() {
     store.logout()
     uid.value = ''
     token.value = ''
-    Toast.success('已退出')
+    showSuccessToast('已退出')
   }).catch(() => {})
 }
 

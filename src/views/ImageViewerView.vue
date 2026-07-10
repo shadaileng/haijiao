@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { Toast } from 'vant'
+import { showToast } from 'vant'
 
 const route = useRoute()
 const imageUrl = ref('')
@@ -12,7 +12,7 @@ onMounted(() => {
   if (url) {
     imageUrl.value = url
   } else {
-    Toast('没有图片URL')
+    showToast('没有图片URL')
     history.back()
   }
 })

@@ -1,6 +1,6 @@
 import { ref, computed } from 'vue'
 import { useUserStore } from '@/stores/user'
-import { Toast } from 'vant'
+import { showSuccessToast } from 'vant'
 
 export function useProxyConfig() {
   const store = useUserStore()
@@ -17,7 +17,7 @@ export function useProxyConfig() {
   function saveConfig() {
     store.setProxyBase(proxyUrl.value)
     showDialog.value = false
-    Toast.success('代理地址已更新')
+    showSuccessToast('代理地址已更新')
   }
 
   return { showDialog, proxyUrl, proxyDisplay, openConfig, saveConfig }

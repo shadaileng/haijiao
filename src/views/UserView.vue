@@ -3,7 +3,7 @@ import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { getUserTopics } from '@/api/request'
-import { Toast } from 'vant'
+import { showToast, showSuccessToast } from 'vant'
 
 const route = useRoute()
 const router = useRouter()
@@ -35,7 +35,7 @@ watch(userId, (newId) => {
 
 async function loadUserTopics() {
   if (!userId.value) {
-    Toast('请输入用户ID')
+    showToast('请输入用户ID')
     return
   }
 
@@ -43,7 +43,7 @@ async function loadUserTopics() {
   try {
     const data = await getUserTopics(userId.value, pageNum.value, pageSize)
     if (!data?.results) {
-      Toast('获取数据失败')
+      showToast('获取数据失败')
       finished.value = true
       return
     }
@@ -62,7 +62,7 @@ async function loadUserTopics() {
     const total = data.page?.total || 0
     finished.value = topicList.value.length >= total
   } catch (error: any) {
-    Toast(error.message || '加载失败')
+    showToast(error.message || '加载失败')
   } finally {
     loading.value = false
   }
@@ -85,7 +85,7 @@ function openTopic(pid: string) {
 
 function copyText(text: string) {
   navigator.clipboard.writeText(text).then(() => {
-    Toast.success('已复制')
+    showSuccessToast('已复制')
   })
 }
 </script>

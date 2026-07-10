@@ -3,7 +3,7 @@ import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { getFollowList } from '@/api/request'
-import { Toast } from 'vant'
+import { showToast, showSuccessToast } from 'vant'
 
 const route = useRoute()
 const router = useRouter()
@@ -34,7 +34,7 @@ watch(uid, (newUid) => {
 
 async function loadFollow() {
   if (!uid.value || !token.value) {
-    Toast('请先在设置中填写UID和Token')
+    showToast('请先在设置中填写UID和Token')
     return
   }
 
@@ -42,14 +42,14 @@ async function loadFollow() {
   try {
     const data = await getFollowList(token.value, uid.value)
     if (!data || !Array.isArray(data)) {
-      Toast('获取关注列表失败')
+      showToast('获取关注列表失败')
       return
     }
 
     followList.value = data
     store.cacheFollow(uid.value, data)
   } catch (error: any) {
-    Toast(error.message || '加载失败')
+    showToast(error.message || '加载失败')
   } finally {
     loading.value = false
   }
@@ -65,7 +65,7 @@ function openUserProfile(userId: string) {
 
 function copyText(text: string) {
   navigator.clipboard.writeText(text).then(() => {
-    Toast.success('已复制')
+    showSuccessToast('已复制')
   })
 }
 </script>
