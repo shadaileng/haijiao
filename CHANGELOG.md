@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.1] - 2026-07-10
+
+### Fixed
+
+- 图片加载改为走代理地址：`v-headicon` 指令通过 `getApiPrefix()` + `customDecode()` 解码加载，不再直连源站
+
+### Changed
+
+- 提取 `customDecode` / `fetchImageThroughProxy` 到 `src/utils/image.ts` 共享工具
+- `request.ts` 的 `processImages` 复用了相同的代理+解码逻辑
+
 ## [1.6.0] - 2026-07-10
 
 ### Added

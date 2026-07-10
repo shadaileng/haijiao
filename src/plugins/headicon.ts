@@ -1,4 +1,5 @@
 import type { App } from 'vue'
+import { fetchImageThroughProxy } from '@/utils/image'
 
 const LOADING_URL = 'https://haijiao.com/images/common/project/loading.gif'
 
@@ -6,11 +7,29 @@ const observer = new IntersectionObserver((entries) => {
   entries.forEach((entry) => {
     if (entry.isIntersecting) {
       const img = entry.target as HTMLImageElement
-      if (img.dataset.src) {
+      if (img.dataset.src && img.dataset.lazy !== 'loaded') {
         const url = img.dataset.src
-        img.src = url.startsWith('http') ? url + '.txt' : url
-        img.dataset.lazy = 'loaded'
-        observer.unobserve(img)
+        if (url.startsWith('http')) {
+          fetchImageThroughProxy(url)
+            .then((dataUri) => {
+              if (dataUri) {
+                img.src = dataUri
+              } else {
+                img.src = url + '.txt'
+              }
+              img.dataset.lazy = 'loaded'
+              observer.unobserve(img)
+            })
+            .catch(() => {
+              img.src = url + '.txt'
+              img.dataset.lazy = 'loaded'
+              observer.unobserve(img)
+            })
+        } else {
+          img.src = url
+          img.dataset.lazy = 'loaded'
+          observer.unobserve(img)
+        }
       }
     }
   })
