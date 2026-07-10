@@ -14,14 +14,11 @@ const observer = new IntersectionObserver((entries) => {
             .then((dataUri) => {
               if (dataUri) {
                 img.src = dataUri
-              } else {
-                img.src = url + '.txt'
               }
               img.dataset.lazy = 'loaded'
               observer.unobserve(img)
             })
             .catch(() => {
-              img.src = url + '.txt'
               img.dataset.lazy = 'loaded'
               observer.unobserve(img)
             })

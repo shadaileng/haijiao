@@ -37,8 +37,11 @@ function getPathFromUrl(url: string): string {
 export async function fetchImageThroughProxy(imageUrl: string): Promise<string> {
   const prefix = getApiPrefix()
   const path = getPathFromUrl(imageUrl)
-  const proxyUrl = `${prefix}${path}`
+  // Append .txt suffix to fetch the encoded text version of the image
+  const encodedPath = path.endsWith('.txt') ? path : path + '.txt'
+  const proxyUrl = `${prefix}${encodedPath}`
   const response = await fetch(proxyUrl)
+  if (!response.ok) return ''
   const text = await response.text()
   if (!text) return ''
 
