@@ -25,7 +25,7 @@ defineProps<{
           width="4rem"
           height="4rem"
           :src="LOADING_URL"
-          v-headicon="userInfo?.avatar"
+          v-headicon="userInfo?.avatar?.startsWith('http') ? userInfo?.avatar + '.txt' : userInfo?.avatar"
         />
       </van-col>
       <van-col span="16" class="hv-text-start">

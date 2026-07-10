@@ -102,7 +102,7 @@ defineExpose({ startLoad, endLoad })
                   height="1rem"
                   :src="LOADING_URL"
                   class="hv-user-icon"
-                  v-headicon="item.user?.avatar"
+                  v-headicon="item.user?.avatar?.startsWith('http') ? item.user?.avatar + '.txt' : item.user?.avatar"
                 />
                 <span>{{ item.user?.nickname }}</span>
               </van-col>

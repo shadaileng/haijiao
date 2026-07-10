@@ -11,13 +11,7 @@ export default defineConfig({
   },
   server: {
     port: 3000,
-    proxy: {
-      '/api': {
-        target: 'https://haijiao.com',
-        changeOrigin: true,
-        secure: true,
-      },
-    },
+    host: '0.0.0.0',
   },
   build: {
     rollupOptions: {

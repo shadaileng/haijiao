@@ -94,7 +94,7 @@ const loadTopic = async (topicPid: string) => {
           width="3rem"
           height="3rem"
           :src="LOADING_URL"
-          v-headicon="topicLocal.user?.avatar"
+          v-headicon="topicLocal.user?.avatar?.startsWith('http') ? topicLocal.user?.avatar + '.txt' : topicLocal.user?.avatar"
         />
       </van-col>
       <van-col span="16" class="hv-text-start">

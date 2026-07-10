@@ -51,6 +51,10 @@ const loadComments = async (index: number) => {
     finished.value = true
   }
 }
+
+const handleClick = (params: any) => {
+  console.log('handleClick:', params)
+}
 </script>
 
 <template>
@@ -71,7 +75,7 @@ const loadComments = async (index: number) => {
                     width="3rem"
                     height="3rem"
                     :src="LOADING_URL"
-                    v-headicon="item.avatar"
+                    v-headicon="item.avatar?.startsWith('http') ? item.avatar + '.txt' : item.avatar"
                   />
                 </van-col>
                 <van-col span="16" class="hv-text-start">
@@ -93,7 +97,14 @@ const loadComments = async (index: number) => {
 
           </van-row>
           <van-row>
-            <div class="content" v-html="item.content"></div>
+            <div
+              class="content"
+              v-content="{
+                content: item.content,
+                attachments: item.attachments,
+                handleClick,
+              }"
+            ></div>
           </van-row>
           <van-row>
             <div class="commend_list" v-if="item.commend_list?.length > 0">

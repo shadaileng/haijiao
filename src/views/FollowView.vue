@@ -79,7 +79,7 @@ const filterItems = () => {
                   width="4rem"
                   height="4rem"
                   :src="LOADING_URL"
-                  v-headicon="(item as any).avatar"
+                  v-headicon="((item as any).avatar?.startsWith('http') ? (item as any).avatar + '.txt' : (item as any).avatar)"
                 />
               </van-col>
               <van-col span="16" class="hv-text-start">

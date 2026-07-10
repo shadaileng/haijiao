@@ -97,7 +97,7 @@ const pageto = (index: number) => {
                   <van-image
                     width="80" height="80" fit="cover" radius="5"
                     :src="LOADING_URL"
-                    v-headicon="attach.remoteUrl || attach.coverUrl"
+                    v-headicon="(attach.remoteUrl || attach.coverUrl)?.startsWith('http') ? (attach.remoteUrl || attach.coverUrl) + '.txt' : (attach.remoteUrl || attach.coverUrl)"
                   />
                 </van-col>
               </van-row>
@@ -116,7 +116,7 @@ const pageto = (index: number) => {
                   <van-image
                     width="80" height="80" fit="cover" radius="5"
                     :src="LOADING_URL"
-                    v-headicon="item.attachments[0].remoteUrl || item.attachments[0].coverUrl"
+                    v-headicon="(item.attachments[0].remoteUrl || item.attachments[0].coverUrl)?.startsWith('http') ? (item.attachments[0].remoteUrl || item.attachments[0].coverUrl) + '.txt' : (item.attachments[0].remoteUrl || item.attachments[0].coverUrl)"
                   />
                 </van-col>
               </van-row>

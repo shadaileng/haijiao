@@ -1,5 +1,6 @@
 import type { App } from 'vue'
 import { fetchImageThroughProxy } from '@/utils/image'
+import { useUserStore } from '@/stores/user'
 
 const LOADING_URL = 'https://haijiao.com/images/common/project/loading.gif'
 
@@ -45,8 +46,14 @@ export default {
           img.dataset.lazy = 'loading'
           observer.observe(img)
         } else {
-          img.src = binding.value
-          img.dataset.lazy = 'loaded'
+          const store = useUserStore()
+          const baseUrl = store.proxyBase || 'https://haijiao.com'
+          const extension = binding.value === '-1' ? '.png' : '.jpg'
+          img.src = `${baseUrl}/imgs/headicon/${binding.value}${extension}`
+          img.dataset.lazy = 'loading'
+          img.onload = () => {
+            img.dataset.lazy = 'loaded'
+          }
         }
       },
     })
