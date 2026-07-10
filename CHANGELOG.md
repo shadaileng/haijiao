@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- 图片代理 URL 去掉 `/api` 前缀：新增 `getImageBase()` 函数从 proxyBase 推导静态资源路径，`fetchImageThroughProxy` 用其对图片发请求，不再走 302 后 404 的错误路径
+- `fetchImageThroughProxy` 直接使用 `remoteUrl` 原值 + `.txt` 后缀 fetch + customDecode，不再做路径解构和代理前缀拼装
 
 ## [1.6.1] - 2026-07-10
 

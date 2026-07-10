@@ -1,13 +1,3 @@
-import { useUserStore } from '@/stores/user'
-
-function getImageBase(): string {
-  const store = useUserStore()
-  const base = store.proxyBase || '/api'
-  if (base === '/api') return ''
-  if (base.endsWith('/api')) return base.slice(0, -4)
-  return base
-}
-
 export function customDecode(str: string): string {
   let decoded = str
   decoded = decoded.replace(/[^A-Za-z0-9\*\#]/g, '')
@@ -25,21 +15,9 @@ export function customDecode(str: string): string {
   return result
 }
 
-function getPathFromUrl(url: string): string {
-  try {
-    const parsed = new URL(url)
-    return parsed.pathname + parsed.search
-  } catch {
-    return url.startsWith('/') ? url : '/' + url
-  }
-}
-
 export async function fetchImageThroughProxy(imageUrl: string): Promise<string> {
-  const imageBase = getImageBase()
-  const path = getPathFromUrl(imageUrl)
-  const encodedPath = path.endsWith('.txt') ? path : path + '.txt'
-  const proxyUrl = `${imageBase}${encodedPath}`
-  const response = await fetch(proxyUrl)
+  const url = imageUrl.endsWith('.txt') ? imageUrl : imageUrl + '.txt'
+  const response = await fetch(url)
   if (!response.ok) return ''
   const text = await response.text()
   if (!text) return ''
