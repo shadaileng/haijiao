@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2026-07-10
+
+### Changed
+
+- 代理地址统一接管 API 和资源请求：`getApiHost()` 从 `proxyBase` 推导域名，资源直链自动跟随代理地址
+- 设置页新增代理地址配置入口，替换原有的"数据源"字段
+- 首页移除代理地址配置入口（迁移至设置页）
+
+### Removed
+
+- 移除 Store 中 `apiBase` 状态和 `setApiBase()` 方法，取消独立的数据源配置
+
 ## [1.4.2] - 2026-07-10
 
 ### Fixed

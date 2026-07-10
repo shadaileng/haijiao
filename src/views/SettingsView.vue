@@ -1,20 +1,27 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
-import { showToast, showSuccessToast, showDialog } from 'vant'
+import { useProxyConfig } from '@/composables/useProxyConfig'
+import { showToast, showSuccessToast, showDialog as showConfirmDialog } from 'vant'
 
 const router = useRouter()
 const store = useUserStore()
+const { showDialog: proxyDialog, proxyUrl, proxyDisplay, openConfig, saveConfig } = useProxyConfig()
 
 const uid = ref(store.uid || '')
 const token = ref(store.token || '')
-const apiBase = ref(store.apiBase || 'haijiao.com')
 
 onMounted(() => {
   uid.value = store.uid
   token.value = store.token
-  apiBase.value = store.apiBase
+})
+
+const sourceUrl = computed(() => {
+  if (store.proxyBase && store.proxyBase.startsWith('http')) {
+    return store.proxyBase
+  }
+  return 'https://haijiao.com'
 })
 
 function save() {
@@ -26,12 +33,7 @@ function save() {
     showToast('Token不能为空')
     return
   }
-  if (!apiBase.value) {
-    showToast('数据源不能为空')
-    return
-  }
   store.setCredentials(uid.value, token.value)
-  store.setApiBase(apiBase.value)
   showSuccessToast('保存成功')
   router.back()
 }
@@ -39,14 +41,16 @@ function save() {
 function clear() {
   uid.value = ''
   token.value = ''
-  apiBase.value = 'haijiao.com'
   store.setCredentials('', '')
-  store.setApiBase('haijiao.com')
   showSuccessToast('已清除')
 }
 
+function viewSource() {
+  window.open(sourceUrl.value, '_blank')
+}
+
 function handleLogout() {
-  showDialog({
+  showConfirmDialog({
     title: '退出登录',
     message: '确定要退出登录吗？',
     showCancelButton: true,
@@ -56,10 +60,6 @@ function handleLogout() {
     token.value = ''
     showSuccessToast('已退出')
   }).catch(() => {})
-}
-
-function viewSource() {
-  window.open(`https://${apiBase.value}`, '_blank')
 }
 </script>
 
@@ -92,10 +92,18 @@ function viewSource() {
     </van-cell-group>
 
     <van-cell-group inset class="setting-group">
-      <van-cell title="高级配置" label="手动设置 UID、Token 和数据源" />
+      <van-cell title="高级配置" label="手动设置 UID 和 Token" />
       <van-field v-model="uid" label="UID" placeholder="输入用户ID" clearable />
       <van-field v-model="token" label="Token" placeholder="输入登录Token" type="password" clearable />
-      <van-field v-model="apiBase" label="数据源" placeholder="例如: haijiao.com" clearable />
+    </van-cell-group>
+
+    <van-cell-group inset class="proxy-group">
+      <van-cell
+        title="代理地址"
+        :value="proxyDisplay"
+        is-link
+        @click="openConfig"
+      />
     </van-cell-group>
 
     <van-button type="primary" block round class="save-btn" @click="save">
@@ -107,12 +115,12 @@ function viewSource() {
     </van-button>
 
     <van-cell-group inset class="info-group">
-      <van-cell title="数据来源" :label="apiBase" is-link @click="viewSource" />
+      <van-cell title="数据来源" :label="sourceUrl" is-link @click="viewSource" />
       <van-cell title="使用说明">
         <template #label>
           <div class="tips-text">
             <p>1. 推荐使用登录功能自动获取认证信息</p>
-            <p>2. 也可在下方手动填写 UID、Token 和数据源</p>
+            <p>2. 也可在下方手动填写 UID、Token</p>
             <p>3. 在"关注"页面查看关注列表</p>
             <p>4. 在"首页"输入帖子ID查看帖子详情</p>
             <p>5. 在"搜索"页面搜索帖子</p>
@@ -120,6 +128,16 @@ function viewSource() {
         </template>
       </van-cell>
     </van-cell-group>
+
+    <van-dialog v-model:show="proxyDialog" title="配置代理地址" @confirm="saveConfig" show-cancel-button>
+      <van-field
+        v-model="proxyUrl"
+        placeholder="留空使用默认 /api"
+        clearable
+        label="地址"
+        label-width="50px"
+      />
+    </van-dialog>
   </div>
 </template>
 
@@ -140,6 +158,10 @@ function viewSource() {
 }
 
 .setting-group {
+  margin: 12px;
+}
+
+.proxy-group {
   margin: 12px;
 }
 

@@ -16,10 +16,15 @@ function getApiPrefix(): string {
   return base
 }
 
-// Get current API host from store
+// Derive API host from proxyBase (for direct resource URLs)
 function getApiHost(): string {
   const store = useUserStore()
-  return store.apiBase || 'haijiao.com'
+  if (store.proxyBase && store.proxyBase.startsWith('http')) {
+    try {
+      return new URL(store.proxyBase).hostname
+    } catch {}
+  }
+  return 'haijiao.com'
 }
 
 // Build proxied URL using proxy base prefix
