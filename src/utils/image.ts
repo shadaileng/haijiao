@@ -1,10 +1,10 @@
 import { useUserStore } from '@/stores/user'
 
-function getApiPrefix(): string {
+function getImageBase(): string {
   const store = useUserStore()
   const base = store.proxyBase || '/api'
-  if (base === '/api') return base
-  if (base.startsWith('http')) return `${base}/api`
+  if (base === '/api') return ''
+  if (base.endsWith('/api')) return base.slice(0, -4)
   return base
 }
 
@@ -35,11 +35,10 @@ function getPathFromUrl(url: string): string {
 }
 
 export async function fetchImageThroughProxy(imageUrl: string): Promise<string> {
-  const prefix = getApiPrefix()
+  const imageBase = getImageBase()
   const path = getPathFromUrl(imageUrl)
-  // Append .txt suffix to fetch the encoded text version of the image
   const encodedPath = path.endsWith('.txt') ? path : path + '.txt'
-  const proxyUrl = `${prefix}${encodedPath}`
+  const proxyUrl = `${imageBase}${encodedPath}`
   const response = await fetch(proxyUrl)
   if (!response.ok) return ''
   const text = await response.text()
