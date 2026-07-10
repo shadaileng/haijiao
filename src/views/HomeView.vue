@@ -2,12 +2,14 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
+import { useProxyConfig } from '@/composables/useProxyConfig'
 import { Toast } from 'vant'
 
 const router = useRouter()
 const store = useUserStore()
 const isLoggedIn = ref(store.isLoggedIn)
 const nickname = ref(store.nickname)
+const { showDialog, proxyUrl, proxyDisplay, openConfig, saveConfig } = useProxyConfig()
 
 onMounted(() => {
   isLoggedIn.value = store.isLoggedIn
@@ -41,6 +43,15 @@ onMounted(() => {
           <van-grid-item icon="friends-o" text="关注列表" to="/follow" />
           <van-grid-item icon="user-o" text="用户帖子" to="/user" />
         </van-grid>
+      </van-cell-group>
+
+      <van-cell-group inset class="proxy-group">
+        <van-cell
+          title="代理地址"
+          :value="proxyDisplay"
+          is-link
+          @click="openConfig"
+        />
       </van-cell-group>
 
       <van-cell-group v-if="store.topicIds.length > 0" inset class="recent-group">
@@ -82,6 +93,16 @@ onMounted(() => {
       </van-cell-group>
     </div>
 
+    <van-dialog v-model:show="showDialog" title="配置代理地址" @confirm="saveConfig" show-cancel-button>
+      <van-field
+        v-model="proxyUrl"
+        placeholder="留空使用默认 /api"
+        clearable
+        label="地址"
+        label-width="50px"
+      />
+    </van-dialog>
+
     <van-tabbar v-model="active" @change="onTabChange" :fixed="true" :border="true" route>
       <van-tabbar-item name="home" icon="wap-home" to="/">首页</van-tabbar-item>
       <van-tabbar-item name="search" icon="search" to="/search">搜索</van-tabbar-item>
@@ -119,6 +140,10 @@ export default {
 }
 
 .feature-group {
+  margin-bottom: 12px;
+}
+
+.proxy-group {
   margin-bottom: 12px;
 }
 

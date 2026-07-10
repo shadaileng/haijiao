@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-07-10
+
+### Added
+
+- 首页和登录页新增代理地址配置功能
+- 可自定义 API 请求代理地址，默认使用 `/api`
+- `useProxyConfig()` composable 封装代理配置逻辑
+
+### Changed
+
+- `request.ts` 中 `API_BASE` 由硬编码改为动态读取 `store.proxyBase`
+- Store 新增 `proxyBase` 状态及 `setProxyBase()` 方法，持久化到 localStorage
+
 ## [1.3.0] - 2026-07-09
 
 ### Added

@@ -1,7 +1,11 @@
 import type { ApiResult, LoginParams, LoginResponse } from '@/types'
 import { useUserStore } from '@/stores/user'
 
-const API_BASE = '/api'
+// Get proxy base URL from store, fallback to /api
+function getProxyBase(): string {
+  const store = useUserStore()
+  return store.proxyBase || '/api'
+}
 
 // Get current API host from store
 function getApiHost(): string {
@@ -9,9 +13,9 @@ function getApiHost(): string {
   return store.apiBase || 'haijiao.com'
 }
 
-// Build proxied URL using /api prefix
+// Build proxied URL using proxy base prefix
 function buildProxiedUrl(path: string, params?: Record<string, any>): string {
-  const url = `${API_BASE}${path}`
+  const url = `${getProxyBase()}${path}`
   if (!params || Object.keys(params).length === 0) return url
   const search = new URLSearchParams()
   for (const [k, v] of Object.entries(params)) {
@@ -188,7 +192,7 @@ export async function searchTopics(key: string, page: number, nodeId: number = 0
 export async function login(params: LoginParams): Promise<LoginResponse> {
   const sign = generateSign(params.password)
 
-  const response = await fetch(`${API_BASE}/login/signin`, {
+  const response = await fetch(`${getProxyBase()}/login/signin`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

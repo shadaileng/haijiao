@@ -20,6 +20,7 @@ export const useUserStore = defineStore('user', () => {
   const token = ref('')
   const nickname = ref('')
   const apiBase = ref('haijiao.com')
+  const proxyBase = ref('')
   const followMap = ref<Record<string, FollowUser[]>>({})
   const topicIds = ref<string[]>([])
   const topicCache = ref<Record<string, any>>({})
@@ -39,6 +40,7 @@ export const useUserStore = defineStore('user', () => {
         token.value = data.token || ''
         nickname.value = data.nickname || ''
         apiBase.value = data.apiBase || 'haijiao.com'
+        proxyBase.value = data.proxyBase || ''
       }
       const topicRaw = localStorage.getItem('haijiao_topic')
       if (topicRaw) {
@@ -74,6 +76,7 @@ export const useUserStore = defineStore('user', () => {
       token: token.value,
       nickname: nickname.value,
       apiBase: apiBase.value,
+      proxyBase: proxyBase.value,
     }))
   }
 
@@ -115,6 +118,11 @@ export const useUserStore = defineStore('user', () => {
     saveUser()
   }
 
+  function setProxyBase(url: string) {
+    proxyBase.value = url
+    saveUser()
+  }
+
   function loginFromApi(data: LoginResponse) {
     uid.value = String(data.user.id)
     token.value = data.token
@@ -133,6 +141,7 @@ export const useUserStore = defineStore('user', () => {
     uid.value = ''
     token.value = ''
     nickname.value = ''
+    proxyBase.value = ''
     saveUser()
   }
 
@@ -180,10 +189,10 @@ export const useUserStore = defineStore('user', () => {
   loadFromStorage()
 
   return {
-    uid, token, nickname, apiBase, followMap, topicIds, topicCache,
+    uid, token, nickname, apiBase, proxyBase, followMap, topicIds, topicCache,
     userIds, userTopicsCache, searchKeys, searchTopicsCache,
     isLoggedIn,
-    setCredentials, setApiBase, loginFromApi, logout, addTopicId, cacheTopic, addUserUid,
+    setCredentials, setApiBase, setProxyBase, loginFromApi, logout, addTopicId, cacheTopic, addUserUid,
     cacheUserTopics, addSearchKey, cacheSearchTopics, cacheFollow,
   }
 })

@@ -8,7 +8,8 @@ docs/
 ├── _template.md                     # 文档创建模板
 ├── plans/                           # 方案类（待执行 → 已完成）
 │   ├── 01-登录功能实施方案.md
-│   └── 02-功能新增与改善方案.md
+│   ├── 02-功能新增与改善方案.md
+│   └── 03-配置代理地址功能方案.md
 ├── architecture/                    # 架构类（持续维护）
 │   └── 01-架构概览.md
 ├── references/                      # 参考类（持续维护）
@@ -29,6 +30,7 @@ docs/
 | `_template.md` | v1.0.0 | 模板 | `./` | 文档创建模板 | 🏁 |
 | `01-登录功能实施方案.md` | v1.0.0 | 方案 | `plans/` | 登录功能完整方案 | 🏁 |
 | `02-功能新增与改善方案.md` | v1.0.0 | 方案 | `plans/` | 11 项新功能方案 | 📋 |
+| `03-配置代理地址功能方案.md` | v1.0.0 | 方案 | `plans/` | 首页+登录页代理地址配置 | 🏁 |
 | `01-架构概览.md` | v1.0.0 | 架构 | `architecture/` | 系统架构与请求链路 | 🏁 |
 | `01-API 参考.md` | v1.0.0 | 参考 | `references/` | 所有 API 端点定义 | 🏁 |
 | `02-数据字典.md` | v1.0.0 | 参考 | `references/` | 核心类型定义 | 🏁 |
@@ -90,6 +92,17 @@ docs/
 | 第三波 | 视频内联播放器 | P2 | ⬜ 未开始 |
 | 第三波 | VIP 信息展示 | P2 | ⬜ 未开始 |
 | 第三波 | 注册/找回密码 | P2 | ⬜ 未开始 |
+
+### 03-配置代理地址功能方案
+
+| 步骤 | 文件 | 操作 | 状态 |
+|:----:|:-----|:-----|:----:|
+| 1 | `src/stores/user.ts` | 新增 proxyBase 状态 + setProxyBase() | ✅ |
+| 2 | `src/api/request.ts` | API_BASE 硬编码改为动态 getProxyBase() | ✅ |
+| 3 | `src/composables/useProxyConfig.ts` | 新增 composable 封装共享逻辑 | ✅ |
+| 4 | `src/views/LoginView.vue` | 添加配置入口 + 对话框模板 | ✅ |
+| 5 | `src/views/HomeView.vue` | 添加配置入口 + 对话框模板 | ✅ |
+| 6 | 验证 | `vite build` 构建验证 | ✅ |
 
 ## 参考代码
 

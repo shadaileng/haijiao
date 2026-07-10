@@ -3,10 +3,12 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { login } from '@/api/request'
+import { useProxyConfig } from '@/composables/useProxyConfig'
 import { Toast } from 'vant'
 
 const router = useRouter()
 const store = useUserStore()
+const { showDialog, proxyUrl, proxyDisplay, openConfig, saveConfig } = useProxyConfig()
 
 const username = ref('')
 const password = ref('')
@@ -105,10 +107,28 @@ function goToSettings() {
         手动配置 UID / Token
       </van-button>
 
+      <van-cell
+        title="代理地址"
+        :value="proxyDisplay"
+        is-link
+        class="proxy-cell"
+        @click="openConfig"
+      />
+
       <div class="tips">
         <p>如已有 UID 和 Token，可跳过登录直接手动配置</p>
       </div>
     </div>
+
+    <van-dialog v-model:show="showDialog" title="配置代理地址" @confirm="saveConfig" show-cancel-button>
+      <van-field
+        v-model="proxyUrl"
+        placeholder="留空使用默认 /api"
+        clearable
+        label="地址"
+        label-width="50px"
+      />
+    </van-dialog>
   </div>
 </template>
 
