@@ -9,6 +9,7 @@
 | **帖子详情** | 输入帖子 ID 查看帖子内容、附件和资源 |
 | **搜索帖子** | 按关键字搜索帖子，支持分页浏览 |
 | **用户帖子** | 输入用户 ID 查看该用户发布的所有帖子 |
+| **用户登录** | 支持邮箱/用户名 + 密码登录，自动获取认证信息 |
 | **关注列表** | 输入 UID 和 Token 加载关注用户列表 |
 | **图片查看** | 全屏查看帖子中的图片资源 |
 | **离线缓存** | 本地存储缓存帖子、用户和搜索记录 |
@@ -58,11 +59,15 @@ haijiao/
 │   │   ├── UserView.vue    # 用户帖子页
 │   │   ├── FollowView.vue  # 关注列表页
 │   │   ├── SearchView.vue  # 搜索页
+│   │   ├── LoginView.vue   # 登录页
 │   │   ├── SettingsView.vue # 设置页
 │   │   └── ImageViewerView.vue # 图片查看页
 │   └── router/            # 路由配置
 │       └── index.ts        # 路由定义
 └── dist/                  # 构建产物
+└── docs/                  # 项目文档
+    ├── login-feature-plan.md  # 登录功能实现计划
+    └── reference/         # 参考资料
 ```
 
 ## API 接口
@@ -76,6 +81,7 @@ haijiao/
 | `/api/user/favorite/users` | GET | 获取关注列表 |
 | `/api/topic/node/topics` | GET | 获取用户帖子列表 |
 | `/api/topic/searchV2` | GET | 搜索帖子 |
+| `/api/login/signin` | POST | 用户登录 |
 
 ### 认证方式
 
@@ -85,6 +91,8 @@ haijiao/
 X-User-Id: {uid}
 X-User-Token: {token}
 ```
+
+认证信息可通过登录接口（`POST /api/login/signin`）自动获取，也可在设置页面手动配置。
 
 ## 环境变量
 
@@ -148,6 +156,7 @@ npm run build
 - 使用 Pinia 进行状态管理
 - 使用 Vant 4 移动端组件库
 - CSS 使用 Tailwind CSS + SCSS 混合方案
+- 包管理器使用 pnpm
 
 ## 许可证
 

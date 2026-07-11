@@ -29,6 +29,42 @@ export default {
 };
 
 async function proxyApi(request: Request, env: Env): Promise<Response> {
+  const url = new URL(request.url);
+  
+  // 图片代理端点：用于获取 .txt 文件并解码
+  if (url.pathname === '/api/proxy-image') {
+    const targetUrl = url.searchParams.get('url');
+    if (!targetUrl) {
+      return Response.json({ success: false, message: 'Missing url parameter' }, { status: 400 });
+    }
+    
+    try {
+      const response = await fetch(targetUrl, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        },
+      });
+      
+      if (!response.ok) {
+        return Response.json({ success: false, message: 'Image fetch failed' }, { status: response.status });
+      }
+      
+      const text = await response.text();
+      return new Response(text, {
+        status: 200,
+        headers: {
+          'Content-Type': 'text/plain; charset=utf-8',
+          'Access-Control-Allow-Origin': '*',
+        },
+      });
+    } catch (error) {
+      return Response.json(
+        { success: false, message: 'Proxy error', error: String(error) },
+        { status: 502 }
+      );
+    }
+  }
+
   const apiUrl = `${env.HAIJIAO_API_BASE}${request.url.replace(`${new URL(request.url).origin}/api`, '')}`;
 
   const headers = new Headers(request.headers);

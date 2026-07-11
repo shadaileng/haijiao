@@ -1,17 +1,36 @@
+import { md5 } from 'js-md5'
 import type { ApiResult, LoginParams, LoginResponse } from '@/types'
 import { useUserStore } from '@/stores/user'
+import { fetchImageThroughProxy } from '@/utils/image'
 
-const API_BASE = '/api'
-
-// Get current API host from store
-function getApiHost(): string {
+// Get proxy base URL from store, fallback to /api
+function getProxyBase(): string {
   const store = useUserStore()
-  return store.apiBase || 'haijiao.com'
+  return store.proxyBase || '/api'
 }
 
-// Build proxied URL using /api prefix
+// Get full API prefix, appending /api when proxyBase is a full URL
+function getApiPrefix(): string {
+  const base = getProxyBase()
+  if (base === '/api') return base
+  if (base.startsWith('http')) return `${base}/api`
+  return base
+}
+
+// Derive API host from proxyBase (for direct resource URLs)
+function getApiHost(): string {
+  const store = useUserStore()
+  if (store.proxyBase && store.proxyBase.startsWith('http')) {
+    try {
+      return new URL(store.proxyBase).hostname
+    } catch {}
+  }
+  return 'haijiao.com'
+}
+
+// Build proxied URL using proxy base prefix
 function buildProxiedUrl(path: string, params?: Record<string, any>): string {
-  const url = `${API_BASE}${path}`
+  const url = `${getApiPrefix()}${path}`
   if (!params || Object.keys(params).length === 0) return url
   const search = new URLSearchParams()
   for (const [k, v] of Object.entries(params)) {
@@ -157,6 +176,14 @@ async function loadVideoSrc(id: string, resourceId: string): Promise<any> {
   return result
 }
 
+// Hot topics API
+export async function getHotTopics(page: number, limit: number = 20): Promise<any> {
+  return request({
+    url: '/topic/hot/topics',
+    params: { page, limit },
+  })
+}
+
 // User/Follow APIs
 export async function getFollowList(token: string, uid: string): Promise<any[]> {
   return request({
@@ -186,9 +213,9 @@ export async function searchTopics(key: string, page: number, nodeId: number = 0
 
 // Login API
 export async function login(params: LoginParams): Promise<LoginResponse> {
-  const sign = generateSign(params.password)
+  const sign = generateSign(params.username, params.password)
 
-  const response = await fetch(`${API_BASE}/login/signin`, {
+  const response = await fetch(`${getApiPrefix()}/login/signin`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -224,13 +251,8 @@ export async function login(params: LoginParams): Promise<LoginResponse> {
   return result
 }
 
-// TODO: 需要用户提供 Sign 生成算法
-// 当前传入的是密码的 MD5，但实际值不匹配
-// 需要确认：MD5(password)、MD5(password + salt)、还是其他算法
-function generateSign(password: string): string {
-  // 暂时直接返回空字符串，等待用户提供算法
-  // 实际使用时需要替换为正确的 Sign 生成逻辑
-  return password
+function generateSign(username: string, password: string): string {
+  return md5(username + password + navigator.userAgent)
 }
 
 // Image processing
@@ -238,36 +260,12 @@ export async function processImages(items: any[]): Promise<any[]> {
   const props = items.map(async (item: any) => {
     if (!item.remoteUrl) return item
     try {
-      const directUrl = buildDirectUrl(item.remoteUrl)
-      const resp = await fetch(directUrl)
-      const text = await resp.text()
-      if (!text) return item
-      const result = customDecode(text)
-      const base64Part = result.split('base64,')[1] || ''
-      return {
-        ...item,
-        remoteUrl: result.substring(0, result.length - base64Part.length % 4 || 0),
-      }
+      const dataUri = await fetchImageThroughProxy(item.remoteUrl)
+      if (!dataUri) return item
+      return { ...item, remoteUrl: dataUri }
     } catch {
       return item
     }
   })
   return Promise.all(props)
-}
-
-function customDecode(str: string): string {
-  let decoded = str
-  decoded = decoded.replace(/[^A-Za-z0-9\*\#]/g, '')
-  const chars = 'ABCD*EFGHIJKLMNOPQRSTUVWX#YZabcdefghijklmnopqrstuvwxyz1234567890'
-  let result = ''
-  let u = 0
-  while (u < decoded.length) {
-    const o = chars.indexOf(decoded.charAt(u++))
-    const r = chars.indexOf(decoded.charAt(u++))
-    const s = chars.indexOf(decoded.charAt(u++))
-    const c = chars.indexOf(decoded.charAt(u++))
-    result += String.fromCharCode((o << 2) | (r >> 4))
-    if (s !== 64) result += String.fromCharCode(((r & 3) << 6) | c)
-  }
-  return result
 }

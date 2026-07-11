@@ -3,10 +3,12 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { login } from '@/api/request'
-import { Toast } from 'vant'
+import { useProxyConfig } from '@/composables/useProxyConfig'
+import { showToast, showSuccessToast } from 'vant'
 
 const router = useRouter()
 const store = useUserStore()
+const { showDialog, proxyUrl, proxyDisplay, openConfig, saveConfig } = useProxyConfig()
 
 const username = ref('')
 const password = ref('')
@@ -15,11 +17,11 @@ const showPassword = ref(false)
 
 async function handleLogin() {
   if (!username.value.trim()) {
-    Toast('请输入邮箱或用户名')
+    showToast('请输入邮箱或用户名')
     return
   }
   if (!password.value) {
-    Toast('请输入密码')
+    showToast('请输入密码')
     return
   }
 
@@ -30,10 +32,10 @@ async function handleLogin() {
       password: password.value,
     })
     store.loginFromApi(data)
-    Toast.success('登录成功')
+    showSuccessToast('登录成功')
     router.replace('/')
   } catch (e: any) {
-    Toast(e.message || '登录失败')
+    showToast(e.message || '登录失败')
   } finally {
     loading.value = false
   }
@@ -105,10 +107,28 @@ function goToSettings() {
         手动配置 UID / Token
       </van-button>
 
+      <van-cell
+        title="代理地址"
+        :value="proxyDisplay"
+        is-link
+        class="proxy-cell"
+        @click="openConfig"
+      />
+
       <div class="tips">
         <p>如已有 UID 和 Token，可跳过登录直接手动配置</p>
       </div>
     </div>
+
+    <van-dialog v-model:show="showDialog" title="配置代理地址" @confirm="saveConfig" show-cancel-button>
+      <van-field
+        v-model="proxyUrl"
+        placeholder="留空使用默认 /api"
+        clearable
+        label="地址"
+        label-width="50px"
+      />
+    </van-dialog>
   </div>
 </template>
 

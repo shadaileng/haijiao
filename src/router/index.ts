@@ -4,8 +4,13 @@ import { useUserStore } from '@/stores/user'
 const routes = [
   {
     path: '/',
-    name: 'Home',
-    component: () => import('@/views/HomeView.vue'),
+    redirect: '/hot',
+  },
+  {
+    path: '/hot',
+    name: 'Hot',
+    component: () => import('@/views/HotTopicsView.vue'),
+    meta: { showTabBar: true },
   },
   {
     path: '/login',
@@ -18,6 +23,11 @@ const routes = [
     component: () => import('@/views/TopicView.vue'),
   },
   {
+    path: '/homepage/:userId/:nickname?',
+    name: 'Homepage',
+    component: () => import('@/views/UserHomeView.vue'),
+  },
+  {
     path: '/user/:userId?',
     name: 'User',
     component: () => import('@/views/UserView.vue'),
@@ -26,16 +36,19 @@ const routes = [
     path: '/follow/:userId?',
     name: 'Follow',
     component: () => import('@/views/FollowView.vue'),
+    meta: { showTabBar: true },
   },
   {
     path: '/search',
     name: 'Search',
     component: () => import('@/views/SearchView.vue'),
+    meta: { showTabBar: true },
   },
   {
     path: '/settings',
     name: 'Settings',
     component: () => import('@/views/SettingsView.vue'),
+    meta: { showTabBar: true },
   },
   {
     path: '/image-viewer',
@@ -44,7 +57,7 @@ const routes = [
   },
 ]
 
-const publicPages = ['Login', 'Settings', 'ImageViewer']
+const publicPages = ['Login', 'Settings', 'ImageViewer', 'Hot', 'Search', 'Follow']
 
 const router = createRouter({
   history: createWebHistory(),
@@ -52,7 +65,7 @@ const router = createRouter({
   scrollBehavior: () => ({ top: 0 }),
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, _from, next) => {
   const store = useUserStore()
   if (store.isLoggedIn || publicPages.includes(to.name as string)) {
     next()

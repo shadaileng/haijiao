@@ -25,8 +25,9 @@ src/
 ├── layouts/       # 布局组件
 ├── assets/        # 静态资源
 ├── styles/        # 全局样式 (SCSS)
-├── views/         # 页面级组件 (7 个页面)
-└── router/        # 路由配置
+├── views/         # 页面级组件 (8 个页面)
+├── router/        # 路由配置
+└── docs/          # 项目文档
 ```
 
 ## 编码规范
@@ -71,7 +72,7 @@ src/
 | 文件 | 说明 |
 |------|------|
 | `src/main.ts` | 应用入口，注册插件 |
-| `src/router/index.ts` | 路由定义，7 条路由 |
+| `src/router/index.ts` | 路由定义，8 条路由 |
 | `src/stores/user.ts` | 用户状态、缓存管理 |
 | `src/api/request.ts` | HTTP 请求封装、加密处理 |
 | `worker.ts` | Cloudflare Worker 入口 |

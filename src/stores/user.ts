@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 
-import type { UserInfo, FollowUser, LoginResponse } from '@/types'
+import type { FollowUser, LoginResponse } from '@/types'
 
 export interface UserState {
   uid: string
@@ -19,7 +19,7 @@ export const useUserStore = defineStore('user', () => {
   const uid = ref('')
   const token = ref('')
   const nickname = ref('')
-  const apiBase = ref('haijiao.com')
+  const proxyBase = ref('')
   const followMap = ref<Record<string, FollowUser[]>>({})
   const topicIds = ref<string[]>([])
   const topicCache = ref<Record<string, any>>({})
@@ -38,7 +38,7 @@ export const useUserStore = defineStore('user', () => {
         uid.value = data.uid || ''
         token.value = data.token || ''
         nickname.value = data.nickname || ''
-        apiBase.value = data.apiBase || 'haijiao.com'
+        proxyBase.value = data.proxyBase || ''
       }
       const topicRaw = localStorage.getItem('haijiao_topic')
       if (topicRaw) {
@@ -73,7 +73,7 @@ export const useUserStore = defineStore('user', () => {
       uid: uid.value,
       token: token.value,
       nickname: nickname.value,
-      apiBase: apiBase.value,
+      proxyBase: proxyBase.value,
     }))
   }
 
@@ -110,8 +110,8 @@ export const useUserStore = defineStore('user', () => {
     saveUser()
   }
 
-  function setApiBase(newApiBase: string) {
-    apiBase.value = newApiBase
+  function setProxyBase(url: string) {
+    proxyBase.value = url
     saveUser()
   }
 
@@ -119,13 +119,6 @@ export const useUserStore = defineStore('user', () => {
     uid.value = String(data.user.id)
     token.value = data.token
     nickname.value = data.user.nickname
-    if (data.domain) {
-      try {
-        apiBase.value = new URL(data.domain).host
-      } catch {
-        // 忽略无效域名
-      }
-    }
     saveUser()
   }
 
@@ -133,6 +126,7 @@ export const useUserStore = defineStore('user', () => {
     uid.value = ''
     token.value = ''
     nickname.value = ''
+    proxyBase.value = ''
     saveUser()
   }
 
@@ -180,10 +174,10 @@ export const useUserStore = defineStore('user', () => {
   loadFromStorage()
 
   return {
-    uid, token, nickname, apiBase, followMap, topicIds, topicCache,
+    uid, token, nickname, proxyBase, followMap, topicIds, topicCache,
     userIds, userTopicsCache, searchKeys, searchTopicsCache,
     isLoggedIn,
-    setCredentials, setApiBase, loginFromApi, logout, addTopicId, cacheTopic, addUserUid,
+    setCredentials, setProxyBase, loginFromApi, logout, addTopicId, cacheTopic, addUserUid,
     cacheUserTopics, addSearchKey, cacheSearchTopics, cacheFollow,
   }
 })
