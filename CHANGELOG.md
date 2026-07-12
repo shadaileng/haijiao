@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.13.2] - 2026-07-12
+
+### Fixed
+
+- 修复标签显示空白，字段名由 `name` 修正为 `tagName`
+
 ## [1.13.1] - 2026-07-12
 
 ### Fixed

@@ -60,13 +60,13 @@ const search = async (tag?: string) => {
       <div class="hot-tags-list">
         <van-tag
           v-for="tag in tags"
-          :key="tag.id || tag.name"
+          :key="tag.tagId"
           size="large"
           plain
           type="primary"
           class="hot-tag"
-          @click="search(tag.name)"
-        >{{ tag.name }}</van-tag>
+          @click="search(tag.tagName)"
+        >{{ tag.tagName }}</van-tag>
       </div>
     </div>
   </template>
