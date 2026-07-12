@@ -45,13 +45,16 @@ const search = async (tag?: string) => {
     showToast('请输入搜索关键词')
     return
   }
-  skeletonLoading.value = true
+  const isFirstPage = topics.length === 0
+  if (isFirstPage) {
+    skeletonLoading.value = true
+  }
   hasSearched.value = true
   topicsDom.value?.startLoad()
   const result = await api.search({ params: { page: index.value, node_id: 0, key: key.value } })
   if (!result.success) {
     showToast(result.message || '搜索失败')
-    skeletonLoading.value = false
+    if (isFirstPage) skeletonLoading.value = false
     topicsDom.value?.endLoad()
     return
   }
@@ -59,8 +62,10 @@ const search = async (tag?: string) => {
     topics.push(...result.data.results)
   }
   index.value++
-  skeletonLoading.value = false
-  await nextTick()
+  if (isFirstPage) {
+    skeletonLoading.value = false
+    await nextTick()
+  }
   topicsDom.value?.endLoad()
 }
 </script>
