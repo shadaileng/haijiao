@@ -104,7 +104,7 @@ const loadTopic = async (topicPid: string) => {
     </van-row>
   </van-skeleton>
   <van-divider :hairline="false">评论</van-divider>
-  <Comment :topicId="topicLocal.topicId" />
+  <Comment v-if="topicLocal.topicId" :topicId="topicLocal.topicId" />
 </template>
 
 <style scoped></style>
