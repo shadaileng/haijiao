@@ -14,6 +14,7 @@ const userId = ref((route.params.userId as string) || '')
 const nickname = ref((route.params.nickname as string) || '')
 const userInfo = ref<User | null>(null)
 const topicsDom = ref()
+const skeletonLoading = ref(true)
 
 const liteTopics: LiteTopicPage = reactive({ results: [], page: { index: 1, size: 10, total: 0 } })
 
@@ -25,10 +26,12 @@ onMounted(async () => {
   }
   topicsDom.value?.endLoad()
   await pageto(1)
+  skeletonLoading.value = false
 })
 
 watch(() => route.params.userId, async (newId) => {
   if (newId && newId !== userId.value) {
+    skeletonLoading.value = true
     userId.value = newId as string
     nickname.value = (route.params.nickname as string) || ''
     userInfo.value = null
@@ -38,6 +41,7 @@ watch(() => route.params.userId, async (newId) => {
     await loadUserInfo(userId.value)
     topicsDom.value?.endLoad()
     await pageto(1)
+    skeletonLoading.value = false
   }
 })
 
@@ -77,15 +81,31 @@ const loadMore = () => {
 
 <template>
   <van-nav-bar :title="nickname || '用户主页'" left-text="返回" left-arrow @click-left="onClickLeft" :fixed="true" :placeholder="true" />
-  <UserInfo v-if="userInfo" :userInfo="userInfo" />
-  <Topics ref="topicsDom" :topics="liteTopics.results" @load="loadMore()" />
+  <template v-if="skeletonLoading">
+    <div class="skeleton-card van-hairline--bottom">
+      <van-row>
+        <van-col span="6">
+          <van-skeleton-avatar :row="0" />
+        </van-col>
+        <van-col span="16">
+          <van-skeleton-title :row="1" />
+          <van-skeleton-title :row="1" style="width: 60%;" />
+          <van-skeleton-title :row="1" style="width: 40%;" />
+        </van-col>
+      </van-row>
+    </div>
+    <div v-for="i in 3" :key="i" class="skeleton-card">
+      <van-skeleton title avatar :row="2" :loading="true" />
+    </div>
+  </template>
+  <template v-else>
+    <UserInfo v-if="userInfo" :userInfo="userInfo" />
+    <Topics ref="topicsDom" :topics="liteTopics.results" :skeletonLoading="false" @load="loadMore()" />
+  </template>
 </template>
 
 <style scoped>
-.card {
-  text-align: left;
-  cursor: pointer;
-  padding-top: 10px;
-  padding-bottom: 5px;
+.skeleton-card {
+  padding: 15px;
 }
 </style>
