@@ -157,6 +157,10 @@ export async function searchTopics(
   return request({ url: '/topic/searchV2', params: { key, page, node_id: nodeId } })
 }
 
+export async function getTags(params?: Record<string, any>): Promise<any> {
+  return request({ url: '/tag/tags', params })
+}
+
 export async function getUserInfo(uid: string | number): Promise<any> {
   return request({ url: `/user/info/${uid}` })
 }
@@ -224,6 +228,14 @@ export const api = {
   async search({ params }: { params: any }) {
     try {
       const data = await searchTopics(params.key, params.page, params.node_id)
+      return { success: true, data }
+    } catch (e: any) {
+      return { success: false, message: e.message }
+    }
+  },
+  async tags({ params }: { params?: any } = {}) {
+    try {
+      const data = await getTags(params)
       return { success: true, data }
     } catch (e: any) {
       return { success: false, message: e.message }
