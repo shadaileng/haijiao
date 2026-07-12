@@ -1,4 +1,5 @@
 <script setup lang="ts">
+defineOptions({ name: 'SearchView' })
 import { ref, reactive, onMounted } from 'vue'
 import { showToast } from 'vant'
 import { api } from '@/api/request'

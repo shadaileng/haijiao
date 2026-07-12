@@ -35,7 +35,11 @@ provide('overlay', (data: { overlayShow: boolean; overlayImg?: string; overlayVi
 
 <template>
   <div class="app-container">
-    <RouterView />
+    <RouterView v-slot="{ Component }">
+      <keep-alive :include="['SearchView']">
+        <component :is="Component" />
+      </keep-alive>
+    </RouterView>
     <TabBar v-if="route.meta?.showTabBar" />
     <van-back-top />
     <van-overlay :show="overlay.show" @click="overlay.show = false">
