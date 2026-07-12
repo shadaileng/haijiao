@@ -1,6 +1,7 @@
 import { md5 } from 'js-md5'
 import { useSettingsStore } from '@/stores/settings'
 import router from '@/router'
+import { toCamelCase } from '@/utils/transform'
 import type { ApiResult, LoginParams, LoginResponse } from '@/types'
 
 let _redirecting = false
@@ -98,7 +99,7 @@ export async function request<T = any>(options: RequestOptions): Promise<T> {
       console.error('decrypt error:', e)
     }
   }
-  return result
+  return toCamelCase(result) as T
 }
 
 // 帖子详情
