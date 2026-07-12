@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { fetchImageThroughProxy } from '@/utils/image'
+import { loadImg } from '@/utils/image'
 
 const route = useRoute()
 const imgUrl = ref('')
@@ -9,8 +9,8 @@ const imgUrl = ref('')
 onMounted(async () => {
   const url = (route.query.url as string) || ''
   if (!url) return
-  const dataUri = await fetchImageThroughProxy(url)
-  if (dataUri) imgUrl.value = dataUri
+  const data = await loadImg([{ remoteUrl: url }])
+  if (data[0]?.remoteUrl) imgUrl.value = data[0].remoteUrl
 })
 
 const onClickLeft = () => history.back()
