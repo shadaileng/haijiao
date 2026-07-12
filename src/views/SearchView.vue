@@ -1,6 +1,6 @@
 <script setup lang="ts">
 defineOptions({ name: 'SearchView' })
-import { ref, reactive, onMounted, inject, watch } from 'vue'
+import { ref, reactive, onMounted, inject } from 'vue'
 import { showToast } from 'vant'
 import type { LiteTopic } from '@/types'
 import Topics from '@/components/Topics.vue'
@@ -24,22 +24,11 @@ onMounted(async () => {
   skeletonLoading.value = false
 })
 
-watch(key, (val) => {
-  console.log('key changed:', val, 'hasSearched:', hasSearched.value)
-  if (!val && hasSearched.value) {
-    hasSearched.value = false
-    topics.splice(0, topics.length)
-    index.value = 1
-  }
-})
-
 const onClear = () => {
   key.value = ''
-  if (hasSearched.value) {
-    hasSearched.value = false
-    topics.splice(0, topics.length)
-    index.value = 1
-  }
+  hasSearched.value = false
+  topics.splice(0, topics.length)
+  index.value = 1
 }
 
 const search = async (tag?: string) => {
@@ -60,7 +49,9 @@ const search = async (tag?: string) => {
     topicsDom.value?.endLoad()
     return
   }
-  topics.push(...result.data.results)
+  if (result.data?.results) {
+    topics.push(...result.data.results)
+  }
   index.value++
   skeletonLoading.value = false
   topicsDom.value?.endLoad()
@@ -68,7 +59,14 @@ const search = async (tag?: string) => {
 </script>
 
 <template>
-  <van-search v-model="key" placeholder="请输入搜索关键词" @search="search()" @click-icon="onClear" />
+  <van-search
+    v-model="key"
+    placeholder="请输入搜索关键词"
+    clearable
+    clear-trigger="always"
+    @search="search()"
+    @clear="onClear"
+  />
   <template v-if="!hasSearched">
     <div v-if="skeletonLoading" class="skeleton-card">
       <van-skeleton title :row="3" :loading="true" />
