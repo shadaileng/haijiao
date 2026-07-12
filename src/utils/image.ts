@@ -10,7 +10,8 @@ function customDecode(str: string): string {
     const s = CHARS.indexOf(decoded.charAt(u++))
     const c = CHARS.indexOf(decoded.charAt(u++))
     result += String.fromCharCode((o << 2) | (r >> 4))
-    if (s !== 64 && s >= 0) result += String.fromCharCode(((r & 3) << 6) | c)
+    if (s !== 64) result += String.fromCharCode(((15 & r) << 4) | (s >> 2))
+    if (c !== 64) result += String.fromCharCode(((3 & s) << 6) | c)
   }
   const bytes = new Uint8Array(result.length)
   for (let i = 0; i < result.length; i++) {
