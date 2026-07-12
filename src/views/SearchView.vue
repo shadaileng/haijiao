@@ -18,7 +18,8 @@ const tags = reactive<any[]>([])
 onMounted(async () => {
   const result = await api.tags()
   if (result.success && result.data) {
-    tags.splice(0, tags.length, ...result.data)
+    const list = Array.isArray(result.data) ? result.data : (result.data.results || [])
+    tags.splice(0, tags.length, ...list)
   }
   skeletonLoading.value = false
 })
