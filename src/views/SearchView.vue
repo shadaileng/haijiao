@@ -25,12 +25,22 @@ onMounted(async () => {
 })
 
 watch(key, (val) => {
+  console.log('key changed:', val, 'hasSearched:', hasSearched.value)
   if (!val && hasSearched.value) {
     hasSearched.value = false
     topics.splice(0, topics.length)
     index.value = 1
   }
 })
+
+const onClear = () => {
+  key.value = ''
+  if (hasSearched.value) {
+    hasSearched.value = false
+    topics.splice(0, topics.length)
+    index.value = 1
+  }
+}
 
 const search = async (tag?: string) => {
   if (tag) {
@@ -58,7 +68,7 @@ const search = async (tag?: string) => {
 </script>
 
 <template>
-  <van-search v-model="key" placeholder="请输入搜索关键词" @search="search()" />
+  <van-search v-model="key" placeholder="请输入搜索关键词" @search="search()" @click-icon="onClear" />
   <template v-if="!hasSearched">
     <div v-if="skeletonLoading" class="skeleton-card">
       <van-skeleton title :row="3" :loading="true" />
