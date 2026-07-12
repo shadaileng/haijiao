@@ -77,10 +77,13 @@ function handleLogout() {
     <van-cell-group inset class="status-group">
       <van-cell title="登录状态" :value="settings.isLoggedIn ? '已登录' : '未登录'">
         <template #label v-if="settings.isLoggedIn">UID: {{ settings.uid }}</template>
-        <template #label v-else><span>请在下方填写 UID 和 Token</span></template>
+        <template #label v-else><span>请在下方填写 UID 和 Token，或前往登录</span></template>
       </van-cell>
       <van-cell v-if="settings.isLoggedIn" title="退出登录" is-link @click="handleLogout">
         <template #right-icon><van-icon name="warning-o" color="#ee0a24" /></template>
+      </van-cell>
+      <van-cell v-else title="去登录" is-link @click="router.push('/login')">
+        <template #right-icon><van-icon name="arrow" /></template>
       </van-cell>
     </van-cell-group>
 
