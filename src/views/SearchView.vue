@@ -1,6 +1,6 @@
 <script setup lang="ts">
 defineOptions({ name: 'SearchView' })
-import { ref, reactive, onMounted, inject } from 'vue'
+import { ref, reactive, onMounted, inject, watch } from 'vue'
 import { showToast } from 'vant'
 import type { LiteTopic } from '@/types'
 import Topics from '@/components/Topics.vue'
@@ -30,6 +30,12 @@ const onClear = () => {
   topics.splice(0, topics.length)
   index.value = 1
 }
+
+watch(key, (val) => {
+  if (!val && hasSearched.value) {
+    onClear()
+  }
+})
 
 const search = async (tag?: string) => {
   if (tag) {
