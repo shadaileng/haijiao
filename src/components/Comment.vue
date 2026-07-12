@@ -17,11 +17,11 @@
                 </van-col>
                 <van-col span="16" class="hv-text-start">
                   <van-space :size="10" direction="vertical">
-                    <van-row class="hv-nickname hv-pointer" @click="$router.push(`/homepage/${item.user_id}/${item.nickname}`)">
+                    <van-row class="hv-nickname hv-pointer" @click="$router.push(`/homepage/${item.userId}/${item.nickname}`)">
                       <van-col span="24">{{ item.nickname }}</van-col>
                     </van-row>
                     <van-row>
-                      <van-col span="24">{{ item.create_time }}</van-col>
+                      <van-col span="24">{{ item.createTime }}</van-col>
                     </van-row>
                   </van-space>
                 </van-col>
@@ -39,11 +39,11 @@
               }"
             ></div>
           </van-row>
-          <van-row v-if="item.commend_list?.length > 0">
+          <van-row v-if="item.commendList?.length > 0">
             <div class="commend_list">
-              <van-row v-for="commend_item in item.commend_list" :key="commend_item.reply_id">
+              <van-row v-for="commend_item in item.commendList" :key="commend_item.replyId">
                 <van-col span="24">
-                  <span class="hv-nickname hv-pointer" @click="$router.push(`/homepage/${item.user_id}/${item.nickname}`)">{{ commend_item.nickname }}:</span>
+                  <span class="hv-nickname hv-pointer" @click="$router.push(`/homepage/${item.userId}/${item.nickname}`)">{{ commend_item.nickname }}:</span>
                   <span>{{ commend_item.content }}</span>
                 </van-col>
               </van-row>

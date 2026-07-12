@@ -105,16 +105,16 @@ export interface LiteTopicPage {
 }
 
 export interface CommentItem {
-  user_id: number
+  userId: number
   nickname: string
   floor: number
   avatar: string
   attachments: string
   certVideo: boolean
-  reply_id: number
-  create_time: string
+  replyId: number
+  createTime: string
   content: string
-  commend_list: CommentItem[]
+  commendList: CommentItem[]
 }
 
 export interface CommentPage {
