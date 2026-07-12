@@ -36,7 +36,7 @@ provide('overlay', (data: { overlayShow: boolean; overlayImg?: string; overlayVi
 <template>
   <div class="app-container">
     <RouterView v-slot="{ Component }">
-      <keep-alive :include="['HotTopicsView', 'SearchView', 'UserHomeView']">
+      <keep-alive :include="['HotTopicsView', 'SearchView', 'UserHomeView', 'FollowView']">
         <component :is="Component" />
       </keep-alive>
     </RouterView>
