@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.13.9] - 2026-07-12
+
+### Fixed
+
+- 搜索完成后使用 `nextTick` 等待 DOM 更新再调用 `endLoad`，避免 Topics 组件未渲染导致加载状态卡住
+
 ## [1.13.8] - 2026-07-12
 
 ### Fixed
