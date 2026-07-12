@@ -1,7 +1,7 @@
 {
   "name": "haijiao-web",
   "private": true,
-  "version": "1.13.7",
+  "version": "1.13.8",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -12,6 +12,7 @@
     "cf:deploy": "wrangler deploy"
   },
   "dependencies": {
+    "@vant/touch-emulator": "^1.5.0",
     "dplayer": "^1.27.1",
     "hls.js": "^1.5.17",
     "js-md5": "^0.8.3",
