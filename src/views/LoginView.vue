@@ -35,7 +35,9 @@ async function handleLogin() {
     return
   }
   showSuccessToast('登录成功')
-  await userStore.fetchCurrent()
+  if (resp.data) {
+    userStore.loginFromApi(resp.data)
+  }
   router.replace('/hot')
 }
 
