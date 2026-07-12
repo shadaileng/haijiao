@@ -27,10 +27,14 @@ const pageto = async (index: number) => {
     return
   }
   const data = resp.data
-  liteTopics.results.splice(0, liteTopics.results.length, ...data.results)
-  liteTopics.page.index = data.page.page
-  liteTopics.page.size = data.page.limit
-  liteTopics.page.total = data.page.total
+  if (data?.results) {
+    liteTopics.results.splice(0, liteTopics.results.length, ...data.results)
+  }
+  if (data?.page) {
+    liteTopics.page.index = data.page.page
+    liteTopics.page.size = data.page.limit
+    liteTopics.page.total = data.page.total
+  }
 }
 
 const loadMore = () => {
