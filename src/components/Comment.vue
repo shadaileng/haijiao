@@ -112,6 +112,11 @@ const loadComments = async (index: number) => {
     return
   }
   const data = resp.data
+  if (!data?.results || !data?.page) {
+    loading.value = false
+    finished.value = true
+    return
+  }
   comments.results.splice(0, comments.results.length, ...data.results)
   comments.page.total = data.page.total
   comments.page.index = data.page.page
