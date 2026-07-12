@@ -50,7 +50,7 @@ const search = async (tag?: string) => {
 </script>
 
 <template>
-  <van-search v-model="key" placeholder="请输入搜索关键词" @search="search()" />
+  <van-search v-model="key" placeholder="请输入搜索关键词" @search="search()" @clear="hasSearched = false" />
   <template v-if="!hasSearched">
     <div v-if="skeletonLoading" class="skeleton-card">
       <van-skeleton title :row="3" :loading="true" />
