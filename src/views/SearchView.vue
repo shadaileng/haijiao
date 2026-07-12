@@ -1,6 +1,6 @@
 <script setup lang="ts">
 defineOptions({ name: 'SearchView' })
-import { ref, reactive, onMounted, inject, watch } from 'vue'
+import { ref, reactive, onMounted, inject, watch, nextTick } from 'vue'
 import { showToast } from 'vant'
 import type { LiteTopic } from '@/types'
 import Topics from '@/components/Topics.vue'
@@ -60,6 +60,7 @@ const search = async (tag?: string) => {
   }
   index.value++
   skeletonLoading.value = false
+  await nextTick()
   topicsDom.value?.endLoad()
 }
 </script>
