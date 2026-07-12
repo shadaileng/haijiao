@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.0] - 2026-07-12
+
+### Added
+
+- `src/utils/transform.ts`：新增 `toCamelCase()` 全局 snake_case → camelCase 转换器，`request()` 对所有 API 响应自动执行
+- `keep-alive` 缓存列表页：HotTopicsView、UserHomeView、SearchView 在 App.vue 中注册
+- `scrollBehavior` 恢复滚动位置：后退导航自动回到上次浏览位置
+
+### Fixed
+
+- 修复评论组件字段名未适配 `toCamelCase` 导致用户主页跳转 `uid` 为 undefined
+- 修复 `CommentItem` 类型定义字段名（`user_id`→`userId`、`reply_id`→`replyId`、`commend_list`→`commendList`）
+- 移除 `request` 层 `errorCode=1` 全局拦截，避免将普通请求失败误判为未登录
+- 修复 Topics 组件单附件/无附件标题行缺少 `@click` 跳转
+
+### Changed
+
+- 设置页移除手动保存/清除按钮，UID/Token/当前用户改为只读展示
+- 开发代理从 Vite `server.proxy` 改为自定义中间件插件，完全控制代理行为
+- 图片加载改为直连 fetch 原始 URL（`loadImg`），移除 `/api/proxy-image`
+
 ## [1.8.2] - 2026-07-12
 
 ### Fixed

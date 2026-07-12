@@ -29,10 +29,10 @@ src/
 ├── composables/   # 组合式函数 (useMirrorConfig 镜像源/数据源配置, useClipboard)
 ├── plugins/       # 指令插件 (headicon 头像解码, content 内容渲染+DPlayer)
 ├── components/    # 通用组件 (Topics/TopicContent/Comment/UserInfo/common/TabBar)
-├── utils/         # 工具 (image 图片代理解码, cipher 自定义密码, constant)
+├── utils/         # 工具 (image 图片解码+loadImg, transform snake→camel, cipher 自定义密码, constant)
 ├── styles/        # 全局样式 (global.scss)
 ├── views/         # 页面级组件 (Home/Hot/Login/Topic/User/UserHome/Follow/Search/Settings/ImageViewer)
-└── router/        # 路由配置 (index.ts)
+└── router/        # 路由配置 (index.ts, scrollBehavior)
 ```
 
 ## 编码规范
@@ -66,6 +66,7 @@ src/
 - 配置了自定义镜像源时，请求携带 `X-Backend` 头告知 Worker 代理目标
 - 支持 Base64 多层加密数据自动解密（兼容 1/2/3 层）
 - 视频地址经 `/api/attachment` 解析，`X-User-Id`/`X-User-Token` 由 settings store 提供
+- `request()` 函数对所有 API 响应执行 `toCamelCase()` 转换，snake_case 字段自动映射为 camelCase
 - 错误统一抛出 Error 对象
 - 组件可通过 `inject('$api')` 获取 wxt 风格 api 对象（topic/hot/search/follow/...）
 
@@ -81,15 +82,17 @@ src/
 | 文件 | 说明 |
 |------|------|
 | `src/main.ts` | 应用入口，注册 pinia(持久化)/router/vant/指令插件 |
-| `src/router/index.ts` | 路由定义，10 条路由，TabBar meta |
+| `src/router/index.ts` | 路由定义，10 条路由，TabBar meta，scrollBehavior |
 | `src/stores/settings.ts` | 镜像源 apiBase / uid / token（持久化） |
 | `src/stores/user.ts` | 当前用户、关注列表缓存（持久化） |
-| `src/api/request.ts` | HTTP 请求封装、加密处理、视频/登录、api 对象 |
+| `src/api/request.ts` | HTTP 请求封装、加密处理、toCamelCase、视频/登录、api 对象 |
+| `src/utils/transform.ts` | `toCamelCase()` snake_case → camelCase 转换器 |
+| `src/utils/image.ts` | `loadImg()` 图片加载 + `customDecode()` 自定义 Base64 解码 |
 | `src/plugins/content.ts` | `v-content` 指令：内容渲染 + 图片/视频(DPlayer) |
 | `src/plugins/headicon.ts` | `v-headicon` 指令：头像懒加载与解码 |
 | `worker.ts` | Cloudflare Worker 入口，支持 X-Backend 镜像源 |
 | `wrangler.toml` | CF Workers 配置 |
-| `vite.config.ts` | Vite 构建配置（含本地 E2E 用 `server.proxy`，router 读 `X-Back-end`） |
+| `vite.config.ts` | Vite 构建配置（含本地 E2E 自定义中间件代理） |
 | `playwright.config.ts` | Playwright 配置，驱动本机 Chrome，`webServer` 启动 `npm run dev` |
 | `e2e/` | Playwright 规格：`config.ts`(参数) + `public`/`auth`/`video`/`mirror` 四规格 |
 
@@ -110,7 +113,7 @@ npm run cf:deploy    # 部署到 Cloudflare Workers
 |------|------|------|
 | `/` | HomeView | 重定向到 `/hot` |
 | `/hot` | HotTopicsView | 热门 |
-| `/topic/:pid?` | TopicView | 帖子详情（含视频） |
+| `/topic/:pid?` | TopicView | 帖子详情（含视频 + 评论） |
 | `/user/:userId?` | UserView | 按 uid 查帖子 |
 | `/homepage/:userId/:nickname?` | UserHomeView | 用户主页 |
 | `/follow/:userId?` | FollowView | 关注列表 |
