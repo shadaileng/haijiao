@@ -33,7 +33,7 @@ docs/
 | `02-功能新增与改善方案.md` | v1.0.0 | 方案 | `plans/` | 11 项新功能方案 | 📋 |
 | `03-配置代理地址功能方案.md` | v1.0.0 | 方案 | `plans/` | 首页+登录页代理地址配置 | 🏁 |
 | `04-参考haijiao-wxt界面布局方案.md` | v1.1.0 | 方案 | `plans/` | 参考 haijiao-wxt dev 分支布局调整 Web 界面 | 🏁 |
-| `05-参考haijiao-wxt重构前端项目方案.md` | v1.0.0 | 方案 | `plans/` | 彻底重建 src/，移植视频播放与模块化能力，支持镜像源 | 📋 |
+| `05-参考haijiao-wxt重构前端项目方案.md` | v1.1.0 | 方案 | `plans/` | 彻底重建 src/，移植视频播放与模块化能力，支持镜像源 | 🏁 |
 | `01-架构概览.md` | v1.0.0 | 架构 | `architecture/` | 系统架构与请求链路 | 🏁 |
 | `01-API 参考.md` | v1.0.0 | 参考 | `references/` | 所有 API 端点定义 | 🏁 |
 | `02-数据字典.md` | v1.0.0 | 参考 | `references/` | 核心类型定义 | 🏁 |
@@ -54,7 +54,8 @@ docs/
 ## 版本关联
 
 | 应用版本 | 日期 | 说明 | 对应文档变更 |
-|:-------:|:----:|------|:-----------:|
+|:-------|:----:|------|:-----------:|
+| v1.7.0 | 2026-07-12 | 重建 src/：视频播放、模块化状态、镜像源 | 05 完成，AGENTS/README/CHANGELOG/API 参考同步 |
 | v1.3.0 | 2026-07-09 | 登录功能 | 01 创建 |
 | v1.2.0 | 2026-07-04 | 数据源配置 | — |
 | v1.1.0 | 2025-07-03 | 项目初始化 | — |
@@ -111,17 +112,17 @@ docs/
 
 | 阶段 | 步骤 | 操作 | 状态 |
 |:----:|:----:|:-----|:----:|
-| 一 | 1 | 删除 `src/` 全部文件 | ⬜ 未开始 |
-| 一 | 2 | 依赖与配置（dplayer/hls.js/persistedstate，移除 vite proxy） | ⬜ 未开始 |
-| 二 | 3 | `types/index.ts` + `utils/image.ts`（cipher） | ⬜ 未开始 |
-| 二 | 4 | `api/request.ts`（镜像源 X-Backend、视频、登录、列表 API） | ⬜ 未开始 |
-| 二 | 5 | 模块化 `stores/`（settings/user/homepage/hot） | ⬜ 未开始 |
-| 三 | 6 | `plugins/`（headicon、content+DPlayer）、`components/` | ⬜ 未开始 |
-| 三 | 7 | `views/` + `router/` + `App.vue` + `main.ts` | ⬜ 未开始 |
-| 三 | 8 | 镜像源设置 UI（SettingsView/LoginView/useProxyConfig） | ⬜ 未开始 |
-| 四 | 9 | `worker.ts` 支持 `X-Backend` 镜像源 | ⬜ 未开始 |
-| 四 | 10 | 验证（build + wrangler dev 联调） | ⬜ 未开始 |
-| 四 | 11 | 文档同步（AGENTS/README/CHANGELOG/API 参考） | ⬜ 未开始 |
+| 一 | 1 | 删除 `src/` 全部文件（含废弃 layouts/useLoading） | ✅ |
+| 一 | 2 | 依赖与配置（dplayer/hls.js/persistedstate，移除 vite proxy） | ✅ |
+| 二 | 3 | `types/index.ts` + `utils/image.ts`（cipher） | ✅ |
+| 二 | 4 | `api/request.ts`（镜像源 X-Backend、视频、登录、列表 API） | ✅ |
+| 二 | 5 | 模块化 `stores/`（settings/user/homepage/hot） | ✅ |
+| 三 | 6 | `plugins/`（headicon、content+DPlayer）、`components/` | ✅ |
+| 三 | 7 | `views/` + `router/` + `App.vue` + `main.ts` | ✅ |
+| 三 | 8 | 镜像源设置 UI（SettingsView/LoginView/useProxyConfig） | ✅ |
+| 四 | 9 | `worker.ts` 支持 `X-Backend` 镜像源 | ✅ |
+| 四 | 10 | 验证（`npm run build` 类型检查 + 打包通过） | ✅ |
+| 四 | 11 | 文档同步（AGENTS/README/CHANGELOG/API 参考） | ✅ |
 
 ### 04-参考haijiao-wxt界面布局方案
 

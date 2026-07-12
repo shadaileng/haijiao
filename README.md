@@ -18,10 +18,11 @@
 
 - **前端框架**: Vue 3.5 + TypeScript 5.6
 - **UI 组件库**: Vant 4.9 (移动端)
-- **状态管理**: Pinia 2.2
-- **路由**: Vue Router 4.4
+- **状态管理**: Pinia 2.2 + pinia-plugin-persistedstate
+- **路由**: Vue Router 4.4 (createWebHistory)
 - **构建工具**: Vite 6.0
 - **部署**: Cloudflare Workers
+- **视频播放**: DPlayer 1.27 + hls.js
 - **CSS**: Tailwind CSS 3.4 + Sass
 
 ## 项目结构
@@ -40,27 +41,40 @@ haijiao/
 │   ├── main.ts            # Vue 应用入口
 │   ├── App.vue            # 根组件
 │   ├── api/               # API 请求层
-│   │   └── request.ts     # HTTP 请求封装、加密数据处理
+│   │   └── request.ts     # HTTP 请求封装、加密处理、视频/登录、api 对象
 │   ├── types/             # TypeScript 类型定义
-│   │   └── index.ts       # 接口类型声明
-│   ├── stores/            # Pinia 状态管理
-│   │   └── user.ts        # 用户状态、缓存管理
+│   │   ├── index.ts       # 接口类型声明
+│   │   └── shims.d.ts    # dplayer / .vue 模块声明
+│   ├── stores/            # Pinia 模块化状态
+│   │   ├── settings.ts     # 镜像源 apiBase / uid / token（持久化）
+│   │   ├── user.ts        # 当前用户、关注列表缓存（持久化）
+│   │   ├── homepage.ts    # 用户主页信息/帖子缓存
+│   │   └── hot.ts         # 热门帖子缓存
 │   ├── composables/       # 组合式函数
-│   │   ├── useClipboard.ts # 剪贴板操作
-│   │   └── useLoading.ts   # 加载状态管理
-│   ├── layouts/           # 布局组件
-│   │   └── MainLayout.vue  # 主布局
-│   ├── assets/            # 静态资源
+│   │   ├── useMirrorConfig.ts # 镜像源（数据源）配置
+│   │   └── useClipboard.ts # 剪贴板操作
+│   ├── plugins/           # 指令插件
+│   │   ├── headicon.ts    # v-headicon 头像懒加载与解码
+│   │   └── content.ts     # v-content 内容渲染 + 视频(DPlayer)
+│   ├── components/        # 通用组件
+│   │   ├── Topics.vue / TopicContent.vue / Comment.vue / UserInfo.vue
+│   │   └── common/TabBar.vue
+│   ├── utils/             # 工具
+│   │   ├── image.ts        # 图片 .txt 代理解码
+│   │   ├── cipher.ts      # 自定义密码算法
+│   │   └── constant.ts    # 常量（LOADING_URL 等）
 │   ├── styles/            # 全局样式
 │   │   └── global.scss    # 全局 SCSS 变量和重置
 │   ├── views/             # 页面级组件
-│   │   ├── HomeView.vue    # 首页（功能导航）
-│   │   ├── TopicView.vue   # 帖子详情页
+│   │   ├── HomeView.vue    # 重定向到 /hot
+│   │   ├── HotTopicsView.vue # 热门
+│   │   ├── TopicView.vue   # 帖子详情（含视频）
 │   │   ├── UserView.vue    # 用户帖子页
+│   │   ├── UserHomeView.vue # 用户主页
 │   │   ├── FollowView.vue  # 关注列表页
 │   │   ├── SearchView.vue  # 搜索页
 │   │   ├── LoginView.vue   # 登录页
-│   │   ├── SettingsView.vue # 设置页
+│   │   ├── SettingsView.vue # 设置页（镜像源/uid/token）
 │   │   └── ImageViewerView.vue # 图片查看页
 │   └── router/            # 路由配置
 │       └── index.ts        # 路由定义
@@ -72,15 +86,16 @@ haijiao/
 
 ## API 接口
 
-应用通过 Cloudflare Worker 代理请求到 `haijiao.com`，避免 CORS 问题。
+应用通过 Cloudflare Worker 代理请求到后端（代码默认 `https://haijiao.com`，但**该官方域名在国内被屏蔽**，实际须填写后台提供的可用镜像/数据源域名）。配置了镜像源时，请求携带 `X-Backend` 头告知 Worker 代理目标。
 
 | 接口 | 方法 | 说明 |
 |------|------|------|
 | `/api/topic/{topicId}` | GET | 获取帖子详情 |
-| `/api/attachment` | POST | 获取视频资源地址 |
+| `/api/attachment` | POST | 获取视频资源地址（m3u8） |
 | `/api/user/favorite/users` | GET | 获取关注列表 |
 | `/api/topic/node/topics` | GET | 获取用户帖子列表 |
 | `/api/topic/searchV2` | GET | 搜索帖子 |
+| `/api/comment/reply_list` | GET | 获取评论列表 |
 | `/api/login/signin` | POST | 用户登录 |
 
 ### 认证方式
@@ -93,6 +108,10 @@ X-User-Token: {token}
 ```
 
 认证信息可通过登录接口（`POST /api/login/signin`）自动获取，也可在设置页面手动配置。
+
+### 镜像源 / 数据源（X-Backend）
+
+在设置页「镜像源（数据源地址）」填写后台提供的、国内可访问的镜像域名（如 `https://your-mirror.com`），前端请求会带上 `X-Backend: <地址>`，Worker 据此将 `/api/**` 代理到该镜像源；未配置时回退 `HAIJIAO_API_BASE` 环境变量（默认 `haijiao.com`，国内不可达，仅作兜底）。
 
 ## 环境变量
 
@@ -131,6 +150,18 @@ npm run cf:deploy
 npm run cf:dev
 ```
 
+### 本地自动化测试（Playwright + 本机 Chrome）
+
+使用 Playwright 驱动本机已安装的 Google Chrome，对应用做端到端测试。本地代理 `vite.config.ts` 的 `server.proxy` 读取请求头 `X-Back-end`（即配置页「数据源字段」）动态转发到镜像源，与 `worker.ts` 行为对齐；该配置仅 `npm run dev` 生效，不影响生产。
+
+```bash
+# 1. 在 e2e/config.ts 填入 mirrorDomain（必填）、uid/token 或 username/password、videoPid
+# 2. 运行（会自动启动 npm run dev 于 3000 端口）
+npm run test:e2e
+```
+
+> 缺少 `mirrorDomain` 时公开页与镜像源规格不可达；缺少登录凭据或 `videoPid` 时对应 `auth`/`video` 规格自动 `test.skip`，详见 `docs/plans/06-E2E自动化测试方案.md`。
+
 ## 部署
 
 ### Cloudflare Workers
@@ -156,7 +187,7 @@ npm run build
 - 使用 Pinia 进行状态管理
 - 使用 Vant 4 移动端组件库
 - CSS 使用 Tailwind CSS + SCSS 混合方案
-- 包管理器使用 pnpm
+- 包管理器使用 npm
 
 ## 许可证
 

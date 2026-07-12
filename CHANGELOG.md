@@ -5,6 +5,44 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.0] - 2026-07-12
+
+### Added
+
+- 本地端到端测试：新增 `playwright.config.ts` + `e2e/`（public/auth/video/mirror 四规格），驱动本机 Chrome，参数集中于 `e2e/config.ts`
+- 本地 E2E 代理：`vite.config.ts` 新增 `server.proxy['/api']`，`router` 读取请求头 `X-Back-end`（即配置页「数据源字段」）动态转发到镜像源，与生产 `worker.ts` 行为对齐，仅 `npm run dev` 生效
+
+### Changed
+
+- 镜像源 composable 重命名 `useProxyConfig` → `useMirrorConfig`，消除「代理地址」概念残留
+- 设置页「镜像源（后端地址）」改为「镜像源（数据源地址）」，placeholder 改为 `https://你的镜像域名`，数据来源处增加「官方域名国内被屏蔽」提示
+- 文档（README/AGENTS/API 参考）同步说明 haijiao.com 国内被屏蔽、实际须填后台可用镜像
+
+## [1.7.0] - 2026-07-12
+
+### Added
+
+- 视频播放能力：移植 wxt 的 DPlayer + hls.js，点击视频封面经 `/api/attachment` 解析 m3u8 并播放
+- 模块化 Pinia 状态：`settings`(镜像源/uid/token) / `user`(当前用户+关注) / `homepage` / `hot`，统一 `pinia-plugin-persistedstate` 持久化到 localStorage
+- 可配置镜像源：设置页可填写后端地址，请求经 `X-Backend` 头告知 Worker 代理目标，回退 `HAIJIAO_API_BASE`
+- `v-content` 指令支持图片/视频/音频渲染，`v-headicon` 头像懒加载与解码
+
+### Changed
+
+- 彻底重建 `src/`：参考 haijiao-wxt 重构，移除 `browser.*` 扩展依赖
+- API 层统一走同源 `/api`，加密解密兼容 1/2/3 层 Base64
+- 视频认证统一使用 `settings`/`user` store 的 uid/token（修复 wxt 中未填充的 `browser.storage 'user'`）
+- 不再使用 vite `server.proxy`，后端地址在配置页动态配置
+
+### Fixed
+
+- 修复 wxt `content.ts` 缺失 `LOADING_URL` 导入的 bug（改用本地 data URI 占位图）
+- 清理死代码：`layouts/MainLayout.vue`、`composables/useLoading` 已删除
+
+### Removed
+
+- 移除扩展专属逻辑：`getCurrentTab`、`cookiesGet`、新标签页打开图片/链接等
+
 ## [1.6.2] - 2026-07-10
 
 ### Fixed

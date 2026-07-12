@@ -27,13 +27,17 @@
 所有 API 通过 Cloudflare Worker 代理，前端请求路径格式：
 
 ```
-/api/{path}  →  Worker  →  https://haijiao.com/{path}
+/api/{path}  →  Worker  →  https://{后端}/{path}
 ```
 
-直连请求（图片、视频）绕过 Worker：
+默认后端为 `HAIJIAO_API_BASE`（env，默认 `https://haijiao.com`）。配置自定义镜像源时，前端在请求头携带 `X-Backend: <镜像源>`，Worker 据此将 `/api/**` 代理到该镜像源；未携带或非法值时回退 `HAIJIAO_API_BASE`。
+
+> 不再使用 vite `server.proxy`：前端所有请求走同源 `/api`，由 Worker 代理，避免浏览器直连触发 CORS。
+
+直连请求仅用于图片 `.txt` 密文（经 Worker `/api/proxy-image` 代理）：
 
 ```
-https://{apiBase}/{path}
+/api/proxy-image?url=<.txt 完整或相对地址>
 ```
 
 ### 1.2 通用请求头
@@ -155,10 +159,11 @@ Sign = MD5(Username + Password + navigator.userAgent)
 | 项目 | 值 |
 |------|-----|
 | **函数** | `loadVideoSrc(id, resourceId)` |
-| **URL** | `POST https://{apiBase}/api/attachment`（直连） |
-| **请求头** | `X-User-Id`、`X-User-Token` |
-| **请求体** | `{ id, resource_id, resource_type: "topic", line: "" }` |
-| **响应** | 视频信息（含 url、keyPath 等） |
+| **URL** | `POST /api/attachment`（经 Worker 代理） |
+| **请求头** | `X-Backend: <镜像源>`、`X-User-Id`、`X-User-Token` |
+| **请求体** | `{ id, resource_id, resource_type: "topic", line: "normal1" }` |
+| **响应** | 视频信息（含 `remoteUrl` m3u8、`keyPath` 等） |
+| **播放** | 前端用 DPlayer + hls.js 加载 `remoteUrl`（customHls） |
 
 ---
 
@@ -207,8 +212,8 @@ Sign = MD5(Username + Password + navigator.userAgent)
 ## 8. 环境变量
 
 | 变量 | 类型 | 默认值 | 说明 |
-|:-----|:----:|:------:|------|
-| `HAIJIAO_API_BASE` | string | — | Cloudflare Worker 环境变量，haijiao.com 的域名 |
+|-----|:----:|:------:|------|
+| `HAIJIAO_API_BASE` | string | `https://haijiao.com` | Cloudflare Worker 环境变量，默认后端域名 |
 
 ---
 
@@ -217,6 +222,18 @@ Sign = MD5(Username + Password + navigator.userAgent)
 ### Cloudflare Worker（worker.ts）
 
 ```
+/api/*    → 后端（X-Backend 指定镜像源，否则 HAIJIAO_API_BASE）   （添加 CORS 头）
+/api/proxy-image?url=...  → 后端 .txt 密文                      （添加 CORS 头）
+非 /api 路径 → index.html                                              （SPA 回落）
+```
+
+### 镜像源（X-Backend）
+
+前端在 `settings` store 配置 `apiBase`，请求时携带 `X-Backend: <apiBase>`；Worker 校验为合法 https 域名后作为代理目标，否则回退 `HAIJIAO_API_BASE`。
+
+### 开发代理（vite.config.ts）
+
+生产不使用 vite `server.proxy`：`npm run dev` 默认仅作静态页面服务，后端经已部署 Worker 或 `npm run cf:dev` 本地代理。本地 E2E 测试（`npm run test:e2e`）会临时启用 `vite.config.ts` 的 `server.proxy`，由其 `router` 读取请求头 `X-Backend`（即配置页「数据源字段」）动态转发到镜像源，与生产 Worker 行为对齐，且仅 `npm run dev` 生效、不进入 `dist/` 产物。
 /api/* → https://{HAIJIAO_API_BASE}/*   （添加 CORS 头）
 非 /api 路径 → index.html                （SPA 回落）
 ```
