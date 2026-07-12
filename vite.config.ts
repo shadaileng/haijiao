@@ -45,10 +45,17 @@ function dynamicProxyPlugin() {
         } catch {
           reqPath = req.url!
         }
+        let encodedPath: string
+        try {
+          const u = new URL(reqPath, 'https://placeholder.com')
+          encodedPath = u.pathname + u.search
+        } catch {
+          encodedPath = encodeURI(reqPath)
+        }
         const opts = {
           hostname: target.hostname,
           port: 443,
-          path: reqPath,
+          path: encodedPath,
           method: req.method,
           headers: { ...req.headers, host: target.host },
           rejectAuthorized: false,
