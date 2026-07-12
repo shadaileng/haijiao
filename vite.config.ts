@@ -18,41 +18,6 @@ function dynamicProxyPlugin() {
         }
         if (!req.url?.startsWith('/api')) return next()
 
-        // 本地处理 /api/proxy-image（模拟 Worker 行为）
-        if (req.url.startsWith('/api/proxy-image')) {
-          const rawUrl = req.url || ''
-          const qIdx = rawUrl.indexOf('?url=')
-          let targetUrl = ''
-          if (qIdx >= 0) {
-            try { targetUrl = decodeURIComponent(rawUrl.slice(qIdx + 5)) } catch { targetUrl = rawUrl.slice(qIdx + 5) }
-          }
-          if (!targetUrl) {
-            res.writeHead(400, { 'Content-Type': 'application/json' })
-            res.end(JSON.stringify({ success: false, message: 'Missing url parameter' }))
-            return
-          }
-          const backend = (req.headers['x-backend'] as string) || 'https://haijiao.com'
-          if (!targetUrl.startsWith('http')) {
-            targetUrl = backend.replace(/\/$/, '') + (targetUrl.startsWith('/') ? targetUrl : '/' + targetUrl)
-          }
-          https.get(targetUrl, { headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win6; x64) AppleWebKit/537.36' } }, (proxyRes) => {
-            let data = ''
-            proxyRes.on('data', (chunk) => { data += chunk })
-            proxyRes.on('end', () => {
-              res.writeHead(200, {
-                'Content-Type': 'text/plain; charset=utf-8',
-                'Access-Control-Allow-Origin': '*',
-              })
-              res.end(data)
-            })
-          }).on('error', (err) => {
-            console.error('[proxy-image error]', err.message)
-            res.writeHead(502, { 'Content-Type': 'application/json' })
-            res.end(JSON.stringify({ success: false, message: 'Proxy error' }))
-          })
-          return
-        }
-
         const backend = (req.headers['x-backend'] as string) || ''
         if (!backend) {
           res.writeHead(400, { 'Content-Type': 'application/json' })
