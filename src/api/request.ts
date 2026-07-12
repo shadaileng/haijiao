@@ -1,6 +1,5 @@
 import { md5 } from 'js-md5'
 import { useSettingsStore } from '@/stores/settings'
-import { fetchImageThroughProxy } from '@/utils/image'
 import type { ApiResult, LoginParams, LoginResponse } from '@/types'
 
 function utf8Decode(binary: string): string {
@@ -201,20 +200,6 @@ export async function login(params: LoginParams): Promise<LoginResponse> {
   }
   // 凭证保存由 user store 的 loginFromApi() 方法负责
   return result
-}
-
-export async function processImages(items: any[]): Promise<any[]> {
-  const props = items.map(async (item: any) => {
-    if (!item.remoteUrl) return item
-    try {
-      const dataUri = await fetchImageThroughProxy(item.remoteUrl)
-      if (!dataUri) return item
-      return { ...item, remoteUrl: dataUri }
-    } catch {
-      return item
-    }
-  })
-  return Promise.all(props)
 }
 
 // wxt 风格 api 对象（供组件 inject('$api') 使用）
