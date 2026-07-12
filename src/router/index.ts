@@ -57,7 +57,7 @@ const routes = [
   },
 ]
 
-const publicPages = ['Login', 'Settings', 'ImageViewer', 'Hot', 'Search', 'Follow']
+const publicPages = ['Login', 'Settings', 'ImageViewer']
 
 const router = createRouter({
   history: createWebHistory(),
