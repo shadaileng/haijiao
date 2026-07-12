@@ -9,6 +9,13 @@ function dynamicProxyPlugin() {
     name: 'dynamic-proxy',
     configureServer(server: any) {
       server.middlewares.use((req: any, res: any, next: any) => {
+        try {
+          decodeURI(req.url || '/')
+        } catch {
+          res.writeHead(400, { 'Content-Type': 'text/plain' })
+          res.end('Bad Request: Malformed URI')
+          return
+        }
         if (!req.url?.startsWith('/api')) return next()
 
         // 本地处理 /api/proxy-image（模拟 Worker 行为）
@@ -47,18 +54,36 @@ function dynamicProxyPlugin() {
         }
 
         const backend = (req.headers['x-backend'] as string) || ''
-        if (!backend) return next()
+        if (!backend) {
+          res.writeHead(400, { 'Content-Type': 'application/json' })
+          res.end(JSON.stringify({ success: false, message: 'Missing X-Backend header' }))
+          return
+        }
+
         let target: URL
         try {
           target = new URL(backend)
-          if (target.protocol !== 'https:') return next()
-        } catch { return next() }
+        } catch {
+          res.writeHead(400, { 'Content-Type': 'application/json' })
+          res.end(JSON.stringify({ success: false, message: 'Invalid backend URL' }))
+          return
+        }
+        if (target.protocol !== 'https:') {
+          res.writeHead(400, { 'Content-Type': 'application/json' })
+          res.end(JSON.stringify({ success: false, message: 'Backend must use HTTPS' }))
+          return
+        }
 
-        const path = req.url
+        let reqPath: string
+        try {
+          reqPath = decodeURI(req.url!)
+        } catch {
+          reqPath = req.url!
+        }
         const opts = {
           hostname: target.hostname,
           port: 443,
-          path,
+          path: reqPath,
           method: req.method,
           headers: { ...req.headers, host: target.host },
           rejectAuthorized: false,
