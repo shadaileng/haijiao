@@ -1,5 +1,6 @@
 import { md5 } from 'js-md5'
 import { useSettingsStore } from '@/stores/settings'
+import router from '@/router'
 import type { ApiResult, LoginParams, LoginResponse } from '@/types'
 
 let _redirecting = false
@@ -9,8 +10,7 @@ function handleAuthError() {
   const settings = useSettingsStore()
   settings.logout()
   setTimeout(() => { _redirecting = false }, 1000)
-  window.location.hash = ''
-  window.location.href = '/login'
+  router.push('/login')
 }
 
 function utf8Decode(binary: string): string {
