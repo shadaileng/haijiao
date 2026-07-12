@@ -1,11 +1,11 @@
 <script setup lang="ts">
 defineOptions({ name: 'SearchView' })
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted, inject } from 'vue'
 import { showToast } from 'vant'
-import { api } from '@/api/request'
 import type { LiteTopic } from '@/types'
 import Topics from '@/components/Topics.vue'
 
+const api = inject('$api') as any
 const topicsDom = ref()
 const key = ref('')
 const index = ref(1)
@@ -13,8 +13,15 @@ const skeletonLoading = ref(true)
 const hasSearched = ref(false)
 
 const topics: LiteTopic[] = reactive([])
+const tags = reactive<any[]>([])
 
-const hotTags = ['资源分享', '技术交流', '灌水', '求助', '原创', '二次元', '音乐', '读书']
+onMounted(async () => {
+  const result = await api.tags()
+  if (result.success && result.data) {
+    tags.splice(0, tags.length, ...result.data)
+  }
+  skeletonLoading.value = false
+})
 
 const search = async (tag?: string) => {
   if (tag) {
@@ -44,18 +51,21 @@ const search = async (tag?: string) => {
 <template>
   <van-search v-model="key" placeholder="请输入搜索关键词" @search="search()" />
   <template v-if="!hasSearched">
-    <div class="hot-tags">
-      <div class="hot-tags-title">热门搜索</div>
+    <div v-if="skeletonLoading" class="skeleton-card">
+      <van-skeleton title :row="3" :loading="true" />
+    </div>
+    <div v-else-if="tags.length" class="hot-tags">
+      <div class="hot-tags-title">热门标签</div>
       <div class="hot-tags-list">
         <van-tag
-          v-for="tag in hotTags"
-          :key="tag"
+          v-for="tag in tags"
+          :key="tag.id || tag.name"
           size="large"
           plain
           type="primary"
           class="hot-tag"
-          @click="search(tag)"
-        >{{ tag }}</van-tag>
+          @click="search(tag.name)"
+        >{{ tag.name }}</van-tag>
       </div>
     </div>
   </template>
