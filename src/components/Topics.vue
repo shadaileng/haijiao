@@ -22,7 +22,7 @@
               </van-row>
             </div>
             <div v-else>
-              <van-row justify="space-between">
+              <van-row justify="space-between" @click="$router.push(`/topic/${item.topicId}`)">
                 <van-col span="16">
                   <van-row justify="space-between">
                     <van-col span="24" class="hv-title">{{ item.title }}</van-col>
