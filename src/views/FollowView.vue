@@ -8,6 +8,7 @@ import type { FollowUser } from '@/types'
 
 const settings = useSettingsStore()
 const loading = ref(false)
+const skeletonLoading = ref(true)
 const username = ref('')
 const itemsAll = reactive<FollowUser[]>([])
 const items = reactive<FollowUser[]>([])
@@ -19,11 +20,13 @@ onMounted(async () => {
   if (!result.success) {
     showToast(result.message || '加载关注列表失败')
     loading.value = false
+    skeletonLoading.value = false
     return
   }
   itemsAll.splice(0, itemsAll.length, ...result.data)
   usernameFilter()
   loading.value = false
+  skeletonLoading.value = false
 })
 
 const usernameFilter = () => {
@@ -41,39 +44,54 @@ const usernameFilter = () => {
     @search="usernameFilter"
     placeholder="搜索昵称"
   />
-  <van-pull-refresh v-model="loading">
-    <van-list :loading="loading" finished finished-text="没有更多了">
-      <van-cell v-for="item in items" :key="item.userId">
-        <template #value>
-          <div class="card">
-            <van-row>
-              <van-col span="6">
-                <van-image
-                  round
-                  width="4rem"
-                  height="4rem"
-                  src="https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg"
-                  v-headicon="item.avatar?.startsWith('http') ? item.avatar + '.txt' : item.avatar"
-                />
-              </van-col>
-              <van-col span="16" class="hv-text-start">
-                <van-row>
-                  <van-col span="16">
-                    <a class="hv-link" @click="$router.push(`/homepage/${item.userId}/${item.nickname}`)">{{ item.nickname }}</a>
-                  </van-col>
-                  <van-col span="8"><van-tag plain type="primary">{{ item.fansCount }}</van-tag></van-col>
-                </van-row>
-                <van-row>
-                  <van-col span="24" class="hv-sign">签名:{{ item.description || '这家伙很懒什么也没留下' }}</van-col>
-                </van-row>
-              </van-col>
-            </van-row>
-          </div>
-        </template>
-      </van-cell>
-    </van-list>
-    <van-back-top />
-  </van-pull-refresh>
+  <template v-if="skeletonLoading">
+    <div v-for="i in 5" :key="i" class="skeleton-card">
+      <van-row>
+        <van-col span="6">
+          <van-skeleton-avatar :row="0" />
+        </van-col>
+        <van-col span="16">
+          <van-skeleton-title :row="1" />
+          <van-skeleton-title :row="1" style="width: 50%;" />
+        </van-col>
+      </van-row>
+    </div>
+  </template>
+  <template v-else>
+    <van-pull-refresh v-model="loading">
+      <van-list :loading="loading" finished finished-text="没有更多了">
+        <van-cell v-for="item in items" :key="item.userId">
+          <template #value>
+            <div class="card">
+              <van-row>
+                <van-col span="6">
+                  <van-image
+                    round
+                    width="4rem"
+                    height="4rem"
+                    src="https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg"
+                    v-headicon="item.avatar?.startsWith('http') ? item.avatar + '.txt' : item.avatar"
+                  />
+                </van-col>
+                <van-col span="16" class="hv-text-start">
+                  <van-row>
+                    <van-col span="16">
+                      <a class="hv-link" @click="$router.push(`/homepage/${item.userId}/${item.nickname}`)">{{ item.nickname }}</a>
+                    </van-col>
+                    <van-col span="8"><van-tag plain type="primary">{{ item.fansCount }}</van-tag></van-col>
+                  </van-row>
+                  <van-row>
+                    <van-col span="24" class="hv-sign">签名:{{ item.description || '这家伙很懒什么也没留下' }}</van-col>
+                  </van-row>
+                </van-col>
+              </van-row>
+            </div>
+          </template>
+        </van-cell>
+      </van-list>
+      <van-back-top />
+    </van-pull-refresh>
+  </template>
 </template>
 
 <style scoped>
@@ -85,5 +103,8 @@ const usernameFilter = () => {
   text-decoration: none;
   cursor: pointer;
   color: #505050;
+}
+.skeleton-card {
+  padding: 15px;
 }
 </style>

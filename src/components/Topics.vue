@@ -1,5 +1,5 @@
 <template>
-  <van-skeleton title avatar :row="3" :loading="false">
+  <van-skeleton title avatar :row="3" :loading="skeletonLoading">
     <van-list :finished="finished" :loading="loading" finished-text="没有更多了" @load="onLoad">
       <van-cell v-for="item in topics" :key="item.topicId">
         <template #value>
@@ -84,6 +84,10 @@ const props = defineProps({
   topics: {
     type: Array<LiteTopic>,
     default: () => [],
+  },
+  skeletonLoading: {
+    type: Boolean,
+    default: true,
   },
 })
 
