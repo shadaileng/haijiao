@@ -20,6 +20,9 @@
 
 ```
 src/
+├── main.ts        # 应用入口
+├── App.vue        # 根组件（TabBar + overlay + back-top）
+├── assets/        # 静态资源
 ├── api/           # API 请求层 (request.ts: 统一请求/解密/列表/视频/登录 + api 对象)
 ├── types/         # TypeScript 类型定义 (index.ts, shims.d.ts)
 ├── stores/        # Pinia 模块化状态 (settings/user/homepage/hot)
@@ -29,8 +32,7 @@ src/
 ├── utils/         # 工具 (image 图片代理解码, cipher 自定义密码, constant)
 ├── styles/        # 全局样式 (global.scss)
 ├── views/         # 页面级组件 (Home/Hot/Login/Topic/User/UserHome/Follow/Search/Settings/ImageViewer)
-├── router/        # 路由配置
-└── main.ts        # 应用入口
+└── router/        # 路由配置 (index.ts)
 ```
 
 ## 编码规范

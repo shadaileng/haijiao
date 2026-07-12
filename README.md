@@ -31,22 +31,26 @@
 haijiao/
 ├── worker.ts              # Cloudflare Worker 入口（API 代理）
 ├── wrangler.toml          # Cloudflare Workers 配置
-├── vite.config.ts         # Vite 构建配置
+├── vite.config.ts         # Vite 构建配置（含本地 E2E 动态代理）
 ├── tailwind.config.js     # Tailwind CSS 配置
 ├── postcss.config.js      # PostCSS 配置
 ├── index.html             # 入口 HTML
 ├── tsconfig.json          # TypeScript 配置
 ├── tsconfig.node.json     # TS Node 配置
+├── playwright.config.ts   # Playwright E2E 测试配置
+├── opencode.json          # opencode AI 助手配置
+├── package.json           # 项目依赖与脚本
 ├── src/
 │   ├── main.ts            # Vue 应用入口
-│   ├── App.vue            # 根组件
+│   ├── App.vue            # 根组件（TabBar + overlay + back-top）
+│   ├── assets/            # 静态资源
 │   ├── api/               # API 请求层
 │   │   └── request.ts     # HTTP 请求封装、加密处理、视频/登录、api 对象
 │   ├── types/             # TypeScript 类型定义
 │   │   ├── index.ts       # 接口类型声明
 │   │   └── shims.d.ts    # dplayer / .vue 模块声明
 │   ├── stores/            # Pinia 模块化状态
-│   │   ├── settings.ts     # 镜像源 apiBase / uid / token（持久化）
+│   │   ├── settings.ts    # 镜像源 apiBase / uid / token（持久化）
 │   │   ├── user.ts        # 当前用户、关注列表缓存（持久化）
 │   │   ├── homepage.ts    # 用户主页信息/帖子缓存
 │   │   └── hot.ts         # 热门帖子缓存
@@ -57,10 +61,13 @@ haijiao/
 │   │   ├── headicon.ts    # v-headicon 头像懒加载与解码
 │   │   └── content.ts     # v-content 内容渲染 + 视频(DPlayer)
 │   ├── components/        # 通用组件
-│   │   ├── Topics.vue / TopicContent.vue / Comment.vue / UserInfo.vue
-│   │   └── common/TabBar.vue
+│   │   ├── Topics.vue     # 帖子列表组件
+│   │   ├── TopicContent.vue # 帖子内容渲染组件
+│   │   ├── Comment.vue    # 评论列表组件
+│   │   ├── UserInfo.vue   # 用户信息卡片组件
+│   │   └── common/TabBar.vue # 底部导航栏
 │   ├── utils/             # 工具
-│   │   ├── image.ts        # 图片 .txt 代理解码
+│   │   ├── image.ts       # 图片 .txt 代理解码
 │   │   ├── cipher.ts      # 自定义密码算法
 │   │   └── constant.ts    # 常量（LOADING_URL 等）
 │   ├── styles/            # 全局样式
@@ -77,11 +84,23 @@ haijiao/
 │   │   ├── SettingsView.vue # 设置页（镜像源/uid/token）
 │   │   └── ImageViewerView.vue # 图片查看页
 │   └── router/            # 路由配置
-│       └── index.ts        # 路由定义
+│       └── index.ts       # 路由定义
+├── e2e/                   # Playwright 端到端测试
+│   ├── config.ts          # 测试参数配置（mirrorDomain/凭据/videoPid）
+│   ├── helpers.ts         # 测试辅助函数
+│   ├── public.spec.ts     # 公开页规格
+│   ├── auth.spec.ts       # 登录规格
+│   ├── video.spec.ts      # 视频播放规格
+│   └── mirror.spec.ts     # 镜像源规格
+├── docs/                  # 项目文档
+│   ├── README.md          # 文档索引与执行总览
+│   ├── _template.md       # 文档创建模板
+│   ├── plans/             # 方案类文档
+│   ├── architecture/      # 架构类文档
+│   ├── references/        # 参考类文档
+│   └── guides/            # 指南/手册类文档
+├── .opencode/             # opencode 技能与配置
 └── dist/                  # 构建产物
-└── docs/                  # 项目文档
-    ├── login-feature-plan.md  # 登录功能实现计划
-    └── reference/         # 参考资料
 ```
 
 ## API 接口
