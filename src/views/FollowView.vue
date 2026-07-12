@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import { api } from '@/api/request'
 import { useSettingsStore } from '@/stores/settings'
 import type { FollowUser } from '@/types'
 
-const router = useRouter()
 const settings = useSettingsStore()
 const loading = ref(false)
 const username = ref('')
@@ -14,10 +12,7 @@ const itemsAll = reactive<FollowUser[]>([])
 const items = reactive<FollowUser[]>([])
 
 onMounted(async () => {
-  if (!settings.isLoggedIn) {
-    router.replace('/login')
-    return
-  }
+  if (!settings.isLoggedIn) return
   loading.value = true
   const result = await api.follow()
   if (!result.success) {

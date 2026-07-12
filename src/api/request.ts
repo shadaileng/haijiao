@@ -2,6 +2,17 @@ import { md5 } from 'js-md5'
 import { useSettingsStore } from '@/stores/settings'
 import type { ApiResult, LoginParams, LoginResponse } from '@/types'
 
+let _redirecting = false
+function handleAuthError() {
+  if (_redirecting) return
+  _redirecting = true
+  const settings = useSettingsStore()
+  settings.logout()
+  setTimeout(() => { _redirecting = false }, 1000)
+  window.location.hash = ''
+  window.location.href = '/login'
+}
+
 function utf8Decode(binary: string): string {
   const bytes = new Uint8Array(binary.length)
   for (let i = 0; i < binary.length; i++) {
@@ -73,6 +84,9 @@ export async function request<T = any>(options: RequestOptions): Promise<T> {
   const data: ApiResult<T> = await response.json()
 
   if (!data.success) {
+    if (data.errorCode === 1) {
+      handleAuthError()
+    }
     throw new Error(data.message || '请求失败')
   }
 

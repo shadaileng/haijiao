@@ -127,6 +127,7 @@ export interface ApiResult<T = any> {
   data: T
   isEncrypted?: boolean
   message?: string
+  errorCode?: number
 }
 
 export interface LoginParams {
