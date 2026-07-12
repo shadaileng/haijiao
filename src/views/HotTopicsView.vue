@@ -12,16 +12,15 @@ const topicsDom = ref()
 const skeletonLoading = ref(true)
 
 onMounted(() => {
-  topicsDom.value.endLoad()
   loadHot()
 })
 
 const loadHot = async () => {
-  topicsDom.value.startLoad()
+  topicsDom.value?.startLoad()
   const result = await api.hot({ params: { page: pageIndex.value } })
   if (!result.success) {
     showToast(result.message || '加载热门列表失败')
-    topicsDom.value.endLoad()
+    topicsDom.value?.endLoad()
     skeletonLoading.value = false
     return
   }
@@ -30,8 +29,8 @@ const loadHot = async () => {
   }
   topics.push(...result.data.results)
   pageIndex.value++
-  topicsDom.value.endLoad()
   skeletonLoading.value = false
+  topicsDom.value?.endLoad()
 }
 </script>
 

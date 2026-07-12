@@ -24,7 +24,6 @@ onMounted(async () => {
   if (userId.value) {
     await loadUserInfo(userId.value)
   }
-  topicsDom.value?.endLoad()
   await pageto(1)
   skeletonLoading.value = false
 })
@@ -39,7 +38,6 @@ watch(() => route.params.userId, async (newId) => {
     liteTopics.page.index = 1
     liteTopics.page.total = 0
     await loadUserInfo(userId.value)
-    topicsDom.value?.endLoad()
     await pageto(1)
     skeletonLoading.value = false
   }
