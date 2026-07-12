@@ -62,7 +62,12 @@ const publicPages = ['Login', 'Settings', 'ImageViewer']
 const router = createRouter({
   history: createWebHistory(),
   routes,
-  scrollBehavior: () => ({ top: 0 }),
+  scrollBehavior(_to, _from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition
+    }
+    return { top: 0 }
+  },
 })
 
 router.beforeEach((to, _from, next) => {
