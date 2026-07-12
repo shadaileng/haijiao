@@ -5,15 +5,16 @@
 > | 项目 | 内容 |
 > |------|------|
 > | 文档编号 | 04 |
-> | 文档版本 | v1.0.0 |
+> | 文档版本 | v1.1.0 |
 > | 文档状态 | 🏁 已完成 |
-> | 最后更新 | 2026-07-10 |
+> | 最后更新 | 2026-07-12 |
 > | 对应内容 | 所有 API 端点定义、参数、响应 |
 >
 > **变更历史**
 >
 > | 日期 | 版本 | 说明 |
 > |------|:----:|------|
+> | 2026-07-12 | v1.1.0 | 移除 proxy-image 引用、添加 toCamelCase 说明、修复重复章节 |
 > | 2026-07-10 | v1.0.0 | 初版，基于代码和参考分析整理 |
 
 > **关联文档**：[01-架构概览.md](../architecture/01-架构概览.md)（请求流程）· [02-数据字典.md](./02-数据字典.md)（类型定义）· [01-登录功能实施方案.md](../plans/01-登录功能实施方案.md)（登录流程）
@@ -34,19 +35,16 @@
 
 > 不再使用 vite `server.proxy`：前端所有请求走同源 `/api`，由 Worker 代理，避免浏览器直连触发 CORS。
 
-直连请求仅用于图片 `.txt` 密文（经 Worker `/api/proxy-image` 代理）：
-
-```
-/api/proxy-image?url=<.txt 完整或相对地址>
-```
+图片直连请求（`loadImg`）直接 fetch 原始 URL 获取加密字符串，经 `customDecode()` 解码。
 
 ### 1.2 通用请求头
 
 | 头 | 值 | 说明 |
 |:---|:----|------|
-| `Content-Type` | `application/json` | 所有 API 请求 |
+| `Content-Type` | `application/json` | POST/PUT 请求 |
 | `X-User-Id` | `{uid}` | 需认证的接口 |
 | `X-User-Token` | `{token}` | 需认证的接口 |
+| `X-Backend` | `{镜像源域名}` | Worker 代理目标 |
 
 ### 1.3 通用响应格式
 
@@ -55,11 +53,12 @@ interface ApiResult<T = any> {
   success: boolean        // 是否成功
   data: T | string        // 数据（加密时返回 string）
   isEncrypted?: boolean   // data 是否加密
+  errorCode?: number      // 错误码（0=成功）
   message?: string        // 错误消息
 }
 ```
 
-加密数据经过三层 Base64 解码后 JSON.parse 得到原始数据。
+加密数据经过三层 Base64 解码后 JSON.parse 得到原始数据。snake_case 字段自动转换为 camelCase。
 
 ### 1.4 函数调用约定
 
@@ -173,9 +172,10 @@ Sign = MD5(Username + Password + navigator.userAgent)
 
 | 项目 | 值 |
 |------|-----|
-| **函数** | `processImages(items)` |
-| **说明** | 批量获取图片并执行自定义 Base64 解码（`customDecode`） |
+| **函数** | `loadImg(url)` |
+| **说明** | 直连 fetch 原始 URL 获取加密字符串，执行自定义 Base64 解码（`customDecode`） |
 | **字符集** | `ABCD*EFGHIJKLMNOPQRSTUVWX#YZabcdefghijklmnopqrstuvwxyz1234567890` |
+| **返回** | `Promise<string>` data URI |
 
 ---
 
@@ -223,7 +223,6 @@ Sign = MD5(Username + Password + navigator.userAgent)
 
 ```
 /api/*    → 后端（X-Backend 指定镜像源，否则 HAIJIAO_API_BASE）   （添加 CORS 头）
-/api/proxy-image?url=...  → 后端 .txt 密文                      （添加 CORS 头）
 非 /api 路径 → index.html                                              （SPA 回落）
 ```
 
@@ -233,13 +232,6 @@ Sign = MD5(Username + Password + navigator.userAgent)
 
 ### 开发代理（vite.config.ts）
 
-生产不使用 vite `server.proxy`：`npm run dev` 默认仅作静态页面服务，后端经已部署 Worker 或 `npm run cf:dev` 本地代理。本地 E2E 测试（`npm run test:e2e`）会临时启用 `vite.config.ts` 的 `server.proxy`，由其 `router` 读取请求头 `X-Backend`（即配置页「数据源字段」）动态转发到镜像源，与生产 Worker 行为对齐，且仅 `npm run dev` 生效、不进入 `dist/` 产物。
-/api/* → https://{HAIJIAO_API_BASE}/*   （添加 CORS 头）
-非 /api 路径 → index.html                （SPA 回落）
-```
+生产不使用 vite `server.proxy`：`npm run dev` 默认仅作静态页面服务，后端经已部署 Worker 或 `npm run cf:dev` 本地代理。本地 E2E 测试（`npm run test:e2e`）会临时启用 `vite.config.ts` 的自定义中间件插件，读取请求头 `X-Backend`（即配置页「数据源字段」）动态转发到镜像源，与生产 Worker 行为对齐，且仅 `npm run dev` 生效、不进入 `dist/` 产物。
 
-### 开发代理（vite.config.ts）
-
-```
-/api/* → https://haijiao.com/*
-```
+本地 E2E 代理通过 Vite 插件的 `configureServer` 钩子注入自定义中间件，直接用 `node:https` 模块发请求，完全控制代理行为。
