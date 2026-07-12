@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { UserCurrent, FollowUser } from '@/types'
+import type { UserCurrent, FollowUser, LoginResponse } from '@/types'
 import { api } from '@/api/request'
+import { useSettingsStore } from '@/stores/settings'
 
 export const useUserStore = defineStore(
   'user',
@@ -27,7 +28,21 @@ export const useUserStore = defineStore(
       return data
     }
 
-    return { current, follow, setCurrent, getFollow, setFollow, fetchCurrent }
+    // 登录成功后调用，保存凭证并设置当前用户
+    function loginFromApi(data: LoginResponse) {
+      const settings = useSettingsStore()
+      settings.setCredentials(String(data.user.id), data.token)
+      current.value = data.user as UserCurrent
+    }
+
+    // 退出登录，清除所有用户数据
+    function logout() {
+      const settings = useSettingsStore()
+      settings.logout()
+      current.value = null
+    }
+
+    return { current, follow, setCurrent, getFollow, setFollow, fetchCurrent, loginFromApi, logout }
   },
   {
     persist: true,

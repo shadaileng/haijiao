@@ -199,8 +199,7 @@ export async function login(params: LoginParams): Promise<LoginResponse> {
       throw new Error('登录数据解密失败')
     }
   }
-  const settings = useSettingsStore()
-  settings.setCredentials(String(result.user.id), result.token)
+  // 凭证保存由 user store 的 loginFromApi() 方法负责
   return result
 }
 

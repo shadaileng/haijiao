@@ -46,7 +46,7 @@ function save() {
 function clear() {
   uid.value = ''
   token.value = ''
-  settings.logout()
+  userStore.logout()
   currentUser.value = null
   showSuccessToast('已清除')
 }
@@ -58,8 +58,7 @@ function handleLogout() {
     showCancelButton: true,
   })
     .then(() => {
-      settings.logout()
-      userStore.current = null
+      userStore.logout()
       currentUser.value = null
       uid.value = ''
       token.value = ''
