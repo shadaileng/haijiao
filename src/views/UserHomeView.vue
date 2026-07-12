@@ -1,4 +1,5 @@
 <script setup lang="ts">
+defineOptions({ name: 'UserHomeView' })
 import { ref, reactive, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { showToast } from 'vant'
