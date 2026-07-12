@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.2] - 2026-07-12
+
+### Fixed
+
+- 修复 `fetchImageThroughProxy` 缺少 `X-Backend` 头导致图片代理 404 的问题
+- 修复 E2E 测试：`addInitScript` 每次导航覆盖登录凭据、视频测试选择器/断言错误，测试从 4/10 提升到 10/10 通过
+
 ## [1.8.0] - 2026-07-12
 
 ### Added

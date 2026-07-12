@@ -7,7 +7,10 @@ test.describe('公开页冒烟', () => {
 
   test.beforeEach(async ({ context }) => {
     await context.addInitScript((apiBase: string) => {
-      localStorage.setItem('settings', JSON.stringify({ apiBase, uid: '', token: '' }))
+      const raw = localStorage.getItem('settings')
+      const cfg = raw ? JSON.parse(raw) : {}
+      cfg.apiBase = apiBase
+      localStorage.setItem('settings', JSON.stringify(cfg))
     }, E2E.mirrorDomain)
   })
 
@@ -18,24 +21,8 @@ test.describe('公开页冒烟', () => {
     page.on('requestfailed', (req) => {
       console.log('[failed]', req.url(), req.failure()?.errorText)
     })
-    // 捕获所有请求的头信息
-    page.on('request', (req) => {
-      const url = req.url()
-      if (url.includes('/api')) {
-        console.log('[request headers]', url, JSON.stringify(req.headers()))
-      }
-    })
 
     await page.goto('/hot')
-    await page.waitForTimeout(3000)
-
-    // 检查当前 settings store 值
-    const settings = await page.evaluate(() => {
-      const raw = localStorage.getItem('settings')
-      return raw ? JSON.parse(raw) : null
-    })
-    console.log('[settings]', JSON.stringify(settings))
-
     await expect(page.locator('.card').first()).toBeVisible({ timeout: 30000 })
     const title = await page.locator('.card').first().innerText()
     expect(title.trim().length).toBeGreaterThan(0)
@@ -57,8 +44,10 @@ test.describe('公开页冒烟', () => {
 
   test('封面图片被解码为 data URI', async ({ page }) => {
     await page.goto('/hot')
-    await expect(page.locator('.card img').first()).toBeVisible({ timeout: 20000 })
-    const src = await page.locator('.card img').first().getAttribute('src')
-    expect(src?.startsWith('data:')).toBeTruthy()
+    await expect(page.locator('.card').first()).toBeVisible({ timeout: 30000 })
+    const img = page.locator('.card .van-image img, .card .hv-user-icon, .card img').first()
+    await expect(img).toBeVisible({ timeout: 20000 })
+    // IntersectionObserver 异步触发解码，等待 src 从 loading 状态变为 data: URI
+    await expect(img).toHaveAttribute('src', /^data:/, { timeout: 30000 })
   })
 })

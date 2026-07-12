@@ -1,9 +1,13 @@
 import { customDecode } from '@/utils/cipher'
+import { useSettingsStore } from '@/stores/settings'
 
 export async function fetchImageThroughProxy(imageUrl: string): Promise<string> {
   const url = imageUrl.endsWith('.txt') ? imageUrl : imageUrl + '.txt'
   const proxyUrl = `/api/proxy-image?url=${encodeURIComponent(url)}`
-  const response = await fetch(proxyUrl)
+  const settings = useSettingsStore()
+  const response = await fetch(proxyUrl, {
+    headers: { 'X-Backend': settings.apiBase },
+  })
   if (!response.ok) return ''
   const text = await response.text()
   if (!text) return ''
