@@ -2,6 +2,7 @@
 import { RouterView, useRoute } from 'vue-router'
 import { ref, reactive, watch, provide } from 'vue'
 import TabBar from '@/components/common/TabBar.vue'
+import { api } from '@/api/request'
 
 const route = useRoute()
 const active = ref('hot')
@@ -16,6 +17,8 @@ watch(
   },
   { immediate: true }
 )
+
+provide('$api', api)
 
 const overlay = reactive({
   show: false,

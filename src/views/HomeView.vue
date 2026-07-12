@@ -1,80 +1,9 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { useUserStore } from '@/stores/user'
 
 const router = useRouter()
-const store = useUserStore()
-const isLoggedIn = ref(store.isLoggedIn)
-const nickname = ref(store.nickname)
-
-onMounted(() => {
-  isLoggedIn.value = store.isLoggedIn
-  nickname.value = store.nickname
-})
+onMounted(() => router.replace('/hot'))
 </script>
 
-<template>
-  <div class="home-view">
-    <van-nav-bar title="海角助手">
-      <template #right>
-        <van-icon name="setting-o" size="22" @click="router.push('/settings')" />
-      </template>
-    </van-nav-bar>
-
-    <div class="content-area">
-      <van-cell-group inset class="status-group">
-        <van-cell
-          title="登录状态"
-          :value="isLoggedIn ? '已登录' : '未登录'"
-          :label="isLoggedIn ? (nickname ? `${nickname} | UID: ${store.uid}` : `UID: ${store.uid}`) : '请前往登录或在设置中填写UID和Token'"
-          is-link
-          @click="router.push(isLoggedIn ? '/settings' : '/login')"
-        />
-      </van-cell-group>
-
-      <van-cell-group inset class="feature-group">
-        <van-grid :column-num="2" :border="false">
-          <van-grid-item icon="wap-home-o" text="帖子详情" to="/topic" />
-          <van-grid-item icon="search" text="搜索帖子" to="/search" />
-          <van-grid-item icon="friends-o" text="关注列表" to="/follow" />
-          <van-grid-item icon="user-o" text="用户帖子" to="/user" />
-        </van-grid>
-      </van-cell-group>
-
-      <van-cell-group v-if="store.topicIds.length > 0" inset class="recent-group">
-        <van-cell title="最近帖子" />
-        <van-cell
-          v-for="pid in store.topicIds.slice(0, 5)" :key="pid"
-          :title="pid" is-link to="/topic"
-        />
-      </van-cell-group>
-
-      <van-cell-group v-if="store.userIds.length > 0" inset class="recent-group">
-        <van-cell title="最近用户" />
-        <van-cell
-          v-for="uid in store.userIds.slice(0, 5)" :key="uid"
-          :title="uid" is-link to="/user"
-        />
-      </van-cell-group>
-
-      <van-cell-group v-if="store.searchKeys.length > 0" inset class="recent-group">
-        <van-cell title="最近搜索" />
-        <van-cell
-          v-for="key in store.searchKeys.slice(0, 5)" :key="key" :title="key" is-link
-        />
-      </van-cell-group>
-    </div>
-  </div>
-</template>
-
-<style scoped>
-.home-view {
-  min-height: 100vh;
-  background: #f7f8fa;
-}
-.content-area { padding: 12px 0; }
-.status-group { margin-bottom: 12px; }
-.feature-group { margin-bottom: 12px; }
-.recent-group { margin-bottom: 12px; }
-</style>
+<template></template>

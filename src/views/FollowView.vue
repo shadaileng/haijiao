@@ -1,75 +1,48 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import { showToast } from 'vant'
-import { useUserStore } from '@/stores/user'
-import { getFollowList } from '@/api/request'
+import { api } from '@/api/request'
+import { useSettingsStore } from '@/stores/settings'
 import type { FollowUser } from '@/types'
 
-const LOADING_URL = 'https://haijiao.com/images/common/project/loading.gif'
-
-const store = useUserStore()
-
+const settings = useSettingsStore()
+const loading = ref(false)
 const username = ref('')
 const itemsAll = reactive<FollowUser[]>([])
-const items = ref<FollowUser[]>([])
-const loading = ref(false)
-const finished = ref(false)
+const items = reactive<FollowUser[]>([])
 
 onMounted(async () => {
-  if (store.followMap[store.uid]) {
-    itemsAll.splice(0, itemsAll.length, ...store.followMap[store.uid])
-    filterItems()
+  if (!settings.isLoggedIn) return
+  loading.value = true
+  const result = await api.follow()
+  if (!result.success) {
+    showToast(result.message || '加载关注列表失败')
+    loading.value = false
+    return
   }
-  if (store.isLoggedIn) {
-    await loadFollow()
-  }
+  itemsAll.splice(0, itemsAll.length, ...result.data)
+  usernameFilter()
+  loading.value = false
 })
 
-const loadFollow = async () => {
-  loading.value = true
-  try {
-    const data = await getFollowList(store.token, store.uid)
-    if (!data || !Array.isArray(data)) {
-      showToast('加载关注列表失败')
-      return
-    }
-    itemsAll.splice(0, itemsAll.length, ...data)
-    store.cacheFollow(store.uid, data)
-    filterItems()
-  } catch (e: any) {
-    showToast(e.message || '加载关注列表失败')
-  } finally {
-    loading.value = false
-    finished.value = true
-  }
+const usernameFilter = () => {
+  items.splice(
+    0,
+    items.length,
+    ...itemsAll.filter(item => item.nickname?.includes(username.value))
+  )
 }
-
-const filterItems = () => {
-  if (!username.value) {
-    items.value = [...itemsAll]
-  } else {
-    items.value = itemsAll.filter(item =>
-      (item as any).nickname?.includes(username.value)
-    )
-  }
-}
-
 </script>
 
 <template>
   <van-search
     v-model="username"
-    @search="filterItems"
-    placeholder="输入昵称搜索"
+    @search="usernameFilter"
+    placeholder="搜索昵称"
   />
   <van-pull-refresh v-model="loading">
-    <van-list
-      :loading="loading"
-      :finished="finished"
-      finished-text="没有更多了"
-      @load="loadFollow"
-    >
-      <van-cell v-for="item in items" :key="(item as any).userId">
+    <van-list :loading="loading" finished finished-text="没有更多了">
+      <van-cell v-for="item in items" :key="item.userId">
         <template #value>
           <div class="card">
             <van-row>
@@ -78,28 +51,19 @@ const filterItems = () => {
                   round
                   width="4rem"
                   height="4rem"
-                  :src="LOADING_URL"
-                  v-headicon="((item as any).avatar?.startsWith('http') ? (item as any).avatar + '.txt' : (item as any).avatar)"
+                  src="https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg"
+                  v-headicon="item.avatar?.startsWith('http') ? item.avatar + '.txt' : item.avatar"
                 />
               </van-col>
               <van-col span="16" class="hv-text-start">
                 <van-row>
                   <van-col span="16">
-                    <a
-                      class="hv-link"
-                      @click="$router.push(`/homepage/${(item as any).userId}/${(item as any).nickname}`)"
-                    >
-                      {{ (item as any).nickname }}
-                    </a>
+                    <a class="hv-link" @click="$router.push(`/homepage/${item.userId}/${item.nickname}`)">{{ item.nickname }}</a>
                   </van-col>
-                  <van-col span="8">
-                    <van-tag plain type="primary">{{ (item as any).fansCount }}</van-tag>
-                  </van-col>
+                  <van-col span="8"><van-tag plain type="primary">{{ item.fansCount }}</van-tag></van-col>
                 </van-row>
                 <van-row>
-                  <van-col span="24" class="hv-sign">
-                    签名:{{ (item as any).description || '这家伙很懒什么也没留下' }}
-                  </van-col>
+                  <van-col span="24" class="hv-sign">签名:{{ item.description || '这家伙很懒什么也没留下' }}</van-col>
                 </van-row>
               </van-col>
             </van-row>
@@ -117,7 +81,6 @@ const filterItems = () => {
   padding: 0;
 }
 .hv-link {
-  color: #29253b;
   text-decoration: none;
   cursor: pointer;
   color: #505050;

@@ -1,21 +1,3 @@
-<script setup lang="ts">
-const LOADING_URL = 'https://haijiao.com/images/common/project/loading.gif'
-
-interface UserInfoData {
-  id: number
-  nickname: string
-  avatar: string
-  description?: string
-  topicCount?: number
-  fansCount?: number
-  favoriteCount?: number
-}
-
-defineProps<{
-  userInfo: UserInfoData | null
-}>()
-</script>
-
 <template>
   <div class="card van-hairline--bottom">
     <van-row>
@@ -25,7 +7,7 @@ defineProps<{
           width="4rem"
           height="4rem"
           :src="LOADING_URL"
-          v-headicon="userInfo?.avatar?.startsWith('http') ? userInfo?.avatar + '.txt' : userInfo?.avatar"
+          v-headicon="userInfo && (userInfo.avatar?.startsWith('http') ? userInfo.avatar + '.txt' : userInfo.avatar)"
         />
       </van-col>
       <van-col span="16" class="hv-text-start">
@@ -33,7 +15,7 @@ defineProps<{
           <van-row>
             <van-col span="24">
               <span>{{ userInfo?.nickname }}</span>
-              <span>(ID: {{ userInfo?.id }})</span>
+              <span>(ID: {{ userInfo?.id || userInfo?.userId }})</span>
             </van-col>
           </van-row>
           <van-row>
@@ -56,10 +38,22 @@ defineProps<{
   </div>
 </template>
 
+<script setup lang="ts">
+import { LOADING_URL } from '@/utils/constant'
+
+defineProps({
+  userInfo: {
+    type: Object as any,
+    default: () => null,
+  },
+})
+</script>
+
 <style scoped>
 .card {
   text-align: left;
   cursor: pointer;
-  padding: 10px 0 5px;
+  padding-top: 10px;
+  padding-bottom: 5px;
 }
 </style>

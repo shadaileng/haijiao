@@ -1,54 +1,44 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useSettingsStore } from '@/stores/settings'
 import { useUserStore } from '@/stores/user'
-import { useProxyConfig } from '@/composables/useProxyConfig'
-import { request } from '@/api/request'
+import { useMirrorConfig } from '@/composables/useMirrorConfig'
 import { showToast, showSuccessToast, showDialog as showConfirmDialog } from 'vant'
 import UserInfo from '@/components/UserInfo.vue'
 
 const router = useRouter()
-const store = useUserStore()
-const { showDialog: proxyDialog, proxyUrl, proxyDisplay, openConfig, saveConfig } = useProxyConfig()
+const settings = useSettingsStore()
+const userStore = useUserStore()
+const { showDialog, mirrorUrl, mirrorDisplay, openConfig, saveConfig } = useMirrorConfig()
 
-const uid = ref(store.uid || '')
-const token = ref(store.token || '')
-const currentUser = ref<any>(null)
+const uid = ref(settings.uid || '')
+const token = ref(settings.token || '')
+const currentUser = ref<any>(userStore.current)
 
 onMounted(async () => {
-  uid.value = store.uid
-  token.value = store.token
-  if (store.isLoggedIn) {
+  uid.value = settings.uid
+  token.value = settings.token
+  if (settings.isLoggedIn) {
     await loadCurrentUser()
   }
 })
 
 const loadCurrentUser = async () => {
-  try {
-    const data = await request({
-      url: '/user/current',
-      params: { date: Date.now() },
-      headers: { 'X-User-Id': store.uid, 'X-User-Token': store.token },
-    })
-    if (data) {
-      currentUser.value = data.user || data
-    }
-  } catch {
-    // ignore
-  }
+  const data = await userStore.fetchCurrent()
+  if (data) currentUser.value = data
 }
 
-const sourceUrl = computed(() => {
-  if (store.proxyBase && store.proxyBase.startsWith('http')) {
-    return store.proxyBase
-  }
-  return 'https://haijiao.com'
-})
-
 function save() {
-  if (!uid.value) { showToast('UID不能为空'); return }
-  if (!token.value) { showToast('Token不能为空'); return }
-  store.setCredentials(uid.value, token.value)
+  if (!uid.value) {
+    showToast('UID不能为空')
+    return
+  }
+  if (!token.value) {
+    showToast('Token不能为空')
+    return
+  }
+  settings.setCredentials(uid.value, token.value)
   showSuccessToast('保存成功')
   loadCurrentUser()
 }
@@ -56,7 +46,8 @@ function save() {
 function clear() {
   uid.value = ''
   token.value = ''
-  store.setCredentials('', '')
+  settings.logout()
+  currentUser.value = null
   showSuccessToast('已清除')
 }
 
@@ -65,13 +56,16 @@ function handleLogout() {
     title: '退出登录',
     message: '确定要退出登录吗？',
     showCancelButton: true,
-  }).then(() => {
-    store.logout()
-    uid.value = ''
-    token.value = ''
-    currentUser.value = null
-    showSuccessToast('已退出')
-  }).catch(() => {})
+  })
+    .then(() => {
+      settings.logout()
+      userStore.current = null
+      currentUser.value = null
+      uid.value = ''
+      token.value = ''
+      showSuccessToast('已退出')
+    })
+    .catch(() => {})
 }
 </script>
 
@@ -82,18 +76,12 @@ function handleLogout() {
     <UserInfo v-if="currentUser" :userInfo="currentUser" />
 
     <van-cell-group inset class="status-group">
-      <van-cell title="登录状态" :value="store.isLoggedIn ? '已登录' : '未登录'" is-link>
-        <template #label v-if="store.isLoggedIn">
-          UID: {{ store.uid }}
-        </template>
-        <template #label v-else>
-          <span>请在下方填写UID和Token</span>
-        </template>
+      <van-cell title="登录状态" :value="settings.isLoggedIn ? '已登录' : '未登录'">
+        <template #label v-if="settings.isLoggedIn">UID: {{ settings.uid }}</template>
+        <template #label v-else><span>请在下方填写 UID 和 Token</span></template>
       </van-cell>
-      <van-cell v-if="store.isLoggedIn" title="退出登录" is-link @click="handleLogout">
-        <template #right-icon>
-          <van-icon name="warning-o" color="#ee0a24" />
-        </template>
+      <van-cell v-if="settings.isLoggedIn" title="退出登录" is-link @click="handleLogout">
+        <template #right-icon><van-icon name="warning-o" color="#ee0a24" /></template>
       </van-cell>
     </van-cell-group>
 
@@ -103,8 +91,8 @@ function handleLogout() {
       <van-field v-model="token" label="Token" placeholder="请输入Token" type="password" clearable />
     </van-cell-group>
 
-    <van-cell-group inset class="proxy-group">
-      <van-cell title="代理地址" :value="proxyDisplay" is-link @click="openConfig" />
+    <van-cell-group inset class="mirror-group">
+      <van-cell title="镜像源（数据源地址）" :value="mirrorDisplay()" is-link @click="openConfig" />
     </van-cell-group>
 
     <van-button type="primary" block round class="save-btn" @click="save">保存</van-button>
@@ -112,12 +100,15 @@ function handleLogout() {
 
     <van-cell-group inset class="info-group">
       <van-cell title="数据来源">
-        <template #label>{{ sourceUrl }}</template>
+        <template #label>
+          <div>{{ settings.apiBase }}</div>
+          <div class="source-hint">官方域名国内被屏蔽，请填写后台提供的可用镜像地址</div>
+        </template>
       </van-cell>
     </van-cell-group>
 
-    <van-dialog v-model:show="proxyDialog" title="配置代理地址" @confirm="saveConfig" show-cancel-button>
-      <van-field v-model="proxyUrl" placeholder="留空使用默认 /api" clearable label="地址" label-width="50px" />
+    <van-dialog v-model:show="showDialog" title="配置镜像源" @confirm="saveConfig" show-cancel-button>
+      <van-field v-model="mirrorUrl" placeholder="https://你的镜像域名" clearable label="地址" label-width="60px" />
     </van-dialog>
   </div>
 </template>
@@ -127,10 +118,27 @@ function handleLogout() {
   min-height: 100vh;
   background: #f7f8fa;
 }
-.status-group { margin: 12px; }
-.setting-group { margin: 12px; }
-.proxy-group { margin: 12px; }
-.save-btn { margin: 16px 12px; }
-.clear-btn { margin: 0 12px 16px; }
-.info-group { margin: 12px; }
+.status-group {
+  margin: 12px;
+}
+.setting-group {
+  margin: 12px;
+}
+.mirror-group {
+  margin: 12px;
+}
+.source-hint {
+  margin-top: 4px;
+  color: #ee0a24;
+  font-size: 12px;
+}
+.save-btn {
+  margin: 16px 12px;
+}
+.clear-btn {
+  margin: 0 12px 16px;
+}
+.info-group {
+  margin: 12px;
+}
 </style>

@@ -28,27 +28,48 @@ export default {
   },
 };
 
+// 解析前端传入的镜像源（X-Backend），校验为合法 https 域名则作为代理目标，否则回退 env 默认
+function resolveBackend(request: Request, env: Env): string {
+  const backend = request.headers.get('X-Backend')
+  if (backend) {
+    try {
+      const u = new URL(backend)
+      if (u.protocol === 'https:') {
+        return u.origin
+      }
+    } catch {
+      // 忽略非法值
+    }
+  }
+  return env.HAIJIAO_API_BASE
+}
+
 async function proxyApi(request: Request, env: Env): Promise<Response> {
   const url = new URL(request.url);
-  
+  const backend = resolveBackend(request, env);
+
   // 图片代理端点：用于获取 .txt 文件并解码
   if (url.pathname === '/api/proxy-image') {
-    const targetUrl = url.searchParams.get('url');
+    let targetUrl = url.searchParams.get('url');
     if (!targetUrl) {
       return Response.json({ success: false, message: 'Missing url parameter' }, { status: 400 });
     }
-    
+    // 支持镜像源：若传入的是相对路径，则拼接到镜像源
+    if (!targetUrl.startsWith('http')) {
+      targetUrl = backend.replace(/\/$/, '') + (targetUrl.startsWith('/') ? targetUrl : '/' + targetUrl);
+    }
+
     try {
       const response = await fetch(targetUrl, {
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
         },
       });
-      
+
       if (!response.ok) {
         return Response.json({ success: false, message: 'Image fetch failed' }, { status: response.status });
       }
-      
+
       const text = await response.text();
       return new Response(text, {
         status: 200,
@@ -65,7 +86,8 @@ async function proxyApi(request: Request, env: Env): Promise<Response> {
     }
   }
 
-  const apiUrl = `${env.HAIJIAO_API_BASE}${request.url.replace(`${new URL(request.url).origin}/api`, '')}`;
+  const apiPath = url.pathname.replace(/^\/api/, '')
+  const apiUrl = `${backend}${apiPath}${url.search}`;
 
   const headers = new Headers(request.headers);
   headers.delete('host');

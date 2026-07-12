@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import { showToast } from 'vant'
-import { getHotTopics } from '@/api/request'
+import { api } from '@/api/request'
 import type { LiteTopic } from '@/types'
 import Topics from '@/components/Topics.vue'
 
@@ -9,29 +9,25 @@ const topics: LiteTopic[] = reactive([])
 const pageIndex = ref(1)
 const topicsDom = ref()
 
-onMounted(async () => {
+onMounted(() => {
   topicsDom.value.endLoad()
-  await loadHot()
+  loadHot()
 })
 
 const loadHot = async () => {
   topicsDom.value.startLoad()
-  try {
-    const result = await getHotTopics(pageIndex.value)
-    if (!result?.results) {
-      showToast('加载热门列表失败')
-      return
-    }
-    if (pageIndex.value === 1) {
-      topics.length = 0
-    }
-    topics.push(...result.results)
-  } catch (e: any) {
-    showToast(e.message || '加载热门列表失败')
-  } finally {
+  const result = await api.hot({ params: { page: pageIndex.value } })
+  if (!result.success) {
+    showToast(result.message || '加载热门列表失败')
     topicsDom.value.endLoad()
-    pageIndex.value++
+    return
   }
+  if (pageIndex.value === 1) {
+    topics.length = 0
+  }
+  topics.push(...result.data.results)
+  pageIndex.value++
+  topicsDom.value.endLoad()
 }
 </script>
 

@@ -1,61 +1,58 @@
-import type { App } from 'vue'
+import type { App, Directive } from 'vue'
 import { fetchImageThroughProxy } from '@/utils/image'
-import { useUserStore } from '@/stores/user'
+import { LOADING_URL } from '@/utils/constant'
+import { useSettingsStore } from '@/stores/settings'
 
-const LOADING_URL = 'https://haijiao.com/images/common/project/loading.gif'
-
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach((entry) => {
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
     if (entry.isIntersecting) {
-      const img = entry.target as HTMLImageElement
-      if (img.dataset.src && img.dataset.lazy !== 'loaded') {
-        const url = img.dataset.src
-        if (url.startsWith('http')) {
-          fetchImageThroughProxy(url)
-            .then((dataUri) => {
-              if (dataUri) {
-                img.src = dataUri
-              }
-              img.dataset.lazy = 'loaded'
-              observer.unobserve(img)
-            })
-            .catch(() => {
-              img.dataset.lazy = 'loaded'
-              observer.unobserve(img)
-            })
-        } else {
-          img.src = url
-          img.dataset.lazy = 'loaded'
-          observer.unobserve(img)
-        }
+      const imgElement = entry.target as HTMLImageElement
+      if (imgElement?.dataset['src']) {
+        fetchImageThroughProxy(imgElement.dataset['src'])
+          .then(dataUri => {
+            if (dataUri) imgElement.setAttribute('src', dataUri)
+          })
+          .finally(() => {
+            imgElement.dataset.lazy = 'loaded'
+            observer.unobserve(entry.target)
+          })
       }
     }
   })
 })
 
+function apply(el: HTMLElement, binding: any) {
+  const value = binding.value
+  const imgElement = el.querySelector('img') as HTMLImageElement | null
+  if (!imgElement || imgElement.dataset.lazy === 'loaded') return
+
+  const settings = useSettingsStore()
+
+  if (typeof value === 'string' && value.startsWith('http')) {
+    imgElement.setAttribute('src', LOADING_URL)
+    imgElement.dataset.src = value
+    imgElement.dataset.lazy = 'loading'
+    observer.observe(imgElement)
+    return
+  }
+
+  if (value) {
+    const suffix = value === '-1' ? '.png' : '.jpg'
+    imgElement.setAttribute('src', `${settings.apiBase}/imgs/headicon/${value}${suffix}`)
+    imgElement.dataset.lazy = 'loading'
+    imgElement.onload = () => {
+      imgElement.dataset.lazy = 'loaded'
+    }
+  }
+}
+
+const vHeadicon: Directive = {
+  mounted: (el: HTMLElement, binding: any) => apply(el, binding),
+  updated: (el: HTMLElement, binding: any) => apply(el, binding),
+}
+
 export default {
   install(app: App) {
-    app.directive('headicon', {
-      updated(el: HTMLElement, binding: { value: string }) {
-        const img = el.querySelector('img')
-        if (!img || img.dataset.lazy === 'loaded' || !binding.value) return
-
-        if (binding.value.startsWith('http')) {
-          img.src = LOADING_URL
-          img.dataset.src = binding.value
-          img.dataset.lazy = 'loading'
-          observer.observe(img)
-        } else {
-          const store = useUserStore()
-          const baseUrl = store.proxyBase || 'https://haijiao.com'
-          const extension = binding.value === '-1' ? '.png' : '.jpg'
-          img.src = `${baseUrl}/imgs/headicon/${binding.value}${extension}`
-          img.dataset.lazy = 'loading'
-          img.onload = () => {
-            img.dataset.lazy = 'loaded'
-          }
-        }
-      },
-    })
+    app.directive('headicon', vHeadicon)
   },
 }

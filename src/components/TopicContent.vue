@@ -1,20 +1,8 @@
-<script setup lang="ts">
-import type { Attachment } from '@/types'
-
-defineProps<{
-  content: string
-  attachments?: Attachment[]
-}>()
-
-const handleClick = (params: any) => {
-  console.log('handleClick:', params)
-}
-</script>
-
 <template>
   <div
-    class="topic-content"
+    class="content"
     v-content="{
+      topicId,
       content,
       attachments,
       handleClick,
@@ -22,17 +10,30 @@ const handleClick = (params: any) => {
   ></div>
 </template>
 
+<script setup lang="ts">
+import { inject } from 'vue'
+import type { Attachment } from '@/types'
+
+defineProps({
+  topicId: { type: [String, Number], default: 0 },
+  content: { type: String, default: '' },
+  attachments: { type: Array<Attachment>, default: () => [] },
+})
+
+const handleClick = inject('overlay') as (data: any) => void
+</script>
+
 <style scoped>
-.topic-content {
+.content {
   overflow: auto;
   text-align: left;
   font-size: 1.2rem;
   padding: 0 15px;
 }
-.topic-content :deep(p) {
+.content p {
   margin: 0;
 }
-.topic-content :deep(img) {
+.content img {
   width: 100%;
   height: auto;
 }

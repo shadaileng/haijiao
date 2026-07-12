@@ -2,18 +2,15 @@
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { showToast } from 'vant'
-import { useUserStore } from '@/stores/user'
-import { request } from '@/api/request'
+import { api } from '@/api/request'
 import type { Topic } from '@/types'
 import Comment from '@/components/Comment.vue'
 import TopicContent from '@/components/TopicContent.vue'
-
-const LOADING_URL = 'https://haijiao.com/images/common/project/loading.gif'
+import { LOADING_URL } from '@/utils/constant'
 
 const route = useRoute()
-const store = useUserStore()
 
-const pid = ref(route.params.pid as string || '')
+const pid = ref((route.params.pid as string) || '')
 const loading = ref(true)
 const topicLocal = ref<Topic>({
   topicId: 0,
@@ -39,27 +36,14 @@ onMounted(async () => {
 const loadTopic = async (topicPid: string) => {
   if (!topicPid) return
   loading.value = true
-  try {
-    if (store.topicCache[topicPid]) {
-      Object.assign(topicLocal.value, store.topicCache[topicPid])
-      loading.value = false
-      return
-    }
-    const data = await request({
-      url: `/topic/${topicPid}`,
-    })
-    if (!data) {
-      showToast('加载主题失败')
-      return
-    }
-    Object.assign(topicLocal.value, data)
-    store.cacheTopic(topicPid, data)
-    store.addTopicId(topicPid)
-  } catch (e: any) {
-    showToast(e.message || '加载主题失败')
-  } finally {
+  const resp = await api.topic({ params: { topicId: topicPid } })
+  if (!resp.success) {
+    showToast(resp.message || '加载主题失败')
     loading.value = false
+    return
   }
+  Object.assign(topicLocal.value, resp.data)
+  loading.value = false
 }
 </script>
 
@@ -113,6 +97,7 @@ const loadTopic = async (topicPid: string) => {
     </van-row>
     <van-row class="hv-box-padding" v-if="topicLocal.content?.length">
       <TopicContent
+        :topicId="topicLocal.topicId"
         :content="topicLocal.content"
         :attachments="topicLocal.attachments"
       />
@@ -122,5 +107,4 @@ const loadTopic = async (topicPid: string) => {
   <Comment :topicId="topicLocal.topicId" />
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

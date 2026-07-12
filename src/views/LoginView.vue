@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useUserStore } from '@/stores/user'
-import { login } from '@/api/request'
-import { useProxyConfig } from '@/composables/useProxyConfig'
 import { showToast, showSuccessToast } from 'vant'
+import { useSettingsStore } from '@/stores/settings'
+import { useUserStore } from '@/stores/user'
+import { api } from '@/api/request'
 
 const router = useRouter()
-const store = useUserStore()
-const { showDialog, proxyUrl, proxyDisplay, openConfig, saveConfig } = useProxyConfig()
+const settings = useSettingsStore()
+const userStore = useUserStore()
 
 const username = ref('')
 const password = ref('')
@@ -24,21 +24,19 @@ async function handleLogin() {
     showToast('请输入密码')
     return
   }
-
   loading.value = true
-  try {
-    const data = await login({
-      username: username.value.trim(),
-      password: password.value,
-    })
-    store.loginFromApi(data)
-    showSuccessToast('登录成功')
-    router.replace('/')
-  } catch (e: any) {
-    showToast(e.message || '登录失败')
-  } finally {
-    loading.value = false
+  const resp = await api.login({
+    username: username.value.trim(),
+    password: password.value,
+  })
+  loading.value = false
+  if (!resp.success) {
+    showToast(resp.message || '登录失败')
+    return
   }
+  showSuccessToast('登录成功')
+  await userStore.fetchCurrent()
+  router.replace('/hot')
 }
 
 function goToSettings() {
@@ -76,59 +74,24 @@ function goToSettings() {
           :disabled="loading"
         >
           <template #button>
-            <van-icon
-              :name="showPassword ? 'eye-o' : 'closed-eye'"
-              size="20"
-              @click="showPassword = !showPassword"
-            />
+            <van-icon :name="showPassword ? 'eye-o' : 'closed-eye'" size="20" @click="showPassword = !showPassword" />
           </template>
         </van-field>
       </van-cell-group>
 
-      <van-button
-        type="primary"
-        block
-        round
-        class="login-btn"
-        :loading="loading"
-        loading-text="登录中..."
-        @click="handleLogin"
-      >
+      <van-button type="primary" block round class="login-btn" :loading="loading" loading-text="登录中..." @click="handleLogin">
         登录
       </van-button>
 
-      <van-button
-        plain
-        block
-        round
-        class="settings-btn"
-        @click="goToSettings"
-      >
-        手动配置 UID / Token
+      <van-button plain block round class="settings-btn" @click="goToSettings">
+        手动配置 UID / Token / 镜像源
       </van-button>
 
-      <van-cell
-        title="代理地址"
-        :value="proxyDisplay"
-        is-link
-        class="proxy-cell"
-        @click="openConfig"
-      />
-
       <div class="tips">
-        <p>如已有 UID 和 Token，可跳过登录直接手动配置</p>
+        <p>如已有 UID 和 Token，可跳过登录直接在配置页填写</p>
+        <p>当前镜像源：{{ settings.apiBase }}</p>
       </div>
     </div>
-
-    <van-dialog v-model:show="showDialog" title="配置代理地址" @confirm="saveConfig" show-cancel-button>
-      <van-field
-        v-model="proxyUrl"
-        placeholder="留空使用默认 /api"
-        clearable
-        label="地址"
-        label-width="50px"
-      />
-    </van-dialog>
   </div>
 </template>
 
@@ -137,44 +100,35 @@ function goToSettings() {
   min-height: 100vh;
   background: #f7f8fa;
 }
-
 .login-content {
   padding: 24px 16px;
 }
-
 .logo-area {
   text-align: center;
   padding: 32px 0 24px;
 }
-
 .logo-area h2 {
   margin: 12px 0 4px;
   font-size: 22px;
   color: #323233;
 }
-
 .logo-area p {
   margin: 0;
   font-size: 14px;
   color: #969799;
 }
-
 .login-form {
   margin-bottom: 24px;
 }
-
 .login-btn {
   margin-bottom: 12px;
 }
-
 .settings-btn {
   margin-bottom: 16px;
 }
-
 .tips {
   text-align: center;
 }
-
 .tips p {
   margin: 0;
   font-size: 12px;

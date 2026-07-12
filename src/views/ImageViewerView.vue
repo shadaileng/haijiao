@@ -1,73 +1,36 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { showToast } from 'vant'
+import { fetchImageThroughProxy } from '@/utils/image'
 
 const route = useRoute()
-const imageUrl = ref('')
-const loading = ref(true)
+const imgUrl = ref('')
 
-onMounted(() => {
-  const url = route.query.url as string
-  if (url) {
-    imageUrl.value = url
-  } else {
-    showToast('没有图片URL')
-    history.back()
-  }
+onMounted(async () => {
+  const url = (route.query.url as string) || ''
+  if (!url) return
+  const dataUri = await fetchImageThroughProxy(url)
+  if (dataUri) imgUrl.value = dataUri
 })
 
-function downloadImage() {
-  if (!imageUrl.value) return
-  const a = document.createElement('a')
-  a.href = imageUrl.value
-  a.download = 'image.jpg'
-  a.target = '_blank'
-  a.click()
-}
+const onClickLeft = () => history.back()
 </script>
 
 <template>
-  <div class="image-viewer-page">
-    <van-nav-bar title="图片查看" left-arrow :fixed="true" :placeholder="true">
-      <template #right>
-        <van-icon name="down" size="20" @click="downloadImage" />
-      </template>
-    </van-nav-bar>
-
-    <div class="image-container">
-      <van-loading v-if="loading" size="24px" vertical>加载中...</van-loading>
-      <img
-        v-else
-        :src="imageUrl"
-        alt="image"
-        class="viewer-image"
-        @load="loading = false"
-      />
-    </div>
+  <van-nav-bar title="图片查看" left-text="返回" left-arrow @click-left="onClickLeft" :fixed="true" :placeholder="true" />
+  <div class="image-viewer">
+    <img v-if="imgUrl" :src="imgUrl" class="hv-img-view" />
+    <van-empty v-else description="无图片" />
   </div>
 </template>
 
 <style scoped>
-.image-viewer-page {
-  min-height: 100vh;
-  background: #000;
-  display: flex;
-  flex-direction: column;
+.image-viewer {
+  padding: 10px;
+  text-align: center;
 }
-
-.image-container {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-}
-
-.viewer-image {
-  max-width: 100%;
-  max-height: calc(100vh - 80px);
-  object-fit: contain;
-  border-radius: 4px;
+.hv-img-view {
+  width: 100%;
+  height: auto;
 }
 </style>

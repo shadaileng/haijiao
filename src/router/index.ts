@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useUserStore } from '@/stores/user'
+import { useSettingsStore } from '@/stores/settings'
 
 const routes = [
   {
@@ -66,8 +66,8 @@ const router = createRouter({
 })
 
 router.beforeEach((to, _from, next) => {
-  const store = useUserStore()
-  if (store.isLoggedIn || publicPages.includes(to.name as string)) {
+  const settings = useSettingsStore()
+  if (settings.isLoggedIn || publicPages.includes(to.name as string)) {
     next()
   } else {
     next({ name: 'Login' })

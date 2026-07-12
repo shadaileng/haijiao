@@ -4,9 +4,54 @@ export interface UserInfo {
   nickname?: string
 }
 
-export interface FollowUser {
-  userId: string
+export interface User {
+  userId: number
   nickname: string
+  avatar: string
+  description: string
+  topicCount: number
+  videoCount: number
+  fansCount: number
+  favoriteCount: number
+}
+
+export interface UserCurrent {
+  id: number
+  nickname: string
+  avatar: string
+  description: string
+  topicCount: number
+  videoCount: number
+  commentCount: number
+  fansCount: number
+  favoriteCount: number
+  status: number
+  sex: number
+  vip: number
+  vipExpiresTime: string
+  tags: Array<any> | null
+  role: number
+  phone: string
+  gold: number
+  topicLikeNum: number
+  username: string
+  email: string
+  emailVerified: boolean
+  createTime: string
+  lastLoginTime: string
+  lastLoginIp: string
+}
+
+export interface FollowUser {
+  id: number
+  userId: number
+  nickname: string
+  avatar: string
+  description: string
+  topicCount: number
+  videoCount: number
+  fansCount: number
+  favoriteCount: number
 }
 
 export interface Page {
@@ -59,60 +104,6 @@ export interface LiteTopicPage {
   page: Page
 }
 
-export interface TopicItem {
-  topicId: string
-  id: string
-  title: string
-  content: string
-  desc: string
-  user: {
-    id: string
-    nickname: string
-  }
-  create_time: string
-  createTime: string
-  category?: string
-  remoteUrl?: string
-  play_info?: {
-    cdn_url?: string
-  }
-  video_url?: string
-  url?: string
-  name?: string
-  [key: string]: any
-}
-
-export interface TopicListResponse {
-  results: TopicItem[]
-  page: {
-    total: number
-    page: number
-    limit: number
-  }
-}
-
-export interface SearchResponse {
-  results: TopicItem[]
-  page: {
-    total: number
-    page: number
-    limit: number
-  }
-}
-
-export interface AttachmentItem {
-  id: string
-  category: string
-  remoteUrl: string
-  name?: string
-  play_info?: {
-    cdn_url?: string
-  }
-  video_url?: string
-  url?: string
-  [key: string]: any
-}
-
 export interface CommentItem {
   user_id: number
   nickname: string
@@ -129,13 +120,6 @@ export interface CommentItem {
 export interface CommentPage {
   results: CommentItem[]
   page: Page
-}
-
-export interface PaginationProps {
-  totalCount: number
-  totalPages: number
-  currentPage: number
-  pageSize: number
 }
 
 export interface ApiResult<T = any> {
@@ -155,21 +139,7 @@ export interface LoginParams {
 
 export interface LoginResponse {
   token: string
-  user: {
-    id: number
-    nickname: string
-    avatar: string
-    email: string
-    username: string
-    description: string
-    topicCount: number
-    commentCount: number
-    fansCount: number
-    favoriteCount: number
-    createTime: string
-    lastLoginTime: string
-    [key: string]: any
-  }
+  user: UserCurrent
   domain: string
   domainAbroad: string
   customerService: string
