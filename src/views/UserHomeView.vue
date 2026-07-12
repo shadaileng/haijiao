@@ -1,6 +1,6 @@
 <script setup lang="ts">
 defineOptions({ name: 'UserHomeView' })
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { showToast } from 'vant'
 import { api } from '@/api/request'
@@ -25,6 +25,20 @@ onMounted(async () => {
   }
   topicsDom.value?.endLoad()
   await pageto(1)
+})
+
+watch(() => route.params.userId, async (newId) => {
+  if (newId && newId !== userId.value) {
+    userId.value = newId as string
+    nickname.value = (route.params.nickname as string) || ''
+    userInfo.value = null
+    liteTopics.results.splice(0, liteTopics.results.length)
+    liteTopics.page.index = 1
+    liteTopics.page.total = 0
+    await loadUserInfo(userId.value)
+    topicsDom.value?.endLoad()
+    await pageto(1)
+  }
 })
 
 const loadUserInfo = async (id: string) => {
