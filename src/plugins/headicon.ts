@@ -1,5 +1,5 @@
 import type { App, Directive } from 'vue'
-import { fetchImageThroughProxy } from '@/utils/image'
+import { loadImg } from '@/utils/image'
 import { LOADING_URL } from '@/utils/constant'
 import { useSettingsStore } from '@/stores/settings'
 
@@ -8,9 +8,9 @@ const observer = new IntersectionObserver(entries => {
     if (entry.isIntersecting) {
       const imgElement = entry.target as HTMLImageElement
       if (imgElement?.dataset['src']) {
-        fetchImageThroughProxy(imgElement.dataset['src'])
-          .then(dataUri => {
-            if (dataUri) imgElement.setAttribute('src', dataUri)
+        loadImg([{ remoteUrl: imgElement.dataset['src'] }])
+          .then(data => {
+            if (data[0]?.remoteUrl) imgElement.setAttribute('src', data[0].remoteUrl)
           })
           .finally(() => {
             imgElement.dataset.lazy = 'loaded'
