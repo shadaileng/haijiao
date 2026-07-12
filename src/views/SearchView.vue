@@ -1,6 +1,6 @@
 <script setup lang="ts">
 defineOptions({ name: 'SearchView' })
-import { ref, reactive, onMounted, inject } from 'vue'
+import { ref, reactive, onMounted, inject, watch } from 'vue'
 import { showToast } from 'vant'
 import type { LiteTopic } from '@/types'
 import Topics from '@/components/Topics.vue'
@@ -22,6 +22,14 @@ onMounted(async () => {
     tags.splice(0, tags.length, ...list)
   }
   skeletonLoading.value = false
+})
+
+watch(key, (val) => {
+  if (!val && hasSearched.value) {
+    hasSearched.value = false
+    topics.splice(0, topics.length)
+    index.value = 1
+  }
 })
 
 const search = async (tag?: string) => {
@@ -50,7 +58,7 @@ const search = async (tag?: string) => {
 </script>
 
 <template>
-  <van-search v-model="key" placeholder="请输入搜索关键词" @search="search()" @clear="hasSearched = false" />
+  <van-search v-model="key" placeholder="请输入搜索关键词" @search="search()" />
   <template v-if="!hasSearched">
     <div v-if="skeletonLoading" class="skeleton-card">
       <van-skeleton title :row="3" :loading="true" />
