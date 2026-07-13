@@ -18,12 +18,7 @@ function dynamicProxyPlugin() {
         }
         if (!req.url?.startsWith('/api')) return next()
 
-        const backend = (req.headers['x-backend'] as string) || ''
-        if (!backend) {
-          res.writeHead(400, { 'Content-Type': 'application/json' })
-          res.end(JSON.stringify({ success: false, message: 'Missing X-Backend header' }))
-          return
-        }
+        const backend = (req.headers['x-backend'] as string) || 'https://haijiao.com'
 
         let target: URL
         try {
