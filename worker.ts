@@ -48,11 +48,11 @@ async function proxyApi(request: Request, env: Env): Promise<Response> {
   const url = new URL(request.url);
   const backend = resolveBackend(request, env);
 
-  const apiPath = url.pathname.replace(/^\/api/, '')
-  const apiUrl = `${backend}${apiPath}${url.search}`;
+  const apiUrl = `${backend}${url.pathname}${url.search}`;
 
   const headers = new Headers(request.headers);
   headers.delete('host');
+  headers.delete('x-backend');
   headers.set('origin', backend);
 
   // Preserve auth cookies
