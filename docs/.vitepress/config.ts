@@ -61,6 +61,7 @@ export default defineConfig({
     sidebar: {
       '/architecture/': [
         { text: '架构概览', link: '/architecture/01-架构概览/' },
+        { text: '架构演进', link: '/architecture/02-架构演进/' },
       ],
       '/guides/': [
         { text: '开发指南', link: '/guides/01-开发指南/' },
@@ -74,6 +75,7 @@ export default defineConfig({
         { text: '参考 haijiao-wxt 界面布局方案', link: '/plans/04-参考haijiao-wxt界面布局方案/' },
         { text: '参考 haijiao-wxt 重构前端项目方案', link: '/plans/05-参考haijiao-wxt重构前端项目方案/' },
         { text: 'E2E 自动化测试方案', link: '/plans/06-E2E自动化测试方案/' },
+        { text: 'Worker 代理适配优化方案', link: '/plans/07-Worker代理适配优化方案/' },
       ],
       '/references/': [
         { text: 'API 参考', link: '/references/01-API 参考/' },

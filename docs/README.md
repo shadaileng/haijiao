@@ -6,26 +6,32 @@
 docs/
 ├── README.md                        # 本文件：文档索引与执行总览
 ├── _template.md                     # 文档创建模板
+├── index.md                         # VitePress 首页
+├── .vitepress/                      # VitePress 配置与主题
 ├── plans/                           # 方案类（待执行 → 已完成）
 │   ├── 01-登录功能实施方案.md
 │   ├── 02-功能新增与改善方案.md
 │   ├── 03-配置代理地址功能方案.md
 │   ├── 04-参考haijiao-wxt界面布局方案.md
 │   ├── 05-参考haijiao-wxt重构前端项目方案.md
-│   └── 06-E2E自动化测试方案.md
+│   ├── 06-E2E自动化测试方案.md
+│   └── 07-Worker代理适配优化方案.md
 ├── architecture/                    # 架构类（持续维护）
-│   └── 01-架构概览.md
+│   ├── 01-架构概览.md
+│   └── 02-架构演进.md
 ├── references/                      # 参考类（持续维护）
 │   ├── 01-API 参考.md
-│   └── 02-数据字典.md
+│   ├── 02-数据字典.md
 │   └── 03-Origin 代码剖析.md
 ├── guides/                          # 指南/手册类（持续维护）
 │   ├── 01-开发指南.md
 │   ├── 02-用户手册.md
 │   └── 03-E2E代理踩坑排查.md
-└── reference/                       # 参考代码
-    ├── app.js                       # haijiao.com 主应用 Webpack 包
-    └── chunk-vendors.js             # 第三方依赖包
+└── reference/                       # 参考代码（.gitignore，不纳入版本管理）
+    ├── origin/                      # 原始 Webpack 编译产物
+    │   ├── app.js
+    │   └── chunk-vendors.js
+    └── haijiao-wxt/                 # 参考项目源码（已 gitignore）
 ```
 
 ## 文档一览
@@ -39,6 +45,7 @@ docs/
 | `04-参考haijiao-wxt界面布局方案.md` | v1.1.0 | 方案 | `plans/` | 参考 haijiao-wxt dev 分支布局调整 Web 界面 | 🏁 |
 | `05-参考haijiao-wxt重构前端项目方案.md` | v1.1.0 | 方案 | `plans/` | 彻底重建 src/，移植视频播放与模块化能力，支持镜像源 | 🏁 |
 | `06-E2E自动化测试方案.md` | v1.2.0 | 方案 | `plans/` | Playwright + 本机 Chrome 端到端测试 | 🏁 |
+| `07-Worker代理适配优化方案.md` | v1.1.0 | 方案 | `plans/` | worker.ts 代理层与前端适配问题修复 | 🏁 |
 | `01-架构概览.md` | v1.1.0 | 架构 | `architecture/` | 系统架构与请求链路 | 🏁 |
 | `02-架构演进.md` | v1.0.0 | 架构 | `architecture/` | 从 Vue2/ElementUI 到 Vue3/Vant 的迁移 | 🏁 |
 | `01-API 参考.md` | v1.1.0 | 参考 | `references/` | 所有 API 端点定义 | 🏁 |
@@ -166,6 +173,16 @@ docs/
 | 二 | 6 | `topic.spec.ts` 帖子详情（视频+图片） | ✅ |
 | 二 | 7 | `mirror.spec.ts` 镜像源 X-Backend | ✅ |
 | 三 | 8 | 文档同步 | ✅ |
+
+### 07-Worker代理适配优化方案
+
+| 步骤 | 文件 | 操作 | 状态 |
+|:----:|:-----|:-----|:----:|
+| 1 | `worker.ts` | 删除 `/api/proxy-image` 端点 | ✅ |
+| 2 | `worker.ts` | `origin` 头改用 `backend` 变量 | ✅ |
+| 3 | `vite.config.ts` | 缺少 `X-Backend` 时回退默认后端 | ✅ |
+| 4 | 验证 | `npm run build` 构建通过 | ✅ |
+| 5 | 文档 | 更新方案文档状态 | ✅ |
 
 ## 参考代码
 
