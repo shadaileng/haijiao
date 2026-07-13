@@ -10,21 +10,13 @@ export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
 
-    // Proxy API requests to haijiao.com
+    // Proxy API requests to backend
     if (url.pathname.startsWith('/api/')) {
       return proxyApi(request, env);
     }
 
-    // Serve static assets
-    try {
-      const asset = await env.ASSETS.fetch(request);
-      if (asset.ok) {
-        return asset;
-      }
-    } catch {}
-
-    // Fallback to index.html for SPA routing
-    return env.ASSETS?.fetch(new Request(`${url.origin}/index.html`, request)) || new Response('Not Found', { status: 404 });
+    // SPA fallback: non-API requests return index.html
+    return env.ASSETS.fetch(new Request(`${url.origin}/index.html`, request));
   },
 };
 
