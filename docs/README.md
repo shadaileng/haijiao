@@ -18,6 +18,7 @@ docs/
 ├── references/                      # 参考类（持续维护）
 │   ├── 01-API 参考.md
 │   └── 02-数据字典.md
+│   └── 03-Origin 代码剖析.md
 ├── guides/                          # 指南/手册类（持续维护）
 │   ├── 01-开发指南.md
 │   ├── 02-用户手册.md
@@ -39,8 +40,10 @@ docs/
 | `05-参考haijiao-wxt重构前端项目方案.md` | v1.1.0 | 方案 | `plans/` | 彻底重建 src/，移植视频播放与模块化能力，支持镜像源 | 🏁 |
 | `06-E2E自动化测试方案.md` | v1.2.0 | 方案 | `plans/` | Playwright + 本机 Chrome 端到端测试 | 🏁 |
 | `01-架构概览.md` | v1.1.0 | 架构 | `architecture/` | 系统架构与请求链路 | 🏁 |
+| `02-架构演进.md` | v1.0.0 | 架构 | `architecture/` | 从 Vue2/ElementUI 到 Vue3/Vant 的迁移 | 🏁 |
 | `01-API 参考.md` | v1.1.0 | 参考 | `references/` | 所有 API 端点定义 | 🏁 |
 | `02-数据字典.md` | v1.1.0 | 参考 | `references/` | 核心类型定义 | 🏁 |
+| `03-Origin 代码剖析.md` | v1.0.0 | 参考 | `references/` | origin/app.js 与 chunk-vendors.js 深度剖析 | 🏁 |
 | `01-开发指南.md` | v1.1.0 | 指南 | `guides/` | 开发、构建、部署指引 | 🏁 |
 | `02-用户手册.md` | v1.1.0 | 手册 | `guides/` | 功能使用说明 | 🏁 |
 | `03-E2E代理踩坑排查.md` | v1.0.0 | 指南 | `guides/` | Vite 6 + http-proxy-3 动态代理踩坑记录 | 🏁 |
