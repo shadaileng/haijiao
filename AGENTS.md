@@ -122,6 +122,10 @@ npm run cf:deploy    # 部署到 Cloudflare Workers
 | `/settings` | SettingsView | 镜像源/uid/token/当前用户 |
 | `/image-viewer` | ImageViewerView | 图片查看 |
 
+## 参考项目
+
+`docs/reference/haijiao-wxt/` 是从 [Gitee - haijiao-wxt](https://gitee.com/shadaileng/haijiao-wxt.git) 下载的原始参考项目源码，用于分析和对比。该目录已加入 `.gitignore`，不纳入版本管理。
+
 ## 操作原则
 
 1. **严格遵循指令范围**：只做用户明确要求的事情，不要"主动"做额外的事

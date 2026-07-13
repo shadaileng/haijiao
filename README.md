@@ -108,6 +108,10 @@ haijiao/
 └── dist/                  # 构建产物
 ```
 
+## 参考项目
+
+`docs/reference/haijiao-wxt/` 是从 [Gitee - haijiao-wxt](https://gitee.com/shadaileng/haijiao-wxt.git) 下载的原始参考项目源码，用于分析和对比。该目录已加入 `.gitignore`，不纳入版本管理。
+
 ## API 接口
 
 应用通过 Cloudflare Worker 代理请求到后端（代码默认 `https://haijiao.com`，但**该官方域名在国内被屏蔽**，实际须填写后台提供的可用镜像/数据源域名）。配置了镜像源时，请求携带 `X-Backend` 头告知 Worker 代理目标。

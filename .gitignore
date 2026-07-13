@@ -26,5 +26,8 @@ coverage/
 test-results/
 playwright-report/
 
+# Reference project
+docs/reference/haijiao-wxt/
+
 # OS
 Thumbs.db
