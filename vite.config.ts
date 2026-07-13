@@ -85,11 +85,14 @@ export default defineConfig({
     },
   },
   build: {
+    chunkSizeWarningLimit: 600,
     rollupOptions: {
       output: {
         manualChunks: {
           vue: ['vue', 'vue-router', 'pinia'],
           vant: ['vant'],
+          dplayer: ['dplayer'],
+          hls: ['hls.js'],
         },
       },
     },
