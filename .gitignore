@@ -29,5 +29,8 @@ playwright-report/
 # Reference project
 docs/reference/haijiao-wxt/
 
+# Package managers
+package-lock.json
+
 # OS
 Thumbs.db

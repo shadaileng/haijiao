@@ -93,18 +93,18 @@ src/
 | `worker.ts` | Cloudflare Worker 入口，支持 X-Backend 镜像源 |
 | `wrangler.toml` | CF Workers 配置 |
 | `vite.config.ts` | Vite 构建配置（含本地 E2E 自定义中间件代理） |
-| `playwright.config.ts` | Playwright 配置，驱动本机 Chrome，`webServer` 启动 `npm run dev` |
+| `playwright.config.ts` | Playwright 配置，驱动本机 Chrome，`webServer` 启动 `pnpm run dev` |
 | `e2e/` | Playwright 规格：`config.ts`(参数) + `public`/`auth`/`video`/`mirror` 四规格 |
 
 ## 常用命令
 
 ```bash
-npm run dev          # 启动开发服务器
-npm run build        # 类型检查 + 构建
-npm run preview      # 预览构建结果
-npm run test:e2e     # Playwright 端到端测试（驱动本机 Chrome，自动起 dev 服务）
-npm run cf:dev       # 本地 CF Worker 测试
-npm run cf:deploy    # 部署到 Cloudflare Workers
+pnpm run dev          # 启动开发服务器
+pnpm run build        # 类型检查 + 构建
+pnpm run preview      # 预览构建结果
+pnpm run test:e2e     # Playwright 端到端测试（驱动本机 Chrome，自动起 dev 服务）
+pnpm run cf:dev       # 本地 CF Worker 测试
+pnpm run cf:deploy    # 部署到 Cloudflare Workers
 ```
 
 ## 路由表

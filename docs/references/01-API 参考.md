@@ -232,6 +232,6 @@ Sign = MD5(Username + Password + navigator.userAgent)
 
 ### 开发代理（vite.config.ts）
 
-生产不使用 vite `server.proxy`：`npm run dev` 默认仅作静态页面服务，后端经已部署 Worker 或 `npm run cf:dev` 本地代理。本地 E2E 测试（`npm run test:e2e`）会临时启用 `vite.config.ts` 的自定义中间件插件，读取请求头 `X-Backend`（即配置页「数据源字段」）动态转发到镜像源，与生产 Worker 行为对齐，且仅 `npm run dev` 生效、不进入 `dist/` 产物。
+生产不使用 vite `server.proxy`：`pnpm run dev` 默认仅作静态页面服务，后端经已部署 Worker 或 `pnpm run cf:dev` 本地代理。本地 E2E 测试（`pnpm run test:e2e`）会临时启用 `vite.config.ts` 的自定义中间件插件，读取请求头 `X-Backend`（即配置页「数据源字段」）动态转发到镜像源，与生产 Worker 行为对齐，且仅 `pnpm run dev` 生效、不进入 `dist/` 产物。
 
 本地 E2E 代理通过 Vite 插件的 `configureServer` 钩子注入自定义中间件，直接用 `node:https` 模块发请求，完全控制代理行为。

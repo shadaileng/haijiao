@@ -27,7 +27,7 @@
 - **视频播放完全缺失**：仅有视频封面占位与空 `hv-video-container`，`loadVideoSrc` / `getTopicAttachments` / `processImages` 为死代码。
 - **存在死代码**：`layouts/MainLayout.vue`（与 `App.vue` 重复且未被引用）、`composables/useLoading`、`composables/useClipboard`（均未被引用）。
 - **状态管理单一臃肿**：仅 `useUserStore` 一个 store 混合认证、代理、各缓存。
-- **开发代理缺失**：`vite.config.ts` 无 `server.proxy`，`npm run dev` 无法连接后端（文档声称有，实际缺失）。
+- **开发代理缺失**：`vite.config.ts` 无 `server.proxy`，`pnpm run dev` 无法连接后端（文档声称有，实际缺失）。
 
 ### 1.2 参考项目 `haijiao-wxt`
 WXT 浏览器扩展，含可移植的优质逻辑：
@@ -163,7 +163,7 @@ src/
 
 - 删除 vite `server.proxy` 配置（用户明确要求不使用）。
 - 开发时通过 `wrangler dev`（本地 Worker 提供 `/api` 代理）联调；或在设置页将“镜像地址”指向已部署的 Worker / 可访问后台。
-- 浏览器不再直连后端，`npm run dev` 仅作静态页面服务。
+- 浏览器不再直连后端，`pnpm run dev` 仅作静态页面服务。
 
 ---
 
@@ -178,7 +178,7 @@ src/
 7. `views/` + `router/` + `App.vue` + `main.ts`。
 8. 镜像源设置 UI（`SettingsView`/`LoginView`/`useProxyConfig`）。
 9. `worker.ts` 支持 `X-Backend` 镜像源。
-10. 验证：`npm run build`（含 vue-tsc）、`wrangler dev` 联调。
+10. 验证：`pnpm run build`（含 vue-tsc）、`wrangler dev` 联调。
 11. 文档：本方案写入 `docs/plans/05-*.md`；同步更新 `AGENTS.md`、`README.md`、`CHANGELOG.md`、API 参考（视频/镜像源章节）。
 
 ---

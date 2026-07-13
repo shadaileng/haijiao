@@ -144,7 +144,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - 本地端到端测试：新增 `playwright.config.ts` + `e2e/`（public/auth/video/mirror 四规格），驱动本机 Chrome，参数集中于 `e2e/config.ts`
-- 本地 E2E 代理：`vite.config.ts` 新增 `server.proxy['/api']`，`router` 读取请求头 `X-Back-end`（即配置页「数据源字段」）动态转发到镜像源，与生产 `worker.ts` 行为对齐，仅 `npm run dev` 生效
+- 本地 E2E 代理：`vite.config.ts` 新增 `server.proxy['/api']`，`router` 读取请求头 `X-Back-end`（即配置页「数据源字段」）动态转发到镜像源，与生产 `worker.ts` 行为对齐，仅 `pnpm run dev` 生效
 
 ### Changed
 

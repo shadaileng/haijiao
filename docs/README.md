@@ -138,7 +138,7 @@ docs/
 | 三 | 7 | `views/` + `router/` + `App.vue` + `main.ts` | ✅ |
 | 三 | 8 | 镜像源设置 UI（SettingsView/LoginView/useProxyConfig） | ✅ |
 | 四 | 9 | `worker.ts` 支持 `X-Backend` 镜像源 | ✅ |
-| 四 | 10 | 验证（`npm run build` 类型检查 + 打包通过） | ✅ |
+| 四 | 10 | 验证（`pnpm run build` 类型检查 + 打包通过） | ✅ |
 | 四 | 11 | 文档同步（AGENTS/README/CHANGELOG/API 参考） | ✅ |
 
 ### 04-参考haijiao-wxt界面布局方案
@@ -181,7 +181,7 @@ docs/
 | 1 | `worker.ts` | 删除 `/api/proxy-image` 端点 | ✅ |
 | 2 | `worker.ts` | `origin` 头改用 `backend` 变量 | ✅ |
 | 3 | `vite.config.ts` | 缺少 `X-Backend` 时回退默认后端 | ✅ |
-| 4 | 验证 | `npm run build` 构建通过 | ✅ |
+| 4 | 验证 | `pnpm run build` 构建通过 | ✅ |
 | 5 | 文档 | 更新方案文档状态 | ✅ |
 
 ## 参考代码

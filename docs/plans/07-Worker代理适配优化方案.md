@@ -56,7 +56,7 @@
 | 1 | `worker.ts` | 删除 `/api/proxy-image` 端点（约 35 行） | ✅ |
 | 2 | `worker.ts` | `origin` 头改用已解析的 `backend` 变量 | ✅ |
 | 3 | `vite.config.ts` | 缺少 `X-Backend` 时回退到默认后端，与 Worker 行为对齐 | ✅ |
-| 4 | 验证 | `npm run build` 构建验证 | ✅ |
+| 4 | 验证 | `pnpm run build` 构建验证 | ✅ |
 | 5 | 文档 | 更新本文档状态为 🏁 已完成 | ✅ |
 
 ## 4. 具体改动
