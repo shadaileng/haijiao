@@ -1,16 +1,12 @@
-{
-  "name": "haijiao-worker",
-  "compatibility_date": "2025-01-01",
-  "main": "worker.ts",
-  "observability": {
-    "logs": {
-      "enabled": true
-    }
-  },
-  assets: {
-    directory: "./dist"
-  },
-  "vars": {
-    "HAIJIAO_API_BASE": "https://haijiao.com"
-  }
-}
+name = "haijiao-worker"
+compatibility_date = "2025-01-01"
+main = "worker.ts"
+
+[observability]
+logs = { enabled = true }
+
+[assets]
+directory = "./dist"
+
+[vars]
+HAIJIAO_API_BASE = "https://haijiao.com"
