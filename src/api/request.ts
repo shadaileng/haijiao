@@ -180,7 +180,7 @@ export async function login(params: LoginParams): Promise<LoginResponse> {
   const sign = md5(params.username + params.password + navigator.userAgent)
   const response = await fetch('/api/login/signin', {
     method: 'POST',
-    headers: getAuthHeaders({ pcver: '2' }),
+    headers: getAuthHeaders({ 'Content-Type': 'application/json', pcver: '2' }),
     body: JSON.stringify({
       Username: params.username,
       Password: params.password,
