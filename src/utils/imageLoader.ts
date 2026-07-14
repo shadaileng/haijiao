@@ -148,7 +148,7 @@ class ImageLoader {
           })
         }
       },
-      { rootMargin: '300px 0px' }
+      { }
     )
   }
 

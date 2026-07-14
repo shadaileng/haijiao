@@ -76,6 +76,10 @@ export default defineConfig({
         { text: '参考 haijiao-wxt 重构前端项目方案', link: '/plans/05-参考haijiao-wxt重构前端项目方案/' },
         { text: 'E2E 自动化测试方案', link: '/plans/06-E2E自动化测试方案/' },
         { text: 'Worker 代理适配优化方案', link: '/plans/07-Worker代理适配优化方案/' },
+        { text: '回复列表渲染方案', link: '/plans/08-回复列表渲染方案/' },
+        { text: '数据驱动重构方案', link: '/plans/09-数据驱动重构方案/' },
+        { text: 'Emoji 解析移植方案', link: '/plans/10-Emoji解析移植方案/' },
+        { text: '批量图片加载模块方案', link: '/plans/11-批量图片加载模块方案/' },
       ],
       '/references/': [
         { text: 'API 参考', link: '/references/01-API 参考/' },

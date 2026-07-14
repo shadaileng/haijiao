@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.19.1] - 2026-07-14
+
+### Fixed
+
+- 移除 IntersectionObserver 的 rootMargin 预加载（300px），恢复为仅在视口内加载，解决页面卡顿问题
+- 补齐 VitePress sidebar 中 plans 目录缺失的 08-11 条目
+- 补齐 docs/index.md features 列表全部 22 篇文档入口
+
 ## [1.19.0] - 2026-07-14
 
 ### Added
@@ -13,7 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - AsyncQueue 并发控制（默认 6 路，3 优先级 bucket：high/medium/low）
   - 指数退避重试（1s→2s→4s，最多 3 次）
   - 内存缓存去重（Map<url, result>，加载中并发自动去重）
-  - IntersectionObserver 统一管理（rootMargin: 300px）
+  - IntersectionObserver 统一管理
   - WeakMap 元素追踪，指令 unmounted 自动清理
 - 原 `loadImg()` 标记 `@deprecated`，保留完整代码供回退
 - `v-headicon` / `v-content` 指令改用 `imageLoader.observe()` 统一加载
