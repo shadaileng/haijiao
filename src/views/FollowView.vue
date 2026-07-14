@@ -69,7 +69,6 @@ const usernameFilter = () => {
                     round
                     width="4rem"
                     height="4rem"
-                    src="https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg"
                     v-headicon="item.avatar?.startsWith('http') ? item.avatar + '.txt' : item.avatar"
                   />
                 </van-col>

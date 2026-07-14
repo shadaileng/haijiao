@@ -40,13 +40,11 @@
 
 <script setup lang="ts">
 import { LOADING_URL } from '@/utils/constant'
+import type { UserInfoProp } from '@/types'
 
-defineProps({
-  userInfo: {
-    type: Object as any,
-    default: () => null,
-  },
-})
+defineProps<{
+  userInfo: UserInfoProp | null
+}>()
 </script>
 
 <style scoped>

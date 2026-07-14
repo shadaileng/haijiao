@@ -9,12 +9,14 @@ import Topics from '@/components/Topics.vue'
 const route = useRoute()
 const userId = ref((route.params.userId as string) || '')
 const topicsDom = ref()
+const skeletonLoading = ref(true)
 
 const liteTopics: LiteTopicPage = reactive({ results: [], page: { index: 1, size: 10, total: 0 } })
 
 onMounted(async () => {
   topicsDom.value?.endLoad()
   await pageto(1)
+  skeletonLoading.value = false
 })
 
 const onClickLeft = () => history.back()
@@ -46,5 +48,5 @@ const loadMore = () => {
 
 <template>
   <van-nav-bar title="用户帖子" left-text="返回" left-arrow @click-left="onClickLeft" :fixed="true" :placeholder="true" />
-  <Topics ref="topicsDom" :topics="liteTopics.results" @load="loadMore()" />
+  <Topics ref="topicsDom" :topics="liteTopics.results" :skeletonLoading="skeletonLoading" @load="loadMore()" />
 </template>

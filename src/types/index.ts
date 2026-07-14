@@ -124,11 +124,13 @@ export interface CommentPage {
 
 export interface ApiResult<T = any> {
   success: boolean
-  data: T
+  data?: T
   isEncrypted?: boolean
   message?: string
   errorCode?: number
 }
+
+export type UserInfoProp = Pick<User, 'nickname' | 'avatar' | 'description' | 'topicCount' | 'fansCount' | 'favoriteCount'> & { id?: number; userId?: number }
 
 export interface LoginParams {
   username: string

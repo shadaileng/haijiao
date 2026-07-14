@@ -1,44 +1,40 @@
 <template>
   <van-skeleton title avatar :row="6" :loading="loading">
-    <van-list :loading="loading" :finished="finished" finished-text="没有更多了" @load="onLoad">
-      <van-cell v-for="item in comments.results" :key="item.floor">
-        <template #value>
-          <div class="comment-header">
-            <van-image
-              round
-              width="3rem"
-              height="3rem"
-              :src="LOADING_URL"
-              v-headicon="item.avatar?.startsWith('http') ? item.avatar + '.txt' : item.avatar"
-              class="comment-avatar"
-            />
-            <div class="comment-header-info">
-              <span class="hv-nickname hv-pointer" @click="$router.push(`/homepage/${item.userId}/${item.nickname}`)">
-                {{ item.nickname }}
-              </span>
-              <span class="comment-header-time">{{ item.createTime }}</span>
-            </div>
-            <span class="comment-header-floor">{{ item.floor }}楼</span>
-          </div>
-          <div class="comment-body">
-            <div
-              class="content"
-              v-content="{
-                content: item.content,
-                attachments: item.attachments,
-                handleClick,
-              }"
-            ></div>
-            <van-divider :style="{ margin: '8px 0', borderColor: '#eee' }" v-if="item.commendList?.length" />
-            <ReplyList
-              v-if="item.commendList?.length"
-              :replies="item.commendList"
-              :handleClick="handleClick"
-            />
-          </div>
-        </template>
-      </van-cell>
-    </van-list>
+    <div v-for="item in comments.results" :key="item.floor" class="comment-cell">
+      <div class="comment-header">
+        <van-image
+          round
+          width="3rem"
+          height="3rem"
+          :src="LOADING_URL"
+          v-headicon="item.avatar?.startsWith('http') ? item.avatar + '.txt' : item.avatar"
+          class="comment-avatar"
+        />
+        <div class="comment-header-info">
+          <span class="hv-nickname hv-pointer" @click="$router.push(`/homepage/${item.userId}/${item.nickname}`)">
+            {{ item.nickname }}
+          </span>
+          <span class="comment-header-time">{{ item.createTime }}</span>
+        </div>
+        <span class="comment-header-floor">{{ item.floor }}楼</span>
+      </div>
+      <div class="comment-body">
+        <div
+          class="content"
+          v-content="{
+            content: item.content,
+            attachments: item.attachments,
+            handleClick,
+          }"
+        ></div>
+        <van-divider :style="{ margin: '8px 0', borderColor: '#eee' }" v-if="item.commendList?.length" />
+        <ReplyList
+          v-if="item.commendList?.length"
+          :replies="item.commendList"
+          :handleClick="handleClick"
+        />
+      </div>
+    </div>
   </van-skeleton>
   <van-pagination
     v-model="comments.page.index"
@@ -67,7 +63,6 @@ const props = defineProps({
 const emit = defineEmits<{ loaded: [scroll: boolean] }>()
 
 const loading = ref(true)
-const finished = ref(false)
 
 const comments = reactive<CommentPage>({
   results: [],
@@ -76,15 +71,12 @@ const comments = reactive<CommentPage>({
 
 const handleClick = inject('overlay') as (data: any) => void
 
-const onLoad = () => {}
-
 onMounted(() => {
   loadComments(1)
 })
 
 const loadComments = async (index: number, scrollToTop = false) => {
   loading.value = true
-  finished.value = false
   const resp = await api.reply_list({
     params: {
       page: index,
@@ -97,13 +89,11 @@ const loadComments = async (index: number, scrollToTop = false) => {
   if (!resp.success) {
     showToast('评论加载失败')
     loading.value = false
-    finished.value = true
     return
   }
   const data = resp.data
   if (!data?.results || !data?.page) {
     loading.value = false
-    finished.value = true
     return
   }
   comments.results.splice(0, comments.results.length, ...data.results)
@@ -111,7 +101,6 @@ const loadComments = async (index: number, scrollToTop = false) => {
   comments.page.index = data.page.page
   comments.page.size = data.page.limit
   loading.value = false
-  finished.value = true
   if (scrollToTop) {
     emit('loaded', true)
   }
@@ -163,6 +152,9 @@ const loadComments = async (index: number, scrollToTop = false) => {
   color: #999;
 }
 
+.comment-cell {
+  padding: 0 16px;
+}
 .comment-body {
   padding-left: calc(3rem + 10px);
 }

@@ -3,9 +3,10 @@ defineOptions({ name: 'SearchView' })
 import { ref, reactive, onMounted, inject, watch, nextTick } from 'vue'
 import { showToast } from 'vant'
 import type { LiteTopic } from '@/types'
+import type { Api } from '@/api/request'
 import Topics from '@/components/Topics.vue'
 
-const api = inject('$api') as any
+const api = inject<Api>('$api')!
 const topicsDom = ref()
 const key = ref('')
 const index = ref(1)

@@ -12,11 +12,13 @@ const settings = useSettingsStore()
 const userStore = useUserStore()
 const { showDialog, mirrorUrl, mirrorDisplay, openConfig, saveConfig } = useMirrorConfig()
 
-const currentUser = ref<any>(userStore.current)
+const currentUser = ref<any>(null)
+const loadingUser = ref(settings.isLoggedIn)
 
 onMounted(async () => {
   if (settings.isLoggedIn) {
     await loadCurrentUser()
+    loadingUser.value = false
   }
 })
 
@@ -44,7 +46,9 @@ function handleLogout() {
   <div class="settings-view">
     <van-nav-bar title="配置" left-arrow @click-left="router.back()" />
 
-    <UserInfo v-if="currentUser" :userInfo="currentUser" />
+    <van-skeleton title avatar :row="3" :loading="loadingUser">
+      <UserInfo v-if="currentUser" :userInfo="currentUser" />
+    </van-skeleton>
 
     <van-cell-group inset class="status-group">
       <van-cell title="登录状态" :value="settings.isLoggedIn ? '已登录' : '未登录'">

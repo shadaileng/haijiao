@@ -194,7 +194,7 @@ export async function login(params: LoginParams): Promise<LoginResponse> {
   if (!data.success) {
     throw new Error(data.message || '登录失败')
   }
-  let result: LoginResponse = data.data
+  let result: LoginResponse = data.data!
   if (data.isEncrypted) {
     try {
       result = JSON.parse(decodeEncrypted(String(data.data)))
@@ -207,8 +207,21 @@ export async function login(params: LoginParams): Promise<LoginResponse> {
   return result
 }
 
+export interface Api {
+  topic(params: { params: { topicId: string | number } }): Promise<ApiResult>
+  hot(params: { params: { page: number; limit?: number } }): Promise<ApiResult>
+  search(params: { params: { key: string; page: number; node_id?: number } }): Promise<ApiResult>
+  tags(params?: { params?: any }): Promise<ApiResult>
+  follow(): Promise<ApiResult>
+  topics(params: { params: { userId: string; page: number; type: number } }): Promise<ApiResult>
+  userinfo(params: { uid: string | number }): Promise<ApiResult>
+  reply_list(params: { params: { page: number; sort: string; topic_id: number; search_type: number; user_id: number } }): Promise<ApiResult>
+  current(): Promise<ApiResult>
+  login(params: LoginParams): Promise<ApiResult>
+}
+
 // wxt 风格 api 对象（供组件 inject('$api') 使用）
-export const api = {
+export const api: Api = {
   async topic({ params }: { params: { topicId: string | number } }) {
     try {
       const data = await getTopicWithVideo(params.topicId)
