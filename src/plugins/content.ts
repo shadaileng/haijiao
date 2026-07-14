@@ -1,31 +1,13 @@
 import type { App, Directive } from 'vue'
 import { Attachment } from '@/types'
 import { loadVideoSrc } from '@/api/request'
-import { loadImg } from '@/utils/image'
+import { imageLoader } from '@/utils/imageLoader'
 import { renderEmoji } from '@/utils/emoji'
 import { LOADING_URL } from '@/utils/constant'
 import DPlayer from 'dplayer'
 import Hls from 'hls.js'
 
 let player: DPlayer | null = null
-
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      const imgElement = entry.target as HTMLImageElement
-      if (imgElement?.dataset['src']) {
-        loadImg([{ remoteUrl: imgElement.dataset['src'] }])
-          .then(data => {
-            if (data[0]?.remoteUrl) imgElement.setAttribute('src', data[0].remoteUrl)
-          })
-          .finally(() => {
-            imgElement.dataset.lazy = 'loaded'
-            observer.unobserve(entry.target)
-          })
-      }
-    }
-  })
-})
 
 function buildAttaMap(attachments: any): Map<number, Attachment> {
   const map = new Map<number, Attachment>()
@@ -101,6 +83,7 @@ const vContent: Directive = {
           img.addEventListener('click', () => {
             handleClick?.({ overlayShow: true, overlayImg: img.src })
           })
+          imageLoader.observe(img, atta.remoteUrl)
         }
         if (atta.category === 'video') {
           img.dataset['src'] = atta.coverUrl
@@ -135,10 +118,14 @@ const vContent: Directive = {
                 console.error('load video error:', err)
               })
           })
+          imageLoader.observe(img, atta.coverUrl)
         }
       }
-      img.setAttribute('lazy', 'loading')
-      observer.observe(img)
+    })
+  },
+  unmounted(el: HTMLDivElement) {
+    el.querySelectorAll<HTMLImageElement>('img:not([data-emoji])').forEach(img => {
+      imageLoader.unobserve(img)
     })
   },
 }

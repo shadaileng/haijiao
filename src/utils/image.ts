@@ -1,6 +1,6 @@
 const CHARS = 'ABCD*EFGHIJKLMNOPQRSTUVWX#YZabcdefghijklmnopqrstuvwxyz1234567890'
 
-function customDecode(str: string): string {
+export function customDecode(str: string): string {
   let decoded = str.replace(/[^A-Za-z0-9\*\#]/g, '')
   let result = ''
   let u = 0
@@ -20,6 +20,7 @@ function customDecode(str: string): string {
   return new TextDecoder('utf-8').decode(bytes)
 }
 
+/** @deprecated 请使用 imageLoader.load() / imageLoader.observe() 替代。保留此函数以便回退。 */
 export function loadImg(items: { remoteUrl: string }[]): Promise<{ remoteUrl: string }[]> {
   const props = items.map(async item => {
     item.remoteUrl = await fetch(item.remoteUrl)

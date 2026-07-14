@@ -1,25 +1,7 @@
 import type { App, Directive } from 'vue'
-import { loadImg } from '@/utils/image'
+import { imageLoader } from '@/utils/imageLoader'
 import { LOADING_URL } from '@/utils/constant'
 import { useSettingsStore } from '@/stores/settings'
-
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      const imgElement = entry.target as HTMLImageElement
-      if (imgElement?.dataset['src']) {
-        loadImg([{ remoteUrl: imgElement.dataset['src'] }])
-          .then(data => {
-            if (data[0]?.remoteUrl) imgElement.setAttribute('src', data[0].remoteUrl)
-          })
-          .finally(() => {
-            imgElement.dataset.lazy = 'loaded'
-            observer.unobserve(entry.target)
-          })
-      }
-    }
-  })
-})
 
 function apply(el: HTMLElement, binding: any) {
   const value = binding.value
@@ -30,9 +12,7 @@ function apply(el: HTMLElement, binding: any) {
 
   if (typeof value === 'string' && value.startsWith('http')) {
     imgElement.setAttribute('src', LOADING_URL)
-    imgElement.dataset.src = value
-    imgElement.dataset.lazy = 'loading'
-    observer.observe(imgElement)
+    imageLoader.observe(imgElement, value)
     return
   }
 
@@ -49,6 +29,10 @@ function apply(el: HTMLElement, binding: any) {
 const vHeadicon: Directive = {
   mounted: (el: HTMLElement, binding: any) => apply(el, binding),
   updated: (el: HTMLElement, binding: any) => apply(el, binding),
+  unmounted: (el: HTMLElement) => {
+    const img = el.querySelector('img')
+    if (img) imageLoader.unobserve(img)
+  },
 }
 
 export default {

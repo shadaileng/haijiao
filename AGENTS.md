@@ -29,7 +29,7 @@ src/
 ├── composables/   # 组合式函数 (useMirrorConfig 镜像源/数据源配置, useClipboard)
 ├── plugins/       # 指令插件 (headicon 头像解码, content 内容渲染+DPlayer)
 ├── components/    # 通用组件 (Topics/TopicContent/Comment/UserInfo/common/TabBar)
-├── utils/         # 工具 (image 图片解码+loadImg, transform snake→camel, cipher 自定义密码, constant)
+├── utils/         # 工具 (image 图片解码+loadImg, imageLoader 批量队列, transform snake→camel, cipher 自定义密码, constant)
 ├── styles/        # 全局样式 (global.scss)
 ├── views/         # 页面级组件 (Home/Hot/Login/Topic/User/UserHome/Follow/Search/Settings/ImageViewer)
 └── router/        # 路由配置 (index.ts, scrollBehavior)

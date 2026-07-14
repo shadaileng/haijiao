@@ -18,7 +18,8 @@ docs/
 │   ├── 07-Worker代理适配优化方案.md
 │   ├── 08-回复列表渲染方案.md
 │   ├── 09-数据驱动重构方案.md
-│   └── 10-Emoji解析移植方案.md
+│   ├── 10-Emoji解析移植方案.md
+│   └── 11-批量图片加载模块方案.md
 ├── architecture/                    # 架构类（持续维护）
 │   ├── 01-架构概览.md
 │   └── 02-架构演进.md
@@ -52,6 +53,7 @@ docs/
 | `08-回复列表渲染方案.md` | v1.0.0 | 方案 | `plans/` | 评论区回复列表递归渲染，v-content 支持 | 🏁 |
 | `09-数据驱动重构方案.md` | v2.0.0 | 方案 | `plans/` | 消除硬编码、死 Store、缺骨架屏等数据驱动问题 | 🏁 |
 | `10-Emoji解析移植方案.md` | v1.0.0 | 方案 | `plans/` | `[emoji]code[/emoji]` 渲染为 `<img>` 图片 | 🏁 |
+| `11-批量图片加载模块方案.md` | v1.0.0 | 方案 | `plans/` | 多任务异步队列批量处理图片解码 | 🏁 |
 | `01-架构概览.md` | v1.1.0 | 架构 | `architecture/` | 系统架构与请求链路 | 🏁 |
 | `02-架构演进.md` | v1.0.0 | 架构 | `architecture/` | 从 Vue2/ElementUI 到 Vue3/Vant 的迁移 | 🏁 |
 | `01-API 参考.md` | v1.1.0 | 参考 | `references/` | 所有 API 端点定义 | 🏁 |
@@ -228,6 +230,18 @@ docs/
 | 6 | `src/types/emoji.d.ts` | 新建：类型声明 | ✅ |
 | 7 | 验证 | `pnpm run build` | ✅ |
 | 8 | 文档同步 | 更新状态标记 | ✅ |
+
+### 11-批量图片加载模块方案
+
+| 步骤 | 任务 | 状态 |
+|:---:|------|:----:|
+| 1 | 新建 `src/utils/imageLoader.ts`：AsyncQueue + Cache + Observer + ImageLoader | ✅ |
+| 2 | `image.ts` 添加 `@deprecated` 标记 | ✅ |
+| 3 | 改造 `headicon.ts`：改用 `imageLoader.observe()` | ✅ |
+| 4 | 改造 `content.ts`：改用 `imageLoader.observe()` | ✅ |
+| 5 | 改造 `ImageViewerView.vue`：改用 `imageLoader.load()` | ✅ |
+| 6 | 验证：`pnpm run build` 类型检查 + 构建通过 | ✅ |
+| 7 | 文档同步：更新本方案状态为 🏁，更新 `docs/README.md` | ✅ |
 
 ## 参考代码
 

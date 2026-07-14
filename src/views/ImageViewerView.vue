@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { loadImg } from '@/utils/image'
+import { imageLoader } from '@/utils/imageLoader'
 
 const route = useRoute()
 const imgUrl = ref('')
@@ -9,8 +9,9 @@ const imgUrl = ref('')
 onMounted(async () => {
   const url = (route.query.url as string) || ''
   if (!url) return
-  const data = await loadImg([{ remoteUrl: url }])
-  if (data[0]?.remoteUrl) imgUrl.value = data[0].remoteUrl
+  const results = await imageLoader.load([url])
+  const result = results.get(url)
+  if (result) imgUrl.value = result
 })
 
 const onClickLeft = () => history.back()
