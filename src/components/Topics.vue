@@ -23,22 +23,26 @@
             </div>
             <div v-else>
               <van-row justify="space-between" @click="$router.push(`/topic/${item.topicId}`)">
-                <van-col span="24" class="hv-title">{{ item.title }}</van-col>
-              </van-row>
-              <van-row justify="space-between">
-                <van-col span="24">
-                  <van-text-ellipsis rows="2" :content="item.liteContent" />
+                <van-col span="16">
+                  <van-row justify="space-between">
+                    <van-col span="24" class="hv-title">{{ item.title }}</van-col>
+                  </van-row>
+                  <van-row justify="space-between">
+                    <van-col span="24">
+                      <van-text-ellipsis rows="2" :content="item.liteContent" />
+                    </van-col>
+                  </van-row>
+                </van-col>
+                <van-col span="8">
+                  <van-image
+                    fit="cover"
+                    radius="5"
+                    :src="LOADING_URL"
+                    v-headicon="item.attachments && (item.attachments[0].remoteUrl || item.attachments[0].coverUrl)"
+                    class="topic-image-single"
+                  />
                 </van-col>
               </van-row>
-              <div class="topic-images">
-                <van-image
-                  fit="cover"
-                  radius="5"
-                  :src="LOADING_URL"
-                  v-headicon="item.attachments && (item.attachments[0].remoteUrl || item.attachments[0].coverUrl)"
-                  class="topic-image"
-                />
-              </div>
             </div>
             <van-row justify="space-between">
               <van-col
@@ -142,6 +146,11 @@ defineExpose({ startLoad, endLoad, finishLoad })
 }
 .topic-image {
   flex: 1;
+  aspect-ratio: 1;
+}
+.topic-image-single {
+  display: block;
+  width: 100%;
   aspect-ratio: 1;
 }
 </style>
