@@ -1,5 +1,6 @@
 <template>
-  <van-skeleton title avatar :row="3" :loading="skeletonLoading">
+  <van-empty v-if="!skeletonLoading && !loading && topics.length === 0" description="暂无内容" />
+  <van-skeleton v-else title avatar :row="3" :loading="skeletonLoading">
     <van-list :finished="finished" :loading="loading" finished-text="没有更多了" @load="onLoad">
       <van-cell v-for="item in topics" :key="item.topicId">
         <template #value>
