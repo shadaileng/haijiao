@@ -71,13 +71,13 @@ const usernameFilter = () => {
                   v-headicon="item.avatar?.startsWith('http') ? item.avatar + '.txt' : item.avatar"
                   class="follow-avatar"
                 />
-                <div class="follow-body">
-                  <div class="follow-row">
+                  <div class="follow-body">
                     <a class="hv-link" @click="$router.push(`/homepage/${item.userId}/${item.nickname}`)">{{ item.nickname }}</a>
-                    <van-tag plain type="primary">{{ item.fansCount }}</van-tag>
+                    <div class="follow-sub">
+                      <span class="hv-sign">签名:{{ item.description || '这家伙很懒什么也没留下' }}</span>
+                      <van-tag plain type="primary">{{ item.fansCount }}</van-tag>
+                    </div>
                   </div>
-                  <div class="hv-sign">签名:{{ item.description || '这家伙很懒什么也没留下' }}</div>
-                </div>
               </div>
             </div>
           </template>
@@ -107,9 +107,10 @@ const usernameFilter = () => {
   flex-direction: column;
   gap: 6px;
 }
-.follow-row {
+.follow-sub {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 8px;
 }
 .hv-link {
