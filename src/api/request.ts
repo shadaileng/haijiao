@@ -220,7 +220,7 @@ export interface Api {
   login(params: LoginParams): Promise<ApiResult>
 }
 
-// wxt 风格 api 对象（供组件 inject('$api') 使用）
+// 统一 API 对象，所有视图直接 import 使用
 export const api: Api = {
   async topic({ params }: { params: { topicId: string | number } }) {
     try {

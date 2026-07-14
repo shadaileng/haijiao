@@ -49,7 +49,7 @@ docs/
 | `06-E2E自动化测试方案.md` | v1.2.0 | 方案 | `plans/` | Playwright + 本机 Chrome 端到端测试 | 🏁 |
 | `07-Worker代理适配优化方案.md` | v1.1.0 | 方案 | `plans/` | worker.ts 代理层与前端适配问题修复 | 🏁 |
 | `08-回复列表渲染方案.md` | v1.0.0 | 方案 | `plans/` | 评论区回复列表递归渲染，v-content 支持 | 🏁 |
-| `09-数据驱动重构方案.md` | v1.1.0 | 方案 | `plans/` | 消除硬编码、死 Store、缺骨架屏等数据驱动问题 | 🚧 |
+| `09-数据驱动重构方案.md` | v2.0.0 | 方案 | `plans/` | 消除硬编码、死 Store、缺骨架屏等数据驱动问题 | 🏁 |
 | `01-架构概览.md` | v1.1.0 | 架构 | `architecture/` | 系统架构与请求链路 | 🏁 |
 | `02-架构演进.md` | v1.0.0 | 架构 | `architecture/` | 从 Vue2/ElementUI 到 Vue3/Vant 的迁移 | 🏁 |
 | `01-API 参考.md` | v1.1.0 | 参考 | `references/` | 所有 API 端点定义 | 🏁 |
@@ -212,7 +212,7 @@ docs/
 | 四 | 10 | SearchView 修复 api 类型 | P2 | ✅ |
 | 四 | 11 | UserInfo 修复 prop 类型 | P2 | ✅ |
 | 五 | 12 | 提取 Api 接口类型 | P3 | ✅ |
-| 五 | 13 | 统一注入模式 | P3 | ⬜ |
+| 五 | 13 | 统一注入模式（统一为`import { api }`，移除`provide('$api')`） | P3 | ✅ |
 
 ## 参考代码
 
