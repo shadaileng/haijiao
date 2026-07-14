@@ -3,33 +3,24 @@
     <van-list :loading="loading" :finished="finished" finished-text="没有更多了" @load="onLoad">
       <van-cell v-for="item in comments.results" :key="item.floor">
         <template #value>
-          <van-row>
-            <van-col span="20">
-              <van-row class="hv-box-padding-tb hv-text-center">
-                <van-col span="6">
-                  <van-image
-                    round
-                    width="3rem"
-                    height="3rem"
-                    :src="LOADING_URL"
-                    v-headicon="item.avatar?.startsWith('http') ? item.avatar + '.txt' : item.avatar"
-                  />
-                </van-col>
-                <van-col span="16" class="hv-text-start">
-                  <van-space :size="10" direction="vertical">
-                    <van-row class="hv-nickname hv-pointer" @click="$router.push(`/homepage/${item.userId}/${item.nickname}`)">
-                      <van-col span="24">{{ item.nickname }}</van-col>
-                    </van-row>
-                    <van-row>
-                      <van-col span="24">{{ item.createTime }}</van-col>
-                    </van-row>
-                  </van-space>
-                </van-col>
-              </van-row>
-            </van-col>
-            <van-col span="4">{{ item.floor }}楼</van-col>
-          </van-row>
-          <van-row>
+          <div class="comment-header">
+            <van-image
+              round
+              width="3rem"
+              height="3rem"
+              :src="LOADING_URL"
+              v-headicon="item.avatar?.startsWith('http') ? item.avatar + '.txt' : item.avatar"
+              class="comment-avatar"
+            />
+            <div class="comment-header-info">
+              <span class="hv-nickname hv-pointer" @click="$router.push(`/homepage/${item.userId}/${item.nickname}`)">
+                {{ item.nickname }}
+              </span>
+              <span class="comment-header-time">{{ item.createTime }}</span>
+            </div>
+            <span class="comment-header-floor">{{ item.floor }}楼</span>
+          </div>
+          <div class="comment-body">
             <div
               class="content"
               v-content="{
@@ -38,12 +29,13 @@
                 handleClick,
               }"
             ></div>
-          </van-row>
-          <ReplyList
-            v-if="item.commendList?.length"
-            :replies="item.commendList"
-            :handleClick="handleClick"
-          />
+            <van-divider :style="{ margin: '8px 0', borderColor: '#eee' }" v-if="item.commendList?.length" />
+            <ReplyList
+              v-if="item.commendList?.length"
+              :replies="item.commendList"
+              :handleClick="handleClick"
+            />
+          </div>
         </template>
       </van-cell>
     </van-list>
@@ -127,7 +119,7 @@ const loadComments = async (index: number) => {
   overflow: auto;
   text-align: left;
   font-size: 1.2rem;
-  padding: 0 15px;
+  padding-right: 15px;
 }
 .content p {
   margin: 0;
@@ -135,6 +127,40 @@ const loadComments = async (index: number) => {
 .content img {
   width: 100%;
   height: auto;
+}
+
+.comment-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 1.5em 0;
+}
+
+.comment-avatar {
+  flex-shrink: 0;
+}
+
+.comment-header-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.5;
+  text-align: left;
+}
+
+.comment-header-time {
+  font-size: 0.8rem;
+  color: #999;
+}
+
+.comment-header-floor {
+  margin-left: auto;
+  flex-shrink: 0;
+  font-size: 0.9rem;
+  color: #999;
+}
+
+.comment-body {
+  padding-left: calc(3rem + 10px);
 }
 
 </style>

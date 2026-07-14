@@ -90,6 +90,8 @@ src/
 | `src/utils/image.ts` | `loadImg()` 图片加载 + `customDecode()` 自定义 Base64 解码 |
 | `src/plugins/content.ts` | `v-content` 指令：内容渲染 + 图片/视频(DPlayer) |
 | `src/plugins/headicon.ts` | `v-headicon` 指令：头像懒加载与解码 |
+| `src/components/Comment.vue` | 评论区组件：flexbox 紧凑布局（头像+用户名/时间左对齐+楼号推右），内容与回复缩进 `calc(3rem + 10px)`，van-divider 分隔 |
+| `src/components/ReplyList.vue` | 回复列表组件：折叠态显示首条摘要（头像+用户名+正文预览+时间），展开态全部回复，递归嵌套 + 独立折叠状态 |
 | `worker.ts` | Cloudflare Worker 入口，支持 X-Backend 镜像源 |
 | `wrangler.toml` | CF Workers 配置 |
 | `vite.config.ts` | Vite 构建配置（含本地 E2E 自定义中间件代理） |

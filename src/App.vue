@@ -62,7 +62,22 @@ provide('overlay', (data: { overlayShow: boolean; overlayImg?: string; overlayVi
 
 <style>
 .app-container {
+  max-width: 768px;
+  min-width: 320px;
+  margin: 0 auto;
   min-height: 100vh;
   background-color: #f7f8fa;
+}
+
+.van-nav-bar--fixed {
+  max-width: 768px;
+  left: 50% !important;
+  transform: translateX(-50%);
+}
+
+.van-tabbar {
+  max-width: 768px;
+  left: 50% !important;
+  transform: translateX(-50%);
 }
 </style>

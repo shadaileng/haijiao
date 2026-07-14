@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.17.0] - 2026-07-14
+
+### Added
+
+- 评论头部重构为 flexbox 紧凑布局：头像固定尺寸，用户名/时间左对齐，楼号 margin-left:auto 推右，间距不随容器宽度伸缩
+- ReplyList 新增折叠/展开功能：折叠态显示首条回复摘要（头像 + 用户名 + 正文预览 + 发布时间），点击展开全部回复，点击箭头收回
+- 回复项与顶层评论样式统一：用户名 + 灰色冒号 + 正文 inline flex-wrap 同行显示，发布时间独立一行居左
+- 正文内容与回复列表缩进对齐（padding-left: calc(3rem + 10px)），与用户名/时间列平齐，形成清晰左对齐层级
+- 评论内容与回复面板之间增加 van-divider 浅灰分隔线
+- App.vue 增加 max-width: 768px 容器约束 + 左右居中，大屏显示不再拉伸
+
 ## [1.16.0] - 2026-07-14
 
 ### Added
