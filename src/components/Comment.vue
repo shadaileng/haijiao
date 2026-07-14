@@ -2,20 +2,12 @@
   <van-skeleton title avatar :row="6" :loading="loading">
     <div v-for="item in comments.results" :key="item.floor" class="comment-cell">
       <div class="comment-header">
-        <van-image
-          round
-          width="3rem"
-          height="3rem"
-          :src="LOADING_URL"
-          v-headicon="item.avatar?.startsWith('http') ? item.avatar + '.txt' : item.avatar"
-          class="comment-avatar"
+        <UserMeta
+          :avatar="item.avatar || ''"
+          :nickname="item.nickname"
+          :userId="item.userId"
+          :createTime="item.createTime"
         />
-        <div class="comment-header-info">
-          <span class="hv-nickname hv-pointer" @click="$router.push(`/homepage/${item.userId}/${item.nickname}`)">
-            {{ item.nickname }}
-          </span>
-          <span class="comment-header-time">{{ item.createTime }}</span>
-        </div>
         <span class="comment-header-floor">{{ item.floor }}楼</span>
       </div>
       <div class="comment-body">
@@ -50,7 +42,7 @@
 import { reactive, inject, ref, onMounted } from 'vue'
 import { CommentPage } from '@/types'
 import { api } from '@/api/request'
-import { LOADING_URL } from '@/utils/constant'
+import UserMeta from '@/components/UserMeta.vue'
 import { showToast } from 'vant'
 import ReplyList from './ReplyList.vue'
 
@@ -133,22 +125,6 @@ const loadComments = async (index: number, scrollToTop = false) => {
   align-items: center;
   gap: 10px;
   padding: 1.5em 0;
-}
-
-.comment-avatar {
-  flex-shrink: 0;
-}
-
-.comment-header-info {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.5;
-  text-align: left;
-}
-
-.comment-header-time {
-  font-size: 0.8rem;
-  color: #999;
 }
 
 .comment-header-floor {

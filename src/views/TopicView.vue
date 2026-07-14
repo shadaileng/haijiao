@@ -6,7 +6,7 @@ import { api } from '@/api/request'
 import type { Topic } from '@/types'
 import Comment from '@/components/Comment.vue'
 import TopicContent from '@/components/TopicContent.vue'
-import { LOADING_URL } from '@/utils/constant'
+import UserMeta from '@/components/UserMeta.vue'
 
 const route = useRoute()
 
@@ -79,28 +79,12 @@ const onCommentLoaded = () => {
       </van-col>
     </van-row>
     <van-row class="hv-box-padding">
-      <van-col span="6">
-        <van-image
-          round
-          width="3rem"
-          height="3rem"
-          :src="LOADING_URL"
-          v-headicon="topicLocal.user?.avatar?.startsWith('http') ? topicLocal.user?.avatar + '.txt' : topicLocal.user?.avatar"
-        />
-      </van-col>
-      <van-col span="16" class="hv-text-start">
-        <van-space :size="10" direction="vertical">
-          <van-row
-            class="hv-nickname hv-pointer"
-            @click="$router.push(`/homepage/${topicLocal.user?.id}/${topicLocal.user?.nickname}`)"
-          >
-            <van-col span="24">{{ topicLocal.user?.nickname }}</van-col>
-          </van-row>
-          <van-row>
-            <van-col span="24">{{ topicLocal.createTime }}</van-col>
-          </van-row>
-        </van-space>
-      </van-col>
+      <UserMeta
+        :avatar="topicLocal.user?.avatar || ''"
+        :nickname="topicLocal.user?.nickname || ''"
+        :userId="topicLocal.user?.id || 0"
+        :createTime="topicLocal.createTime || ''"
+      />
     </van-row>
     <van-row class="hv-box-padding" v-if="topicLocal.content?.length">
       <TopicContent
