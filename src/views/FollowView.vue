@@ -63,27 +63,22 @@ const usernameFilter = () => {
         <van-cell v-for="item in items" :key="item.userId">
           <template #value>
             <div class="card">
-              <van-row>
-                <van-col span="6">
-                  <van-image
-                    round
-                    width="4rem"
-                    height="4rem"
-                    v-headicon="item.avatar?.startsWith('http') ? item.avatar + '.txt' : item.avatar"
-                  />
-                </van-col>
-                <van-col span="16" class="hv-text-start">
-                  <van-row>
-                    <van-col span="16">
-                      <a class="hv-link" @click="$router.push(`/homepage/${item.userId}/${item.nickname}`)">{{ item.nickname }}</a>
-                    </van-col>
-                    <van-col span="8"><van-tag plain type="primary">{{ item.fansCount }}</van-tag></van-col>
-                  </van-row>
-                  <van-row>
-                    <van-col span="24" class="hv-sign">签名:{{ item.description || '这家伙很懒什么也没留下' }}</van-col>
-                  </van-row>
-                </van-col>
-              </van-row>
+              <div class="follow-item">
+                <van-image
+                  round
+                  width="4rem"
+                  height="4rem"
+                  v-headicon="item.avatar?.startsWith('http') ? item.avatar + '.txt' : item.avatar"
+                  class="follow-avatar"
+                />
+                <div class="follow-body">
+                  <div class="follow-row">
+                    <a class="hv-link" @click="$router.push(`/homepage/${item.userId}/${item.nickname}`)">{{ item.nickname }}</a>
+                    <van-tag plain type="primary">{{ item.fansCount }}</van-tag>
+                  </div>
+                  <div class="hv-sign">签名:{{ item.description || '这家伙很懒什么也没留下' }}</div>
+                </div>
+              </div>
             </div>
           </template>
         </van-cell>
@@ -95,8 +90,27 @@ const usernameFilter = () => {
 
 <style scoped>
 .card {
-  text-align: center;
   padding: 0;
+}
+.follow-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.follow-avatar {
+  flex-shrink: 0;
+}
+.follow-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.follow-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 .hv-link {
   text-decoration: none;
