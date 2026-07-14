@@ -9,18 +9,17 @@
               <van-row justify="space-between" @click="$router.push(`/topic/${item.topicId}`)">
                 <van-col span="24" class="hv-title">{{ item.title }}</van-col>
               </van-row>
-              <van-row justify="center">
-                <van-col span="8" v-for="attach in item.attachments" :key="attach.id">
-                  <van-image
-                    width="80"
-                    height="80"
-                    fit="cover"
-                    radius="5"
-                    :src="LOADING_URL"
-                    v-headicon="attach.remoteUrl || attach.coverUrl"
-                  />
-                </van-col>
-              </van-row>
+              <div class="topic-images">
+                <van-image
+                  v-for="attach in item.attachments"
+                  :key="attach.id"
+                  fit="cover"
+                  radius="5"
+                  :src="LOADING_URL"
+                  v-headicon="attach.remoteUrl || attach.coverUrl"
+                  class="topic-image"
+                />
+              </div>
             </div>
             <div v-else>
               <van-row justify="space-between" @click="$router.push(`/topic/${item.topicId}`)">
@@ -144,5 +143,14 @@ defineExpose({ startLoad, endLoad, finishLoad })
 }
 .img-pos {
   margin: 18px 10px;
+}
+.topic-images {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+}
+.topic-image {
+  flex: 1;
+  aspect-ratio: 1;
 }
 </style>
