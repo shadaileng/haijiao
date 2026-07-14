@@ -137,6 +137,9 @@ defineExpose({ startLoad, endLoad, finishLoad })
   color: #969799;
   margin-top: 6px;
 }
+.topic-meta > .van-tag {
+  margin-left: auto;
+}
 .topic-meta-user {
   display: flex;
   align-items: center;
