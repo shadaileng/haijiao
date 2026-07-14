@@ -72,11 +72,11 @@ const usernameFilter = () => {
                   class="follow-avatar"
                 />
                   <div class="follow-body">
-                    <a class="hv-link" @click="$router.push(`/homepage/${item.userId}/${item.nickname}`)">{{ item.nickname }}</a>
-                    <div class="follow-sub">
-                      <span class="hv-sign">签名:{{ item.description || '这家伙很懒什么也没留下' }}</span>
+                    <div class="follow-top">
+                      <a class="hv-link" @click="$router.push(`/homepage/${item.userId}/${item.nickname}`)">{{ item.nickname }}</a>
                       <van-tag plain type="primary">{{ item.fansCount }}</van-tag>
                     </div>
+                    <div class="follow-sign">签名:{{ item.description || '这家伙很懒什么也没留下' }}</div>
                   </div>
               </div>
             </div>
@@ -94,7 +94,7 @@ const usernameFilter = () => {
 }
 .follow-item {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
 }
 .follow-avatar {
@@ -107,11 +107,15 @@ const usernameFilter = () => {
   flex-direction: column;
   gap: 6px;
 }
-.follow-sub {
+.follow-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+}
+.follow-sign {
+  font-size: 0.85rem;
+  color: #999;
+  text-align: left;
 }
 .hv-link {
   text-decoration: none;
