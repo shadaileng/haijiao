@@ -121,6 +121,12 @@ const loadComments = async (index: number, scrollToTop = false) => {
   width: 100%;
   height: auto;
 }
+:deep(.content img.hv-emoji) {
+  display: inline-block;
+  width: 1.2em;
+  height: 1.2em;
+  vertical-align: middle;
+}
 
 .comment-header {
   display: flex;

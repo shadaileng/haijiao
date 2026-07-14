@@ -17,7 +17,8 @@ docs/
 │   ├── 06-E2E自动化测试方案.md
 │   ├── 07-Worker代理适配优化方案.md
 │   ├── 08-回复列表渲染方案.md
-│   └── 09-数据驱动重构方案.md
+│   ├── 09-数据驱动重构方案.md
+│   └── 10-Emoji解析移植方案.md
 ├── architecture/                    # 架构类（持续维护）
 │   ├── 01-架构概览.md
 │   └── 02-架构演进.md
@@ -50,6 +51,7 @@ docs/
 | `07-Worker代理适配优化方案.md` | v1.1.0 | 方案 | `plans/` | worker.ts 代理层与前端适配问题修复 | 🏁 |
 | `08-回复列表渲染方案.md` | v1.0.0 | 方案 | `plans/` | 评论区回复列表递归渲染，v-content 支持 | 🏁 |
 | `09-数据驱动重构方案.md` | v2.0.0 | 方案 | `plans/` | 消除硬编码、死 Store、缺骨架屏等数据驱动问题 | 🏁 |
+| `10-Emoji解析移植方案.md` | v1.0.0 | 方案 | `plans/` | `[emoji]code[/emoji]` 渲染为 `<img>` 图片 | 🏁 |
 | `01-架构概览.md` | v1.1.0 | 架构 | `architecture/` | 系统架构与请求链路 | 🏁 |
 | `02-架构演进.md` | v1.0.0 | 架构 | `architecture/` | 从 Vue2/ElementUI 到 Vue3/Vant 的迁移 | 🏁 |
 | `01-API 参考.md` | v1.1.0 | 参考 | `references/` | 所有 API 端点定义 | 🏁 |
@@ -109,7 +111,7 @@ docs/
 | 第一波 | 每日签到 | P0 | ⬜ 未开始 |
 | 第一波 | 用户帖子分类展示 | P0 | ⬜ 未开始 |
 | 第一波 | 用户信息展示 | P0 | ⬜ 未开始 |
-| 第一波 | Emoji 解析 | P0 | ⬜ 未开始 |
+| 第一波 | Emoji 解析 | P0 | ✅ 已完成 |
 | 第二波 | 帖子收藏 | P1 | ⬜ 未开始 |
 | 第二波 | 关系扩展（粉丝/好友） | P1 | ⬜ 未开始 |
 | 第二波 | 验证码交互 | P1 | ⬜ 未开始 |
@@ -213,6 +215,19 @@ docs/
 | 四 | 11 | UserInfo 修复 prop 类型 | P2 | ✅ |
 | 五 | 12 | 提取 Api 接口类型 | P3 | ✅ |
 | 五 | 13 | 统一注入模式（统一为`import { api }`，移除`provide('$api')`） | P3 | ✅ |
+
+### 10-Emoji解析移植方案
+
+| 步骤 | 文件 | 操作 | 状态 |
+|:---:|:-----|:-----|:----:|
+| 1 | `src/utils/emoji.ts` | 新建：映射表 + `renderEmoji()` | ✅ |
+| 2 | `src/plugins/content.ts` | 集成渲染 + 修复 CSS 冲突 | ✅ |
+| 3 | `src/main.ts` | 挂载 `$emoji` 全局方法 | ✅ |
+| 4 | `src/components/ReplyList.vue` | 折叠预览渲染 + CSS | ✅ |
+| 5 | `src/components/Comment.vue` | `.hv-emoji` CSS | ✅ |
+| 6 | `src/types/emoji.d.ts` | 新建：类型声明 | ✅ |
+| 7 | 验证 | `pnpm run build` | ✅ |
+| 8 | 文档同步 | 更新状态标记 | ✅ |
 
 ## 参考代码
 

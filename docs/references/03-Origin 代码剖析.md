@@ -754,7 +754,7 @@ ABCD*EFGHIJKLMNOPQRSTUVWXYZ#yzabcdefghijklmnopqrstuvwxyz1234567890
 | 帖子详情 | 路由 /post/details | 路由 /topic/:pid | ✅ |
 | 视频播放 | DPlayer 内嵌指令 | DPlayer + v-content 指令 | ✅ |
 | 加密图片 | 自定义 Base64 | utils/image.ts 自定义Decode | ✅ |
-| Emoji 解析 | 4 组 50+ 表情 | 待移植 | ⬜ |
+| Emoji 解析 | 4 组 50+ 表情 | emoji.ts + v-content + ReplyList | ✅ |
 | 用户主页 | /homepage/:uid | /homepage/:userId/:nickname | ✅ |
 | 关注/粉丝 | relation store | user store 关注列表缓存 | ✅ |
 | 搜索 | /es | /search | ✅ |

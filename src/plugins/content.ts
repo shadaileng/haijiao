@@ -2,6 +2,7 @@ import type { App, Directive } from 'vue'
 import { Attachment } from '@/types'
 import { loadVideoSrc } from '@/api/request'
 import { loadImg } from '@/utils/image'
+import { renderEmoji } from '@/utils/emoji'
 import { LOADING_URL } from '@/utils/constant'
 import DPlayer from 'dplayer'
 import Hls from 'hls.js'
@@ -88,9 +89,10 @@ const vContent: Directive = {
       }
     }
 
+    content = renderEmoji(content)
     el.innerHTML = content
 
-    el.querySelectorAll('img').forEach(img => {
+    el.querySelectorAll<HTMLImageElement>('img:not([data-emoji])').forEach(img => {
       img.style.width = '100%'
       const atta = attas.get(Number((img as HTMLElement).dataset['id']))
       if (atta) {

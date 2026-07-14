@@ -17,7 +17,7 @@
               {{ replies[0].nickname }}
             </span>
             <span class="reply-colon">：</span>
-            <span class="reply-text-preview" v-html="replies[0].content"></span>
+            <span class="reply-text-preview" v-html="$emoji.render(replies[0].content)"></span>
           </div>
           <div class="reply-item-time">{{ replies[0].createTime }}</div>
         </div>
@@ -162,6 +162,12 @@ const expanded = ref(false)
 .reply-text-preview {
   color: #000;
   word-break: break-word;
+}
+:deep(.reply-text-preview img.hv-emoji) {
+  display: inline-block;
+  width: 1.2em;
+  height: 1.2em;
+  vertical-align: middle;
 }
 
 .reply-expand {

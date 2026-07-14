@@ -94,6 +94,16 @@ body {
 .content p { margin: 0; }
 .content img { width: 100%; height: auto; }
 
+/* Emoji inline icons */
+.content img.hv-emoji,
+.reply-text img.hv-emoji,
+.reply-text-preview img.hv-emoji {
+  display: inline-block !important;
+  width: 1.2em !important;
+  height: 1.2em;
+  vertical-align: middle;
+}
+
 /* Overlay wrapper */
 .overlay-wrapper {
   display: flex;

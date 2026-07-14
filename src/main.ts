@@ -8,6 +8,7 @@ import App from './App.vue'
 import router from './router'
 import headicon from '@/plugins/headicon'
 import content from '@/plugins/content'
+import { renderEmoji } from '@/utils/emoji'
 import './styles/global.scss'
 
 const app = createApp(App)
@@ -19,5 +20,7 @@ app.use(router)
 app.use(Vant)
 app.use(headicon)
 app.use(content)
+
+app.config.globalProperties.$emoji = { render: renderEmoji }
 
 app.mount('#app')

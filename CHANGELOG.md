@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.18.0] - 2026-07-14
+
+### Added
+
+- Emoji 解析渲染：`[emoji]code[/emoji]` 替换为 `<img>` 内联图片，支持 4 组 59 个表情
+- `src/utils/emoji.ts`：映射表 + `renderEmoji()` 纯函数，通过 settings store apiBase 拼接 CDN 路径
+- v-content 指令集成 emoji 渲染，emoji 图片跳过 IntersectionObserver 懒加载
+- ReplyList 折叠预览也渲染 emoji 为图片
+- 全局 `.hv-emoji` 样式控制内联尺寸（1.2em），覆盖组件作用域的宽高强制
+
 ## [1.17.0] - 2026-07-14
 
 ### Added
