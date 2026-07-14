@@ -15,7 +15,8 @@ docs/
 │   ├── 04-参考haijiao-wxt界面布局方案.md
 │   ├── 05-参考haijiao-wxt重构前端项目方案.md
 │   ├── 06-E2E自动化测试方案.md
-│   └── 07-Worker代理适配优化方案.md
+│   ├── 07-Worker代理适配优化方案.md
+│   └── 08-回复列表渲染方案.md
 ├── architecture/                    # 架构类（持续维护）
 │   ├── 01-架构概览.md
 │   └── 02-架构演进.md
@@ -46,6 +47,7 @@ docs/
 | `05-参考haijiao-wxt重构前端项目方案.md` | v1.1.0 | 方案 | `plans/` | 彻底重建 src/，移植视频播放与模块化能力，支持镜像源 | 🏁 |
 | `06-E2E自动化测试方案.md` | v1.2.0 | 方案 | `plans/` | Playwright + 本机 Chrome 端到端测试 | 🏁 |
 | `07-Worker代理适配优化方案.md` | v1.1.0 | 方案 | `plans/` | worker.ts 代理层与前端适配问题修复 | 🏁 |
+| `08-回复列表渲染方案.md` | v1.0.0 | 方案 | `plans/` | 评论区回复列表递归渲染，v-content 支持 | 🏁 |
 | `01-架构概览.md` | v1.1.0 | 架构 | `architecture/` | 系统架构与请求链路 | 🏁 |
 | `02-架构演进.md` | v1.0.0 | 架构 | `architecture/` | 从 Vue2/ElementUI 到 Vue3/Vant 的迁移 | 🏁 |
 | `01-API 参考.md` | v1.1.0 | 参考 | `references/` | 所有 API 端点定义 | 🏁 |
@@ -183,6 +185,14 @@ docs/
 | 3 | `vite.config.ts` | 缺少 `X-Backend` 时回退默认后端 | ✅ |
 | 4 | 验证 | `pnpm run build` 构建通过 | ✅ |
 | 5 | 文档 | 更新方案文档状态 | ✅ |
+
+### 08-回复列表渲染方案
+
+| 步骤 | 文件 | 操作 | 状态 |
+|:----:|:-----|:-----|:----:|
+| 1 | `src/components/ReplyList.vue` | 新建递归组件 | ✅ |
+| 2 | `src/components/Comment.vue` | 替换内联回复渲染 | ✅ |
+| 3 | — | 构建验证 | ✅ |
 
 ## 参考代码
 

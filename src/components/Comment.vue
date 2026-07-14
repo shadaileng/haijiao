@@ -39,16 +39,11 @@
               }"
             ></div>
           </van-row>
-          <van-row v-if="item.commendList?.length > 0">
-            <div class="commend_list">
-              <van-row v-for="commend_item in item.commendList" :key="commend_item.replyId">
-                <van-col span="24">
-                  <span class="hv-nickname hv-pointer" @click="$router.push(`/homepage/${item.userId}/${item.nickname}`)">{{ commend_item.nickname }}:</span>
-                  <span>{{ commend_item.content }}</span>
-                </van-col>
-              </van-row>
-            </div>
-          </van-row>
+          <ReplyList
+            v-if="item.commendList?.length"
+            :replies="item.commendList"
+            :handleClick="handleClick"
+          />
         </template>
       </van-cell>
     </van-list>
@@ -69,6 +64,7 @@ import { CommentPage } from '@/types'
 import { api } from '@/api/request'
 import { LOADING_URL } from '@/utils/constant'
 import { showToast } from 'vant'
+import ReplyList from './ReplyList.vue'
 
 const props = defineProps({
   topicId: {
@@ -140,13 +136,5 @@ const loadComments = async (index: number) => {
   width: 100%;
   height: auto;
 }
-.commend_list {
-  width: 100%;
-  margin: 0 10px;
-  text-align: left;
-  font-size: 0.8rem;
-  padding: 10px 15px;
-  background-color: #f5f5f5;
-  border-radius: 5px;
-}
+
 </style>

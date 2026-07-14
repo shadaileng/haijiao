@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.16.0] - 2026-07-14
+
+### Added
+
+- 评论区回复列表递归渲染组件 ReplyList：支持头像展示、v-content 富内容渲染（图片/视频/音频）、无限嵌套回复
+- 修复 API snake_case 字段 `commend_list` / `reply_id` 未转换导致回复无法显示的问题
+- 修复回复昵称点击误跳至父评论作者的问题
+
 ## [1.13.10] - 2026-07-12
 
 ### Fixed
