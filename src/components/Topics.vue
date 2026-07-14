@@ -23,15 +23,9 @@
             </div>
             <div v-else>
               <van-row justify="space-between" @click="$router.push(`/topic/${item.topicId}`)">
-                <van-col span="16">
-                  <van-row justify="space-between">
-                    <van-col span="24" class="hv-title">{{ item.title }}</van-col>
-                  </van-row>
-                  <van-row justify="space-between">
-                    <van-col span="24">
-                      <van-text-ellipsis rows="2" :content="item.liteContent" />
-                    </van-col>
-                  </van-row>
+                <van-col span="16" class="topic-text-col">
+                  <div class="hv-title">{{ item.title }}</div>
+                  <van-text-ellipsis rows="2" :content="item.liteContent" />
                 </van-col>
                 <van-col span="8">
                   <van-image
@@ -152,5 +146,11 @@ defineExpose({ startLoad, endLoad, finishLoad })
   display: block;
   width: 100%;
   aspect-ratio: 1;
+}
+.topic-text-col {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-right: 10px;
 }
 </style>
