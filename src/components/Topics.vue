@@ -38,10 +38,9 @@
                 </van-col>
               </van-row>
             </div>
-            <van-row justify="space-between">
-              <van-col
-                span="7"
-                class="hv-topic-state hv-of-hidden hv-pointer"
+            <div class="topic-meta">
+              <span
+                class="topic-meta-user"
                 @click="$router.push(`/homepage/${item.user?.id}/${item.user?.nickname}`)"
                 :title="item.user?.nickname"
               >
@@ -53,13 +52,13 @@
                   class="hv-user-icon"
                   v-headicon="item.user?.avatar?.startsWith('http') ? item.user.avatar + '.txt' : item.user?.avatar"
                 />
-                <span>{{ item.user?.nickname }}</span>
-              </van-col>
-              <van-col span="3" class="hv-topic-state"><van-icon name="chat-o" /><span>{{ item.commentCount }}</span></van-col>
-              <van-col span="3" class="hv-topic-state"><van-icon name="good-job" /><span>{{ item.likeCount }}</span></van-col>
-              <van-col span="6" class="hv-topic-state"><span>{{ item.createTime?.split(' ')[0] }}</span></van-col>
-              <van-col span="5" class="hv-topic-state"><van-tag plain type="primary">{{ item.node?.name }}</van-tag></van-col>
-            </van-row>
+                {{ item.user?.nickname }}
+              </span>
+              <span class="topic-meta-stat"><van-icon name="chat-o" />{{ item.commentCount }}</span>
+              <span class="topic-meta-stat"><van-icon name="good-job" />{{ item.likeCount }}</span>
+              <span class="topic-meta-date">{{ item.createTime?.split(' ')[0] }}</span>
+              <van-tag plain type="primary">{{ item.node?.name }}</van-tag>
+            </div>
           </div>
         </template>
       </van-cell>
@@ -130,8 +129,35 @@ defineExpose({ startLoad, endLoad, finishLoad })
   color: #000;
   padding-bottom: 5px;
 }
-.hv-topic-state {
-  text-align: left;
+.topic-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  color: #969799;
+  margin-top: 6px;
+}
+.topic-meta-user {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  color: #505050;
+  font-weight: 500;
+  flex-shrink: 0;
+  max-width: 40%;
+}
+.topic-meta-stat {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.topic-meta-date {
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 .topic-images {
   display: flex;
