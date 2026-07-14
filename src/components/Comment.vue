@@ -46,7 +46,7 @@
     :items-per-page="comments.page.size"
     v-if="comments.page.total > comments.page.size"
     force-ellipses
-    @change="(index: number) => loadComments(index)"
+    @change="(index: number) => loadComments(index, true)"
   />
 </template>
 
@@ -64,6 +64,7 @@ const props = defineProps({
     required: true,
   },
 })
+const emit = defineEmits<{ loaded: [scroll: boolean] }>()
 
 const loading = ref(true)
 const finished = ref(false)
@@ -81,7 +82,7 @@ onMounted(() => {
   loadComments(1)
 })
 
-const loadComments = async (index: number) => {
+const loadComments = async (index: number, scrollToTop = false) => {
   loading.value = true
   finished.value = false
   const resp = await api.reply_list({
@@ -111,6 +112,9 @@ const loadComments = async (index: number) => {
   comments.page.size = data.page.limit
   loading.value = false
   finished.value = true
+  if (scrollToTop) {
+    emit('loaded', true)
+  }
 }
 </script>
 

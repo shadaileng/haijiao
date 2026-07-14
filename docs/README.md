@@ -16,7 +16,8 @@ docs/
 │   ├── 05-参考haijiao-wxt重构前端项目方案.md
 │   ├── 06-E2E自动化测试方案.md
 │   ├── 07-Worker代理适配优化方案.md
-│   └── 08-回复列表渲染方案.md
+│   ├── 08-回复列表渲染方案.md
+│   └── 09-数据驱动重构方案.md
 ├── architecture/                    # 架构类（持续维护）
 │   ├── 01-架构概览.md
 │   └── 02-架构演进.md
@@ -48,6 +49,7 @@ docs/
 | `06-E2E自动化测试方案.md` | v1.2.0 | 方案 | `plans/` | Playwright + 本机 Chrome 端到端测试 | 🏁 |
 | `07-Worker代理适配优化方案.md` | v1.1.0 | 方案 | `plans/` | worker.ts 代理层与前端适配问题修复 | 🏁 |
 | `08-回复列表渲染方案.md` | v1.0.0 | 方案 | `plans/` | 评论区回复列表递归渲染，v-content 支持 | 🏁 |
+| `09-数据驱动重构方案.md` | v1.0.0 | 方案 | `plans/` | 消除硬编码、死 Store、缺骨架屏等数据驱动问题 | 📋 |
 | `01-架构概览.md` | v1.1.0 | 架构 | `architecture/` | 系统架构与请求链路 | 🏁 |
 | `02-架构演进.md` | v1.0.0 | 架构 | `architecture/` | 从 Vue2/ElementUI 到 Vue3/Vant 的迁移 | 🏁 |
 | `01-API 参考.md` | v1.1.0 | 参考 | `references/` | 所有 API 端点定义 | 🏁 |
@@ -193,6 +195,24 @@ docs/
 | 1 | `src/components/ReplyList.vue` | 新建递归组件 | ✅ |
 | 2 | `src/components/Comment.vue` | 替换内联回复渲染 | ✅ |
 | 3 | — | 构建验证 | ✅ |
+
+### 09-数据驱动重构方案
+
+| 阶段 | 步骤 | 操作 | 优先级 | 状态 |
+|:----:|:----:|:-----|:-----:|:----:|
+| 一 | 1 | TabBar 配置改为响应式数据驱动 | P1 | ⬜ |
+| 一 | 2 | TabBar 按登录态显示/隐藏 | P2 | ⬜ |
+| 一 | 3 | FollowView 移除硬编码占位图 | P1 | ⬜ |
+| 二 | 4 | 删除 `stores/hot.ts` | P1 | ⬜ |
+| 二 | 5 | 删除 `stores/homepage.ts` | P1 | ⬜ |
+| 二 | 6 | 构建验证 | P0 | ⬜ |
+| 三 | 7 | UserView 新增骨架屏 | P1 | ⬜ |
+| 三 | 8 | SettingsView 新增骨架屏 | P2 | ⬜ |
+| 四 | 9 | Comment 删除空 onLoad，改用纯分页 | P1 | ⬜ |
+| 四 | 10 | SearchView 修复 api 类型 | P2 | ⬜ |
+| 四 | 11 | UserInfo 修复 prop 类型 | P2 | ⬜ |
+| 五 | 12 | 提取 Api 接口类型 | P3 | ⬜ |
+| 五 | 13 | 统一注入模式 | P3 | ⬜ |
 
 ## 参考代码
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import { showToast } from 'vant'
 import { api } from '@/api/request'
@@ -11,6 +11,7 @@ import { LOADING_URL } from '@/utils/constant'
 const route = useRoute()
 
 const pid = ref((route.params.pid as string) || '')
+const commentDivider = ref<HTMLElement>()
 const loading = ref(true)
 const topicLocal = ref<Topic>({
   topicId: 0,
@@ -44,6 +45,12 @@ const loadTopic = async (topicPid: string) => {
   }
   Object.assign(topicLocal.value, resp.data)
   loading.value = false
+}
+
+const onCommentLoaded = () => {
+  nextTick(() => {
+    commentDivider.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  })
 }
 </script>
 
@@ -103,8 +110,9 @@ const loadTopic = async (topicPid: string) => {
       />
     </van-row>
   </van-skeleton>
+  <div ref="commentDivider"></div>
   <van-divider :hairline="false">评论</van-divider>
-  <Comment v-if="topicLocal.topicId" :topicId="topicLocal.topicId" />
+  <Comment v-if="topicLocal.topicId" :topicId="topicLocal.topicId" @loaded="onCommentLoaded" />
 </template>
 
 <style scoped></style>
