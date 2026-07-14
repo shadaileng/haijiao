@@ -108,7 +108,12 @@ const endLoad = () => {
   loading.value = false
 }
 
-defineExpose({ startLoad, endLoad })
+const finishLoad = () => {
+  finished.value = true
+  loading.value = false
+}
+
+defineExpose({ startLoad, endLoad, finishLoad })
 </script>
 
 <style scoped>

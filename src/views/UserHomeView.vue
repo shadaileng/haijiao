@@ -1,6 +1,6 @@
 <script setup lang="ts">
 defineOptions({ name: 'UserHomeView' })
-import { ref, reactive, onMounted, watch } from 'vue'
+import { ref, reactive, onMounted, watch, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import { showToast } from 'vant'
 import { api } from '@/api/request'
@@ -26,6 +26,8 @@ onMounted(async () => {
   }
   await pageto(1)
   skeletonLoading.value = false
+  await nextTick()
+  topicsDom.value?.endLoad()
 })
 
 watch(() => route.params.userId, async (newId) => {
@@ -40,6 +42,8 @@ watch(() => route.params.userId, async (newId) => {
     await loadUserInfo(userId.value)
     await pageto(1)
     skeletonLoading.value = false
+    await nextTick()
+    topicsDom.value?.endLoad()
   }
 })
 
@@ -70,9 +74,13 @@ const pageto = async (index: number) => {
   }
 }
 
-const loadMore = () => {
+const loadMore = async () => {
   if (liteTopics.page.index < Math.ceil(liteTopics.page.total / liteTopics.page.size)) {
-    pageto(liteTopics.page.index + 1)
+    topicsDom.value?.startLoad()
+    await pageto(liteTopics.page.index + 1)
+    topicsDom.value?.endLoad()
+  } else {
+    topicsDom.value?.finishLoad()
   }
 }
 </script>
