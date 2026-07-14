@@ -5,6 +5,7 @@ import { showToast } from 'vant'
 import { api } from '@/api/request'
 import { useSettingsStore } from '@/stores/settings'
 import type { FollowUser } from '@/types'
+import { LOADING_URL } from '@/utils/constant'
 
 const settings = useSettingsStore()
 const loading = ref(false)
@@ -68,6 +69,7 @@ const usernameFilter = () => {
                   round
                   width="4rem"
                   height="4rem"
+                  :src="LOADING_URL"
                   v-headicon="item.avatar?.startsWith('http') ? item.avatar + '.txt' : item.avatar"
                   class="follow-avatar"
                 />
