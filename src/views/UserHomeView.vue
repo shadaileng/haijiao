@@ -106,6 +106,7 @@ const loadMore = async () => {
   </template>
   <template v-else>
     <UserInfo v-if="userInfo" :userInfo="userInfo" />
+    <van-divider v-if="userInfo" />
     <Topics ref="topicsDom" :topics="liteTopics.results" :skeletonLoading="false" @load="loadMore()" />
   </template>
 </template>
