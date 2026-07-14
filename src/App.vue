@@ -21,12 +21,25 @@ const overlay = reactive({
   show: false,
   img: '',
   video: false,
+  dplayer: null as any | null,
 })
 
-provide('overlay', (data: { overlayShow: boolean; overlayImg?: string; overlayVideo?: boolean }) => {
+provide('overlay', (data: { overlayShow: boolean; overlayImg?: string; overlayVideo?: boolean; dplayer?: any }) => {
   overlay.show = data.overlayShow
   if (data.overlayImg) overlay.img = data.overlayImg
   if (data.overlayVideo) overlay.video = data.overlayVideo
+  if (data.dplayer) overlay.dplayer = data.dplayer
+})
+
+watch(() => overlay.show, (val) => {
+  if (!val) {
+    if (overlay.dplayer) {
+      overlay.dplayer.destroy()
+      overlay.dplayer = null
+    }
+    overlay.video = false
+    overlay.img = ''
+  }
 })
 </script>
 

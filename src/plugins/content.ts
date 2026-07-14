@@ -129,7 +129,7 @@ const vContent: Directive = {
                     },
                   },
                 })
-                handleClick?.({ overlayShow: true, overlayVideo: true })
+                handleClick?.({ overlayShow: true, overlayVideo: true, dplayer: player })
               })
               .catch((err: any) => {
                 console.error('load video error:', err)
