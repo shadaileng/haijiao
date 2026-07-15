@@ -1,7 +1,7 @@
 import { md5 } from 'js-md5'
 import { useSettingsStore } from '@/stores/settings'
 import { toCamelCase } from '@/utils/transform'
-import type { ApiResult, LoginParams, LoginResponse } from '@/types'
+import type { ApiResult, LoginParams, LoginResponse, VideoLine } from '@/types'
 
 function utf8Decode(binary: string): string {
   const bytes = new Uint8Array(binary.length)
@@ -94,7 +94,7 @@ export async function getTopic(topicId: string | number): Promise<any> {
 }
 
 // 视频地址解析（修复认证来源：统一 settings store 的 uid/token）
-export async function loadVideoSrc(id: string | number, resourceId: string | number): Promise<any> {
+export async function loadVideoSrc(id: string | number, resourceId: string | number, line = 'normal1'): Promise<any> {
   const settings = useSettingsStore()
   const data = await request({
     url: '/attachment',
@@ -103,7 +103,7 @@ export async function loadVideoSrc(id: string | number, resourceId: string | num
       id: Number(id),
       resource_id: Number(resourceId),
       resource_type: 'topic',
-      line: 'normal1',
+      line,
     },
     headers: {
       'X-User-Id': settings.uid,
@@ -111,6 +111,28 @@ export async function loadVideoSrc(id: string | number, resourceId: string | num
     },
   })
   return data
+}
+
+// 获取视频可用线路列表
+export async function getVideoLines(attachmentId: string | number): Promise<VideoLine[]> {
+  return request({ url: '/topic/att/' + attachmentId })
+}
+
+// 解析 preview.m3u8 → 完整视频 URL
+// 参考 haijiao.py:getRealUrl (docs/reference/haijiao_download/haijiao.py:168-180)
+export async function resolveRealUrl(previewUrl: string): Promise<string> {
+  const resp = await fetch(previewUrl)
+  const text = await resp.text()
+  const lines = text.split('\n').filter(l => !l.startsWith('#') && l.trim())
+  if (!lines.length) return previewUrl
+  const firstLine = lines[0]
+  let code: string
+  if (firstLine.startsWith('http')) {
+    code = firstLine.slice(firstLine.lastIndexOf('/') + 1, firstLine.lastIndexOf('.') - 1)
+  } else {
+    code = firstLine.slice(0, firstLine.lastIndexOf('.') - 1)
+  }
+  return previewUrl.replace(/(\d+_i)_preview/, code)
 }
 
 // 帖子详情（含视频附件解析）
@@ -218,6 +240,7 @@ export interface Api {
   reply_list(params: { params: { page: number; sort: string; topic_id: number; search_type: number; user_id: number } }): Promise<ApiResult>
   current(): Promise<ApiResult>
   login(params: LoginParams): Promise<ApiResult>
+  videoLines(params: { attachmentId: string | number }): Promise<ApiResult>
 }
 
 // 统一 API 对象，所有视图直接 import 使用
@@ -297,6 +320,14 @@ export const api: Api = {
   async login(params: LoginParams) {
     try {
       const data = await login(params)
+      return { success: true, data }
+    } catch (e: any) {
+      return { success: false, message: e.message }
+    }
+  },
+  async videoLines({ attachmentId }: { attachmentId: string | number }) {
+    try {
+      const data = await getVideoLines(attachmentId)
       return { success: true, data }
     } catch (e: any) {
       return { success: false, message: e.message }

@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.22.0] - 2026-07-15
+
+### Added
+
+- 视频播放优化：preview.m3u8 自动解析为完整视频
+  - `api/request.ts`：新增 `resolveRealUrl()` 下载 preview m3u8 → 提取 code → 返回完整视频 URL
+  - `plugins/content.ts`：视频播放自动调用 `resolveRealUrl` 转换 remoteUrl；HLS keyPath 片段路径修正（origin 兼容）；`"undefined"` 的 keyPath 值过滤
+  - 移除前端线路按钮和测试按钮（所有 line 均返回 preview，resolveRealUrl 统一解析）
+- sell 内容视频预加载：扫描 sell-btn 内的 `<video data-id>` → 主动调用 `loadVideoSrc` 获取元数据 → 嵌套缩略图
+  - `plugins/content.ts`：sell 处理前先提取 videoId，attachList 中不存在时异步调 API 补全
+
+### Fixed
+
+- 服务端返回 `key-path="undefined"` 导致 HLS 片段 URL 出现 `undefined` 前缀 → 过滤为空字符串
+
 ## [1.21.0] - 2026-07-15
 
 ### Added

@@ -82,6 +82,12 @@ export interface Attachment {
   keyPath: string
 }
 
+export interface VideoLine {
+  keyPath: string
+  url: string
+  name: string
+}
+
 export interface DoorData {
   id: number
   type: number

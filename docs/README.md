@@ -58,6 +58,7 @@ docs/
 | `11-批量图片加载模块方案.md` | v1.0.0 | 方案 | `plans/` | 多任务异步队列批量处理图片解码 | 🏁 |
 | `12-v-content适配Door标签方案.md` | v1.1.0 | 方案 | `plans/` | v-content 插件解析 `[door]` 标签渲染跳转 | 🏁 |
 | `13-v-content适配Sell标签方案.md` | v1.2.0 | 方案 | `plans/` | v-content 插件解析 `sell-btn` HTML 渲染 + 视频预览 | 🏁 |
+| `14-移除视频30秒预览限制.md` | v5.0.0 | 方案 | `plans/` | preview 解析 + keyPath 修复 + sell 视频预加载 | 🏁 |
 | `01-架构概览.md` | v1.1.0 | 架构 | `architecture/` | 系统架构与请求链路 | 🏁 |
 | `02-架构演进.md` | v1.0.0 | 架构 | `architecture/` | 从 Vue2/ElementUI 到 Vue3/Vant 的迁移 | 🏁 |
 | `01-API 参考.md` | v1.1.0 | 参考 | `references/` | 所有 API 端点定义 | 🏁 |
@@ -249,6 +250,7 @@ docs/
 
 | `12-v-content适配Door标签方案.md` | v1.1.0 | 方案 | `plans/` | v-content 插件解析 `[door]` 标签渲染跳转 | 🏁 |
 | `13-v-content适配Sell标签方案.md` | v1.0.0 | 方案 | `plans/` | v-content 插件解析 `[sell]` 标签渲染购买信息 | 🏁 |
+| `14-移除视频30秒预览限制.md` | v1.0.0 | 方案 | `plans/` | 移除出售视频的 30 秒客户端预览截断 | 🏁 |
 
 ### 12-v-content适配Door标签方案
 
@@ -280,6 +282,26 @@ docs/
 | 11 | `plugins/content.ts` 导入 `showDialog` + `formatDuration` 辅助函数 | ✅ |
 | 12 | `styles/global.scss` `.preview-title` 样式 | ✅ |
 | 13 | 验证：`pnpm run build` 类型检查 + 构建通过 | ✅ |
+
+### 14-视频线路切换 + preview URL 解析
+
+| 步骤 | 操作 | 状态 |
+|:----:|:-----|:----:|
+| 1 | 新增 `VideoLine` 类型定义 | ✅ |
+| 2 | `loadVideoSrc()` 接受可选 `line` 参数 | ✅ |
+| 3 | 新增 `getVideoLines(attachmentId)` API | ✅ |
+| 4 | 在 api 对象中注册 `videoLines` 方法 | ✅ |
+| 5 | `content.ts` 视频渲染后异步获取线路列表，渲染按钮 | ✅ |
+| 6 | `content.ts` 视频点击时读取选中线路，传入 `loadVideoSrc` | ✅ |
+| 7 | `content.ts` customHls 中加入 keyPath 片段路径修正 | ✅ |
+| 8 | `global.scss` 新增 `.hv-video-lines` / `.hv-line-btn` 样式 | ✅ |
+| 9 | 修复 keyPath 属性值 `"undefined"` 导致 URL 出现 undefined 前缀 | ✅ |
+| 10 | 新增 `resolveRealUrl()` 解析 preview → 完整视频 URL | ✅ |
+| 11 | 视频点击后自动调用 `resolveRealUrl` 转换 remoteUrl | ✅ |
+| 12 | 线路按钮行增加"测试"按钮，点击后解析并打印完整 URL | ✅ |
+| 13 | `pnpm run build` 构建验证 | ✅ |
+| 14 | sell 内容预加载：扫描 `<video data-id>` → 主动调 API 获取元数据 → 生成缩略图 | ✅ |
+| 15 | 移除线路按钮和测试按钮（所有线路均返回 preview，resolveRealUrl 统一解析） | ✅ |
 
 ## 参考代码
 

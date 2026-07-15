@@ -1,12 +1,11 @@
 import type { App, Directive } from 'vue'
 import { Attachment } from '@/types'
-import { loadVideoSrc } from '@/api/request'
+import { loadVideoSrc, resolveRealUrl } from '@/api/request'
 import { imageLoader } from '@/utils/imageLoader'
 import { renderEmoji } from '@/utils/emoji'
 import { LOADING_URL } from '@/utils/constant'
 import DPlayer from 'dplayer'
 import Hls from 'hls.js'
-import { showDialog } from 'vant'
 import router from '@/router'
 
 let player: DPlayer | null = null
@@ -15,18 +14,6 @@ function formatCount(n: number): string {
   if (n >= 10000) return (n / 10000).toFixed(1) + 'w'
   if (n >= 1000) return (n / 1000).toFixed(1) + 'k'
   return String(n)
-}
-
-function formatDuration(seconds: number): string {
-  if (!seconds || +seconds !== seconds) return '--秒'
-  let result = ''
-  const h = Math.floor(seconds / 3600)
-  const m = Math.floor((seconds % 3600) / 60)
-  const s = seconds % 60
-  if (h >= 1) result += h + '时'
-  if (m >= 1) result += m + '分'
-  result += s + '秒'
-  return result
 }
 
 function buildAttaMap(attachments: any): Map<number, Attachment> {
@@ -128,125 +115,150 @@ const vContent: Directive = {
       }
     }
 
-    // sell-btn HTML 解析
-    if (content.includes('class="sell-btn"')) {
-      const videoAtta = attachList.find(a => a.category === 'video')
-      content = content.replace(
-        /<span\s+class="sell-btn"[^>]*>[\s\S]*?<\/span>/gi,
-        () => {
-          let html = '<div class="hjsell-container">'
-          if (sale) {
-            const unit = sale.moneyType === 1 ? '金币' : (sale.amount / 100).toFixed(2) + '钻石'
-            const price = sale.moneyType === 1 ? sale.amount : (sale.amount / 100).toFixed(2)
-            html += `<div class="hssell-title">此贴售价${price}${unit}，已有${formatCount(sale.buyCount || 0)}人购买</div>`
-            if (sale.buyIndex > 0) {
-              html += `<div class="hssell-title hssell-bought">您是第${sale.buyIndex}个购买者</div>`
-            } else if (sale.buyIndex < 0) {
-              html += `<div class="hssell-title hssell-not-bought">您还未购买</div>`
-              if (videoAtta) {
-                const dur = videoAtta.video_time_length ? `[${formatDuration(videoAtta.video_time_length)}]` : ''
-                html += `<div class="preview-title">出售内容包含${dur}视频，以下是预览30秒视频，请点击购买出售内容，查看完整视频</div>`
-                html += `<div class="hv-video-div" data-id="${videoAtta.id}" id="video_${videoAtta.id}_${Date.now()}" key-path="${videoAtta.keyPath}" data-url="${videoAtta.coverUrl}" data-preview="30">
-                  <img src="${LOADING_URL}" data-id="${videoAtta.id}">
-                </div>`
-              }
-            }
-          } else {
-            html += '<div class="hssell-title">此处为购买内容</div>'
-          }
-          html += '</div>'
-          return html
-        }
-      )
-    }
+    // sell-btn HTML 解析 + 后续所有 DOM 操作（可能需异步预加载 sell 视频数据）
+    ;(async () => {
+      let videoAtta = attachList.find(a => a.category === 'video')
 
-    el.innerHTML = content
-
-    // door 点击导航
-    el.querySelectorAll<HTMLElement>('.door-box, .hv-door-span').forEach(doorEl => {
-      doorEl.addEventListener('click', () => {
-        const pid = doorEl.dataset.door
-        if (pid) router.push('/topic/' + pid)
-      })
-    })
-
-    // door 缩略图懒加载
-    el.querySelectorAll<HTMLImageElement>('.door-box-img img').forEach(img => {
-      const url = img.dataset.src
-      if (url) imageLoader.observe(img, url)
-    })
-
-    el.querySelectorAll<HTMLImageElement>('img:not([data-emoji])').forEach(img => {
-      img.style.width = '100%'
-      const atta = attas.get(Number((img as HTMLElement).dataset['id']))
-      if (atta) {
-        if (atta.category === 'images') {
-          img.dataset['src'] = atta.remoteUrl
-          img.addEventListener('click', () => {
-            handleClick?.({ overlayShow: true, overlayImg: img.src })
-          })
-          imageLoader.observe(img, atta.remoteUrl)
-        }
-        if (atta.category === 'video') {
-          img.dataset['src'] = atta.coverUrl
-          img.addEventListener('click', () => {
-            const videoDiv = img.closest('.hv-video-div') as HTMLElement | null
-            const previewSeconds = Number(videoDiv?.getAttribute('data-preview')) || 0
-
-            handleClick?.({ overlayShow: true, overlayVideo: true })
-            loadVideoSrc(String(atta.id), String(topicId))
-              .then((data: any) => {
-                const target = img as HTMLImageElement
-                if (player) {
-                  player.destroy()
-                  player = null
-                }
-                player = new DPlayer({
-                  container: document.querySelector('.hv-video-container') as HTMLElement,
-                  screenshot: true,
-                  video: {
-                    url: data.remoteUrl,
-                    pic: target.src,
-                    type: 'customHls',
-                    customType: {
-                      customHls: (video: HTMLVideoElement) => {
-                        const hls = new Hls()
-                        hls.loadSource(video.src)
-                        hls.attachMedia(video)
-                      },
-                    },
-                  },
-                })
-
-                if (previewSeconds > 0) {
-                  const dp = player as any
-                  dp.on('timeupdate', () => {
-                    if (player && dp.video.currentTime > previewSeconds) {
-                      player.pause()
-                      showDialog({
-                        title: '提示',
-                        message: '请购买出售内容，观看完整视频',
-                      })
-                    }
-                  })
-                  dp.on('ended', () => {
-                    showDialog({
-                      title: '提示',
-                      message: '请购买出售内容，观看完整视频',
-                    })
-                  })
-                }
-
-                handleClick?.({ overlayShow: true, overlayVideo: true, dplayer: player })
-              })
-              .catch((err: any) => {
-                console.error('load video error:', err)
-              })
-          })
-          imageLoader.observe(img, atta.coverUrl)
+      // 如果 attachList 中没有 video 附件，尝试从 sell 内容中提取 <video> ID 并主动加载
+      if (!videoAtta && content.includes('class="sell-btn"')) {
+        const sellBlock = content.match(/<span\s+class="sell-btn"[^>]*>[\s\S]*?<\/span>/i)?.[0] || ''
+        const vidMatch = sellBlock.match(/<video[\s\S]*?data-id="(\d+)"/)
+        if (vidMatch) {
+          try {
+            const vidId = Number(vidMatch[1])
+            const data = await loadVideoSrc(vidId, topicId, '')
+            videoAtta = {
+              id: vidId,
+              coverUrl: data.coverUrl || '',
+              keyPath: data.keyPath || '',
+              video_time_length: data.video_time_length || 0,
+              category: 'video',
+              remoteUrl: data.remoteUrl || '',
+              status: 1,
+            } as Attachment
+          } catch {}
         }
       }
-    })
+
+      // sell-btn HTML 解析
+      if (content.includes('class="sell-btn"')) {
+        content = content.replace(
+          /<span\s+class="sell-btn"[^>]*>[\s\S]*?<\/span>/gi,
+          () => {
+            let html = '<div class="hjsell-container">'
+            if (sale) {
+              const unit = sale.moneyType === 1 ? '金币' : (sale.amount / 100).toFixed(2) + '钻石'
+              const price = sale.moneyType === 1 ? sale.amount : (sale.amount / 100).toFixed(2)
+              html += `<div class="hssell-title">此贴售价${price}${unit}，已有${formatCount(sale.buyCount || 0)}人购买</div>`
+              if (sale.buyIndex > 0) {
+                html += `<div class="hssell-title hssell-bought">您是第${sale.buyIndex}个购买者</div>`
+              } else if (sale.buyIndex < 0) {
+                html += `<div class="hssell-title hssell-not-bought">您还未购买</div>`
+                if (videoAtta) {
+                  html += `<div class="hv-video-div" data-id="${videoAtta.id}" id="video_${videoAtta.id}_${Date.now()}" key-path="${videoAtta.keyPath}" data-url="${videoAtta.coverUrl}">
+                    <img src="${LOADING_URL}" data-id="${videoAtta.id}">
+                  </div>`
+                }
+              }
+            } else {
+              html += '<div class="hssell-title">此处为购买内容</div>'
+            }
+            html += '</div>'
+            return html
+          }
+        )
+      }
+
+      el.innerHTML = content
+
+      // door 点击导航
+      el.querySelectorAll<HTMLElement>('.door-box, .hv-door-span').forEach(doorEl => {
+        doorEl.addEventListener('click', () => {
+          const pid = doorEl.dataset.door
+          if (pid) router.push('/topic/' + pid)
+        })
+      })
+
+      // door 缩略图懒加载
+      el.querySelectorAll<HTMLImageElement>('.door-box-img img').forEach(img => {
+        const url = img.dataset.src
+        if (url) imageLoader.observe(img, url)
+      })
+
+      el.querySelectorAll<HTMLImageElement>('img:not([data-emoji])').forEach(img => {
+        img.style.width = '100%'
+        const atta = attas.get(Number((img as HTMLElement).dataset['id']))
+        if (atta) {
+          if (atta.category === 'images') {
+            img.dataset['src'] = atta.remoteUrl
+            img.addEventListener('click', () => {
+              handleClick?.({ overlayShow: true, overlayImg: img.src })
+            })
+            imageLoader.observe(img, atta.remoteUrl)
+          }
+          if (atta.category === 'video') {
+            img.dataset['src'] = atta.coverUrl
+            img.addEventListener('click', () => {
+              const videoDiv = img.closest('.hv-video-div') as HTMLElement | null
+              const keyPath = (videoDiv?.getAttribute('key-path') || '') === 'undefined' ? '' : (videoDiv?.getAttribute('key-path') || '')
+
+              handleClick?.({ overlayShow: true, overlayVideo: true })
+              loadVideoSrc(String(atta.id), String(topicId), 'normal1')
+                .then((data: any) => resolveRealUrl(data.remoteUrl))
+                .then((fullUrl: string) => {
+                  const target = img as HTMLImageElement
+                  if (player) {
+                    player.destroy()
+                    player = null
+                  }
+                  player = new DPlayer({
+                    container: document.querySelector('.hv-video-container') as HTMLElement,
+                    screenshot: true,
+                    video: {
+                      url: fullUrl,
+                      pic: target.src,
+                      type: 'customHls',
+                      customType: {
+                        customHls: (video: HTMLVideoElement) => {
+                          const hls = new Hls()
+                          if (keyPath) {
+                            hls.on(Hls.Events.MANIFEST_PARSED, (_event, manifestData) => {
+                              const fragments = manifestData.levels[0]?.details?.fragments
+                              if (!fragments?.length) return
+                              const f0 = fragments[0] as any
+                              const keyUri = keyPath + (f0.levelkey?.reluri || f0.levelkeys?.['identity']?.uri || '')
+                              for (const frag of fragments) {
+                                const f = frag as any
+                                if (f.levelkey) {
+                                  f.levelkey.reluri = keyUri
+                                } else if (f.levelkeys?.['identity']) {
+                                  f.levelkeys['identity'].uri = keyUri
+                                }
+                                if (f.relurl && !f.relurl.startsWith('http')) {
+                                  f.relurl = keyPath + f.relurl
+                                }
+                              }
+                            })
+                          }
+                          hls.loadSource(video.src)
+                          hls.attachMedia(video)
+                        },
+                      },
+                    },
+                  })
+
+                  handleClick?.({ overlayShow: true, overlayVideo: true, dplayer: player })
+                })
+                .catch((err: any) => {
+                  console.error('load video error:', err)
+                })
+            })
+            imageLoader.observe(img, atta.coverUrl)
+          }
+        }
+      })
+
+    })()
   },
   unmounted(el: HTMLDivElement) {
     el.querySelectorAll<HTMLImageElement>('img:not([data-emoji])').forEach(img => {
