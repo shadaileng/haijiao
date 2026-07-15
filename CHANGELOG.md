@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.23.0] - 2026-07-15
+
+### Added
+
+- 配置页新增复制/粘贴 Token 功能
+  - `src/views/SettingsView.vue`：新增 `handleCopyCredentials()` / `handlePasteCredentials()` 函数，认证配置区增加复制/粘贴按钮
+  - 剪贴板格式：`JSON.stringify({ uid, token })`
+
 ## [1.22.0] - 2026-07-15
 
 ### Added

@@ -4,13 +4,15 @@ import { useRouter } from 'vue-router'
 import { useSettingsStore } from '@/stores/settings'
 import { useUserStore } from '@/stores/user'
 import { useMirrorConfig } from '@/composables/useMirrorConfig'
-import { showSuccessToast, showDialog as showConfirmDialog } from 'vant'
+import { showSuccessToast, showDialog as showConfirmDialog, showToast } from 'vant'
 import UserInfo from '@/components/UserInfo.vue'
+import { useClipboard } from '@/composables/useClipboard'
 
 const router = useRouter()
 const settings = useSettingsStore()
 const userStore = useUserStore()
 const { showDialog, mirrorUrl, mirrorDisplay, openConfig, saveConfig } = useMirrorConfig()
+const { copy } = useClipboard()
 
 const currentUser = ref<any>(null)
 const loadingUser = ref(settings.isLoggedIn)
@@ -40,6 +42,29 @@ function handleLogout() {
     })
     .catch(() => {})
 }
+
+async function handleCopyCredentials() {
+  if (!settings.isLoggedIn) return
+  const text = JSON.stringify({ uid: settings.uid, token: settings.token })
+  const ok = await copy(text)
+  if (ok) showSuccessToast('Token 已复制')
+  else showToast('复制失败')
+}
+
+async function handlePasteCredentials() {
+  try {
+    const text = await navigator.clipboard.readText()
+    const data = JSON.parse(text)
+    if (data.uid && data.token) {
+      settings.setCredentials(data.uid, data.token)
+      showSuccessToast('Token 已粘贴')
+    } else {
+      showToast('剪贴板内容格式无效')
+    }
+  } catch {
+    showToast('读取剪贴板失败或格式无效')
+  }
+}
 </script>
 
 <template>
@@ -67,6 +92,14 @@ function handleLogout() {
       <van-cell title="认证配置" />
       <van-field :model-value="settings.uid" label="UID" readonly />
       <van-field :model-value="settings.token" label="Token" type="password" readonly />
+      <van-cell>
+        <template #title>
+          <div class="flex gap-3">
+            <van-button size="small" type="primary" :disabled="!settings.isLoggedIn" @click="handleCopyCredentials">复制 Token</van-button>
+            <van-button size="small" @click="handlePasteCredentials">粘贴 Token</van-button>
+          </div>
+        </template>
+      </van-cell>
     </van-cell-group>
 
     <van-cell-group inset class="mirror-group">

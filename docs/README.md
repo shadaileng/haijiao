@@ -59,6 +59,7 @@ docs/
 | `12-v-content适配Door标签方案.md` | v1.1.0 | 方案 | `plans/` | v-content 插件解析 `[door]` 标签渲染跳转 | 🏁 |
 | `13-v-content适配Sell标签方案.md` | v1.2.0 | 方案 | `plans/` | v-content 插件解析 `sell-btn` HTML 渲染 + 视频预览 | 🏁 |
 | `14-移除视频30秒预览限制.md` | v5.0.0 | 方案 | `plans/` | preview 解析 + keyPath 修复 + sell 视频预加载 | 🏁 |
+| `15-配置页复制粘贴Token方案.md` | v1.0.0 | 方案 | `plans/` | 配置页复制/粘贴 Token 按钮 | 🏁 |
 | `01-架构概览.md` | v1.1.0 | 架构 | `architecture/` | 系统架构与请求链路 | 🏁 |
 | `02-架构演进.md` | v1.0.0 | 架构 | `architecture/` | 从 Vue2/ElementUI 到 Vue3/Vant 的迁移 | 🏁 |
 | `01-API 参考.md` | v1.1.0 | 参考 | `references/` | 所有 API 端点定义 | 🏁 |
@@ -302,6 +303,15 @@ docs/
 | 13 | `pnpm run build` 构建验证 | ✅ |
 | 14 | sell 内容预加载：扫描 `<video data-id>` → 主动调 API 获取元数据 → 生成缩略图 | ✅ |
 | 15 | 移除线路按钮和测试按钮（所有线路均返回 preview，resolveRealUrl 统一解析） | ✅ |
+
+### 15-配置页复制粘贴Token方案
+
+| 步骤 | 任务 | 状态 |
+|:---:|------|:----:|
+| 1 | 创建方案文档 | ✅ |
+| 2 | SettingsView.vue 实现复制/粘贴函数与按钮 | 🚧 进行中 |
+| 3 | 更新 docs/README.md | ✅ |
+| 4 | `pnpm run build` 构建验证 | ⬜ 待执行 |
 
 ## 参考代码
 
