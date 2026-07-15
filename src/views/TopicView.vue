@@ -97,6 +97,7 @@ const onCommentLoaded = () => {
         :content="topicLocal.content"
         :attachments="topicLocal.attachments"
         :doors="topicLocal.doors"
+        :sale="topicLocal.sale"
       />
     </van-row>
   </van-skeleton>

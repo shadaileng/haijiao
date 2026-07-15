@@ -93,6 +93,14 @@ export interface DoorData {
   imgUrl: string
 }
 
+export interface SaleData {
+  moneyType: number
+  amount: number
+  buyCount: number
+  buyIndex: number
+  isBuy: number
+}
+
 export interface Topic {
   topicId: number
   title: string
@@ -104,6 +112,7 @@ export interface Topic {
   node: Node | null
   commentCount: number
   doors: DoorData[]
+  sale?: SaleData
 }
 
 export interface LiteTopic extends Topic {

@@ -6,6 +6,7 @@
       content,
       attachments,
       doors,
+      sale,
       handleClick,
     }"
   ></div>
@@ -13,13 +14,14 @@
 
 <script setup lang="ts">
 import { inject } from 'vue'
-import type { Attachment } from '@/types'
+import type { Attachment, SaleData } from '@/types'
 
 defineProps({
   topicId: { type: [String, Number], default: 0 },
   content: { type: String, default: '' },
   attachments: { type: Array<Attachment>, default: () => [] },
   doors: { type: Array, default: () => [] },
+  sale: { type: Object as () => SaleData | null, default: null },
 })
 
 const handleClick = inject('overlay') as (data: any) => void

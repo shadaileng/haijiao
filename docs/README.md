@@ -20,7 +20,8 @@ docs/
 │   ├── 09-数据驱动重构方案.md
 │   ├── 10-Emoji解析移植方案.md
 │   ├── 11-批量图片加载模块方案.md
-│   └── 12-v-content适配Door标签方案.md
+│   ├── 12-v-content适配Door标签方案.md
+│   ├── 13-v-content适配Sell标签方案.md
 ├── architecture/                    # 架构类（持续维护）
 │   ├── 01-架构概览.md
 │   └── 02-架构演进.md
@@ -56,6 +57,7 @@ docs/
 | `10-Emoji解析移植方案.md` | v1.0.0 | 方案 | `plans/` | `[emoji]code[/emoji]` 渲染为 `<img>` 图片 | 🏁 |
 | `11-批量图片加载模块方案.md` | v1.0.0 | 方案 | `plans/` | 多任务异步队列批量处理图片解码 | 🏁 |
 | `12-v-content适配Door标签方案.md` | v1.1.0 | 方案 | `plans/` | v-content 插件解析 `[door]` 标签渲染跳转 | 🏁 |
+| `13-v-content适配Sell标签方案.md` | v1.2.0 | 方案 | `plans/` | v-content 插件解析 `sell-btn` HTML 渲染 + 视频预览 | 🏁 |
 | `01-架构概览.md` | v1.1.0 | 架构 | `architecture/` | 系统架构与请求链路 | 🏁 |
 | `02-架构演进.md` | v1.0.0 | 架构 | `architecture/` | 从 Vue2/ElementUI 到 Vue3/Vant 的迁移 | 🏁 |
 | `01-API 参考.md` | v1.1.0 | 参考 | `references/` | 所有 API 端点定义 | 🏁 |
@@ -245,6 +247,9 @@ docs/
 | 6 | 验证：`pnpm run build` 类型检查 + 构建通过 | ✅ |
 | 7 | 文档同步：更新本方案状态为 🏁，更新 `docs/README.md` | ✅ |
 
+| `12-v-content适配Door标签方案.md` | v1.1.0 | 方案 | `plans/` | v-content 插件解析 `[door]` 标签渲染跳转 | 🏁 |
+| `13-v-content适配Sell标签方案.md` | v1.0.0 | 方案 | `plans/` | v-content 插件解析 `[sell]` 标签渲染购买信息 | 🏁 |
+
 ### 12-v-content适配Door标签方案
 
 | 步骤 | 任务 | 状态 |
@@ -257,6 +262,24 @@ docs/
 | 6 | `styles/global.scss` 门卡片样式 | ✅ |
 | 7 | 验证：`pnpm run build` 类型检查 + 构建通过 | ✅ |
 | 8 | 文档同步：更新状态标记 + README.md | ✅ |
+
+### 13-v-content适配Sell标签方案
+
+| 步骤 | 任务 | 状态 |
+|:---:|------|:----:|
+| 1 | `types/index.ts` 新增 `SaleData` 接口，`Topic` 添加 `sale` 字段 | ✅ |
+| 2 | `transform.ts` 追加 3 条字段映射 | ✅ |
+| 3 | `plugins/content.ts` 添加 `sell-btn` HTML 正则替换逻辑 | ✅ |
+| 4 | `components/TopicContent.vue` 新增 `sale` prop | ✅ |
+| 5 | `views/TopicView.vue` 传递 `sale` 给 TopicContent | ✅ |
+| 6 | `styles/global.scss` sell 容器/标题/内容样式 | ✅ |
+| 7 | 验证：`pnpm run build` 类型检查 + 构建通过 | ✅ |
+| 8 | 文档同步：更新状态标记 + README.md | ✅ |
+| 9 | `plugins/content.ts` sell 容器内生成 `data-preview="30"` 视频缩略图 | ✅ |
+| 10 | `plugins/content.ts` DPlayer `timeupdate`/`ended` 限时逻辑 | ✅ |
+| 11 | `plugins/content.ts` 导入 `showDialog` + `formatDuration` 辅助函数 | ✅ |
+| 12 | `styles/global.scss` `.preview-title` 样式 | ✅ |
+| 13 | 验证：`pnpm run build` 类型检查 + 构建通过 | ✅ |
 
 ## 参考代码
 

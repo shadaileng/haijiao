@@ -180,6 +180,34 @@ body {
   vertical-align: middle;
 }
 
+/* Sell container */
+.hjsell-container {
+  border: 1px solid #ebedf0;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 12px 0;
+  background: #f5f5f5;
+}
+.hssell-title {
+  font-size: 12px;
+  color: #969799;
+  margin-bottom: 8px;
+}
+.hssell-bought,
+.hssell-not-bought {
+  color: red;
+}
+.hssell-content {
+  font-size: 14px;
+  color: #323233;
+}
+.preview-title {
+  font-size: 13px;
+  color: #07c160;
+  margin: 8px 0;
+  font-weight: 500;
+}
+
 /* Overlay wrapper */
 .overlay-wrapper {
   display: flex;

@@ -19,6 +19,9 @@ const snakeToCamelMap: Record<string, string> = {
   view_count: 'viewCount',
   buy_count: 'buyCount',
   img_url: 'imgUrl',
+  money_type: 'moneyType',
+  buy_index: 'buyIndex',
+  is_buy: 'isBuy',
 }
 
 export function toCamelCase<T = any>(obj: any): T {

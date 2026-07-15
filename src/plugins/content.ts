@@ -6,6 +6,7 @@ import { renderEmoji } from '@/utils/emoji'
 import { LOADING_URL } from '@/utils/constant'
 import DPlayer from 'dplayer'
 import Hls from 'hls.js'
+import { showDialog } from 'vant'
 import router from '@/router'
 
 let player: DPlayer | null = null
@@ -14,6 +15,18 @@ function formatCount(n: number): string {
   if (n >= 10000) return (n / 10000).toFixed(1) + 'w'
   if (n >= 1000) return (n / 1000).toFixed(1) + 'k'
   return String(n)
+}
+
+function formatDuration(seconds: number): string {
+  if (!seconds || +seconds !== seconds) return '--秒'
+  let result = ''
+  const h = Math.floor(seconds / 3600)
+  const m = Math.floor((seconds % 3600) / 60)
+  const s = seconds % 60
+  if (h >= 1) result += h + '时'
+  if (m >= 1) result += m + '分'
+  result += s + '秒'
+  return result
 }
 
 function buildAttaMap(attachments: any): Map<number, Attachment> {
@@ -28,7 +41,7 @@ function buildAttaMap(attachments: any): Map<number, Attachment> {
 const vContent: Directive = {
   mounted(el: HTMLDivElement, binding: any) {
     if (!binding.value) return
-    let { topicId, content, attachments, doors, handleClick } = binding.value
+    let { topicId, content, attachments, doors, handleClick, sale } = binding.value
     if (typeof content !== 'string') content = ''
 
     const attas = buildAttaMap(attachments)
@@ -115,6 +128,38 @@ const vContent: Directive = {
       }
     }
 
+    // sell-btn HTML 解析
+    if (content.includes('class="sell-btn"')) {
+      const videoAtta = attachList.find(a => a.category === 'video')
+      content = content.replace(
+        /<span\s+class="sell-btn"[^>]*>[\s\S]*?<\/span>/gi,
+        () => {
+          let html = '<div class="hjsell-container">'
+          if (sale) {
+            const unit = sale.moneyType === 1 ? '金币' : (sale.amount / 100).toFixed(2) + '钻石'
+            const price = sale.moneyType === 1 ? sale.amount : (sale.amount / 100).toFixed(2)
+            html += `<div class="hssell-title">此贴售价${price}${unit}，已有${formatCount(sale.buyCount || 0)}人购买</div>`
+            if (sale.buyIndex > 0) {
+              html += `<div class="hssell-title hssell-bought">您是第${sale.buyIndex}个购买者</div>`
+            } else if (sale.buyIndex < 0) {
+              html += `<div class="hssell-title hssell-not-bought">您还未购买</div>`
+              if (videoAtta) {
+                const dur = videoAtta.video_time_length ? `[${formatDuration(videoAtta.video_time_length)}]` : ''
+                html += `<div class="preview-title">出售内容包含${dur}视频，以下是预览30秒视频，请点击购买出售内容，查看完整视频</div>`
+                html += `<div class="hv-video-div" data-id="${videoAtta.id}" id="video_${videoAtta.id}_${Date.now()}" key-path="${videoAtta.keyPath}" data-url="${videoAtta.coverUrl}" data-preview="30">
+                  <img src="${LOADING_URL}" data-id="${videoAtta.id}">
+                </div>`
+              }
+            }
+          } else {
+            html += '<div class="hssell-title">此处为购买内容</div>'
+          }
+          html += '</div>'
+          return html
+        }
+      )
+    }
+
     el.innerHTML = content
 
     // door 点击导航
@@ -145,6 +190,9 @@ const vContent: Directive = {
         if (atta.category === 'video') {
           img.dataset['src'] = atta.coverUrl
           img.addEventListener('click', () => {
+            const videoDiv = img.closest('.hv-video-div') as HTMLElement | null
+            const previewSeconds = Number(videoDiv?.getAttribute('data-preview')) || 0
+
             handleClick?.({ overlayShow: true, overlayVideo: true })
             loadVideoSrc(String(atta.id), String(topicId))
               .then((data: any) => {
@@ -169,6 +217,26 @@ const vContent: Directive = {
                     },
                   },
                 })
+
+                if (previewSeconds > 0) {
+                  const dp = player as any
+                  dp.on('timeupdate', () => {
+                    if (player && dp.video.currentTime > previewSeconds) {
+                      player.pause()
+                      showDialog({
+                        title: '提示',
+                        message: '请购买出售内容，观看完整视频',
+                      })
+                    }
+                  })
+                  dp.on('ended', () => {
+                    showDialog({
+                      title: '提示',
+                      message: '请购买出售内容，观看完整视频',
+                    })
+                  })
+                }
+
                 handleClick?.({ overlayShow: true, overlayVideo: true, dplayer: player })
               })
               .catch((err: any) => {

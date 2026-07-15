@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.21.0] - 2026-07-15
+
+### Added
+
+- `v-content` 插件适配 `sell-btn` HTML 渲染购买信息与视频预览
+  - `types/index.ts`：新增 `SaleData` 接口，`Topic.sale` 字段
+  - `utils/transform.ts`：追加 `money_type/buy_index/is_buy` 蛇形→驼峰映射
+  - `plugins/content.ts`：正则替换 `<span class="sell-btn">` 为 `.hjsell-container` 容器，显示售价/购买人数/购买状态；未购买且有视频附件时生成 `data-preview="30"` 视频缩略图；DPlayer `timeupdate`/`ended` 事件超限暂停+弹窗提示购买
+  - `TopicContent.vue`：新增 `sale` prop
+  - `TopicView.vue`：传递 `sale` 给 TopicContent
+  - `global.scss`：`.hjsell-container` / `.hssell-title` / `.hssell-bought` / `.hssell-not-bought` / `.preview-title` 样式
+  - `docs/plans/13-v-content适配Sell标签方案.md`：方案文档，包含基础购买信息展示 + 视频预览实现
+
 ## [1.20.0] - 2026-07-15
 
 ### Added
