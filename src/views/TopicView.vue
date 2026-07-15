@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, nextTick } from 'vue'
+import { ref, watch, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import { showToast } from 'vant'
 import { api } from '@/api/request'
@@ -13,7 +13,7 @@ const route = useRoute()
 const pid = ref((route.params.pid as string) || '')
 const commentDivider = ref<HTMLElement>()
 const loading = ref(true)
-const topicLocal = ref<Topic>({
+const defaultTopic = (): Topic => ({
   topicId: 0,
   likeCount: 0,
   title: '',
@@ -26,16 +26,13 @@ const topicLocal = ref<Topic>({
   doors: [],
 })
 
-const onClickLeft = () => history.back()
+const topicLocal = ref<Topic>(defaultTopic())
 
-onMounted(async () => {
-  if (pid.value) {
-    await loadTopic(pid.value)
-  }
-})
+const onClickLeft = () => history.back()
 
 const loadTopic = async (topicPid: string) => {
   if (!topicPid) return
+  topicLocal.value = defaultTopic()
   loading.value = true
   const resp = await api.topic({ params: { topicId: topicPid } })
   if (!resp.success) {
@@ -46,6 +43,13 @@ const loadTopic = async (topicPid: string) => {
   Object.assign(topicLocal.value, resp.data)
   loading.value = false
 }
+
+watch(() => route.params.pid, async (newPid) => {
+  if (newPid) {
+    pid.value = newPid as string
+    await loadTopic(pid.value)
+  }
+}, { immediate: true })
 
 const onCommentLoaded = () => {
   nextTick(() => {
@@ -88,15 +92,17 @@ const onCommentLoaded = () => {
     </van-row>
     <van-row class="hv-box-padding" v-if="topicLocal.content?.length">
       <TopicContent
+        :key="topicLocal.topicId"
         :topicId="topicLocal.topicId"
         :content="topicLocal.content"
         :attachments="topicLocal.attachments"
+        :doors="topicLocal.doors"
       />
     </van-row>
   </van-skeleton>
   <div ref="commentDivider"></div>
   <van-divider :hairline="false">评论</van-divider>
-  <Comment v-if="topicLocal.topicId" :topicId="topicLocal.topicId" @loaded="onCommentLoaded" />
+  <Comment v-if="topicLocal.topicId" :key="topicLocal.topicId" :topicId="topicLocal.topicId" @loaded="onCommentLoaded" />
 </template>
 
 <style scoped></style>

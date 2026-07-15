@@ -82,6 +82,17 @@ export interface Attachment {
   keyPath: string
 }
 
+export interface DoorData {
+  id: number
+  type: number
+  title: string
+  destValid: boolean
+  viewCount: number
+  commentCount: number
+  buyCount: number
+  imgUrl: string
+}
+
 export interface Topic {
   topicId: number
   title: string
@@ -92,7 +103,7 @@ export interface Topic {
   createTime: string
   node: Node | null
   commentCount: number
-  doors: number[]
+  doors: DoorData[]
 }
 
 export interface LiteTopic extends Topic {

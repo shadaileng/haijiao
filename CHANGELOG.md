@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.20.0] - 2026-07-15
+
+### Added
+
+- `v-content` 插件适配 `[door]{id}[/door]` 标签，渲染门卡片（标题 + 浏览/评论/购买统计 + 缩略图），点击跳转到目标帖子
+  - `types/index.ts`：新增 `DoorData` 接口，`Topic.doors` 从 `number[]` 改为 `DoorData[]`
+  - `utils/transform.ts`：追加 `dest_valid/view_count/buy_count/img_url` 蛇形→驼峰映射
+  - `utils/imageLoader.ts`：`formatCount` 数字格式化辅助
+  - `plugins/content.ts`：`[door]` 解析渲染 + `imageLoader.observe` 缩略图懒加载 + `router.push` 导航
+  - `TopicContent.vue`：新增 `doors` prop
+  - `TopicView.vue`：`watch(() => route.params.pid)` 替代 `onMounted`，参数变化自动重载；`loadTopic` 开头重置 `topicLocal` 清空旧数据；`:key` 强制子组件重建
+  - `global.scss`：`.door-box` 门卡片系列样式
+
 ## [1.19.1] - 2026-07-14
 
 ### Fixed

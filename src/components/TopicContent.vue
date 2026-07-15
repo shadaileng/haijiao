@@ -5,6 +5,7 @@
       topicId,
       content,
       attachments,
+      doors,
       handleClick,
     }"
   ></div>
@@ -18,6 +19,7 @@ defineProps({
   topicId: { type: [String, Number], default: 0 },
   content: { type: String, default: '' },
   attachments: { type: Array<Attachment>, default: () => [] },
+  doors: { type: Array, default: () => [] },
 })
 
 const handleClick = inject('overlay') as (data: any) => void

@@ -15,6 +15,10 @@ const snakeToCamelMap: Record<string, string> = {
   commend_list: 'commendList',
   reply_id: 'replyId',
   cert_video: 'certVideo',
+  dest_valid: 'destValid',
+  view_count: 'viewCount',
+  buy_count: 'buyCount',
+  img_url: 'imgUrl',
 }
 
 export function toCamelCase<T = any>(obj: any): T {

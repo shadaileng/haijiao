@@ -6,8 +6,15 @@ import { renderEmoji } from '@/utils/emoji'
 import { LOADING_URL } from '@/utils/constant'
 import DPlayer from 'dplayer'
 import Hls from 'hls.js'
+import router from '@/router'
 
 let player: DPlayer | null = null
+
+function formatCount(n: number): string {
+  if (n >= 10000) return (n / 10000).toFixed(1) + 'w'
+  if (n >= 1000) return (n / 1000).toFixed(1) + 'k'
+  return String(n)
+}
 
 function buildAttaMap(attachments: any): Map<number, Attachment> {
   const map = new Map<number, Attachment>()
@@ -21,7 +28,7 @@ function buildAttaMap(attachments: any): Map<number, Attachment> {
 const vContent: Directive = {
   mounted(el: HTMLDivElement, binding: any) {
     if (!binding.value) return
-    let { topicId, content, attachments, handleClick } = binding.value
+    let { topicId, content, attachments, doors, handleClick } = binding.value
     if (typeof content !== 'string') content = ''
 
     const attas = buildAttaMap(attachments)
@@ -72,7 +79,57 @@ const vContent: Directive = {
     }
 
     content = renderEmoji(content)
+
+    // [door]{id}[/door] 解析
+    if (content.includes('[/door]')) {
+      for (const fragment of content.split('[/door]')) {
+        if (!fragment.includes('[door]')) continue
+        const doorId = fragment.split('[door]')[1]
+        const doorData = Array.isArray(doors)
+          ? doors.find((d: any) => d.type === 1 && String(d.id) === doorId)
+          : null
+
+        if (doorData && doorData.destValid) {
+          const stats = `
+            <span>${formatCount(doorData.viewCount)} 浏览</span>
+            <span>${formatCount(doorData.commentCount)} 评论</span>
+            <span>${formatCount(doorData.buyCount)} 人已购买</span>`
+          const imgBlock = doorData.imgUrl
+            ? `<div class="door-box-img"><img src="${LOADING_URL}" data-src="${doorData.imgUrl}" /></div>`
+            : ''
+          const html = `<div class="door-box" data-door="${doorData.id}">
+            <div class="door-box-text">
+              <h3>${doorData.title}</h3>
+              <div class="door-stats">${stats}</div>
+            </div>
+            ${imgBlock}
+          </div>`
+          content = content.replace(`[door]${doorId}[/door]`, html)
+        } else {
+          const label = doorData ? '传送门已失效' : '传送门'
+          content = content.replace(
+            `[door]${doorId}[/door]`,
+            `<span class="hv-door-span" data-door="${doorId}">[${label}]</span>`
+          )
+        }
+      }
+    }
+
     el.innerHTML = content
+
+    // door 点击导航
+    el.querySelectorAll<HTMLElement>('.door-box, .hv-door-span').forEach(doorEl => {
+      doorEl.addEventListener('click', () => {
+        const pid = doorEl.dataset.door
+        if (pid) router.push('/topic/' + pid)
+      })
+    })
+
+    // door 缩略图懒加载
+    el.querySelectorAll<HTMLImageElement>('.door-box-img img').forEach(img => {
+      const url = img.dataset.src
+      if (url) imageLoader.observe(img, url)
+    })
 
     el.querySelectorAll<HTMLImageElement>('img:not([data-emoji])').forEach(img => {
       img.style.width = '100%'
