@@ -1,7 +1,71 @@
 <template>
-  <van-empty v-if="!skeletonLoading && !loading && topics.length === 0" description="暂无内容" />
+  <van-empty v-if="!skeletonLoading && (mode === 'scroll' ? !loading : true) && topics.length === 0" description="暂无内容" />
   <van-skeleton v-else title avatar :row="3" :loading="skeletonLoading">
-    <van-list :finished="finished" :loading="loading" finished-text="没有更多了" @load="onLoad">
+    <template v-if="mode === 'scroll'">
+      <van-list :finished="finished" :loading="loading" finished-text="没有更多了" @load="onLoad">
+        <van-cell v-for="item in topics" :key="item.topicId">
+          <template #value>
+            <div class="card">
+              <div v-if="item.attachments?.length > 1">
+                <van-row justify="space-between" @click="$router.push(`/topic/${item.topicId}`)">
+                  <van-col span="24" class="hv-title">{{ item.title }}</van-col>
+                </van-row>
+                <div class="topic-images">
+                  <van-image
+                    v-for="attach in item.attachments"
+                    :key="attach.id"
+                    fit="cover"
+                    radius="5"
+                    :src="LOADING_URL"
+                    v-headicon="attach.remoteUrl || attach.coverUrl"
+                    class="topic-image"
+                  />
+                </div>
+              </div>
+              <div v-else>
+                <van-row justify="space-between" @click="$router.push(`/topic/${item.topicId}`)">
+                  <van-col span="16" class="topic-text-col">
+                    <div class="hv-title">{{ item.title }}</div>
+                    <van-text-ellipsis rows="2" :content="item.liteContent" />
+                  </van-col>
+                  <van-col span="8">
+                    <van-image
+                      fit="cover"
+                      radius="5"
+                      :src="LOADING_URL"
+                      v-headicon="item.attachments && (item.attachments[0].remoteUrl || item.attachments[0].coverUrl)"
+                      class="topic-image-single"
+                    />
+                  </van-col>
+                </van-row>
+              </div>
+              <div class="topic-meta">
+                <span
+                  class="topic-meta-user"
+                  @click="$router.push(`/homepage/${item.user?.id}/${item.user?.nickname}`)"
+                  :title="item.user?.nickname"
+                >
+                  <van-image
+                    round
+                    width="1rem"
+                    height="1rem"
+                    :src="LOADING_URL"
+                    class="hv-user-icon"
+                    v-headicon="item.user?.avatar?.startsWith('http') ? item.user.avatar + '.txt' : item.user?.avatar"
+                  />
+                  {{ item.user?.nickname }}
+                </span>
+                <span class="topic-meta-stat"><van-icon name="chat-o" />{{ item.commentCount }}</span>
+                <span class="topic-meta-stat"><van-icon name="good-job" />{{ item.likeCount }}</span>
+                <span class="topic-meta-date">{{ item.createTime?.split(' ')[0] }}</span>
+                <van-tag plain type="primary">{{ item.node?.name }}</van-tag>
+              </div>
+            </div>
+          </template>
+        </van-cell>
+      </van-list>
+    </template>
+    <template v-else>
       <van-cell v-for="item in topics" :key="item.topicId">
         <template #value>
           <div class="card">
@@ -62,14 +126,22 @@
           </div>
         </template>
       </van-cell>
-    </van-list>
+      <div v-if="totalItems > pageSize" class="pagination-wrapper">
+        <van-pagination
+          :model-value="pageIndex"
+          :total-items="totalItems"
+          :items-per-page="pageSize"
+          @change="(p: number) => emit('pageChange', p)"
+        />
+      </div>
+    </template>
   </van-skeleton>
 </template>
 
 <script setup lang="ts">
 import { LiteTopic } from '@/types'
 import { LOADING_URL } from '@/utils/constant'
-import { ref } from 'vue'
+import { ref, type PropType } from 'vue'
 
 const props = defineProps({
   topics: {
@@ -80,9 +152,25 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  mode: {
+    type: String as PropType<'scroll' | 'pagination'>,
+    default: 'scroll',
+  },
+  pageIndex: {
+    type: Number,
+    default: 1,
+  },
+  totalItems: {
+    type: Number,
+    default: 0,
+  },
+  pageSize: {
+    type: Number,
+    default: 20,
+  },
 })
 
-const emit = defineEmits(['load'])
+const emit = defineEmits(['load', 'pageChange'])
 const finished = ref(false)
 const loading = ref(true)
 
@@ -181,5 +269,10 @@ defineExpose({ startLoad, endLoad, finishLoad })
   flex-direction: column;
   gap: 6px;
   padding-right: 10px;
+}
+.pagination-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 16px 0 60px;
 }
 </style>

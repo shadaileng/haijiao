@@ -22,6 +22,9 @@ docs/
 │   ├── 11-批量图片加载模块方案.md
 │   ├── 12-v-content适配Door标签方案.md
 │   ├── 13-v-content适配Sell标签方案.md
+│   ├── 14-移除视频30秒预览限制.md
+│   ├── 15-配置页复制粘贴Token方案.md
+│   ├── 16-主页无限滚动加载修复方案.md
 ├── architecture/                    # 架构类（持续维护）
 │   ├── 01-架构概览.md
 │   └── 02-架构演进.md
@@ -60,6 +63,7 @@ docs/
 | `13-v-content适配Sell标签方案.md` | v1.2.0 | 方案 | `plans/` | v-content 插件解析 `sell-btn` HTML 渲染 + 视频预览 | 🏁 |
 | `14-移除视频30秒预览限制.md` | v5.0.0 | 方案 | `plans/` | preview 解析 + keyPath 修复 + sell 视频预加载 | 🏁 |
 | `15-配置页复制粘贴Token方案.md` | v1.0.0 | 方案 | `plans/` | 配置页复制/粘贴 Token 按钮 | 🏁 |
+| `16-主页无限滚动加载修复方案.md` | v2.0.0 | 方案 | `plans/` | 主页无限滚动→分页按钮，sessionStorage 记住页码 | 🏁 |
 | `01-架构概览.md` | v1.1.0 | 架构 | `architecture/` | 系统架构与请求链路 | 🏁 |
 | `02-架构演进.md` | v1.0.0 | 架构 | `architecture/` | 从 Vue2/ElementUI 到 Vue3/Vant 的迁移 | 🏁 |
 | `01-API 参考.md` | v1.1.0 | 参考 | `references/` | 所有 API 端点定义 | 🏁 |
@@ -312,6 +316,17 @@ docs/
 | 2 | SettingsView.vue 实现复制/粘贴函数与按钮 | 🚧 进行中 |
 | 3 | 更新 docs/README.md | ✅ |
 | 4 | `pnpm run build` 构建验证 | ⬜ 待执行 |
+
+### 16-主页无限滚动加载修复方案
+
+| 步骤 | 任务 | 状态 |
+|:---:|------|:----:|
+| 1 | 更新方案文档为 v2.0.0（分页方案） | ✅ |
+| 2 | `src/components/Topics.vue` 新增 `mode` prop 和 pagination 分支模板 | ✅ |
+| 3 | `src/views/HotTopicsView.vue` 重构为分页模式 | ✅ |
+| 4 | `src/types/index.ts` 补充 `totalPage` 字段 | ✅ |
+| 5 | 更新 `docs/README.md` 文档一览和执行进度 | ✅ |
+| 6 | `pnpm run build` 构建验证 | ✅ |
 
 ## 参考代码
 

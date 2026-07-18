@@ -1,50 +1,56 @@
 <script setup lang="ts">
 defineOptions({ name: 'HotTopicsView' })
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, onDeactivated } from 'vue'
 import { showToast } from 'vant'
 import { api } from '@/api/request'
 import type { LiteTopic } from '@/types'
 import Topics from '@/components/Topics.vue'
 
 const topics: LiteTopic[] = reactive([])
-const pageIndex = ref(1)
-const topicsDom = ref()
-const skeletonLoading = ref(true)
+const pageIndex = ref(Number(sessionStorage.getItem('hotPageIndex')) || 1)
+const totalItems = ref(0)
+const pageSize = 20
+const loading = ref(true)
+const SCROLL_KEY = 'scrollPos_Hot'
 
 onMounted(() => {
-  loadHot()
+  loadPage(pageIndex.value)
 })
 
-const loadHot = async () => {
-  topicsDom.value?.startLoad()
-  const result = await api.hot({ params: { page: pageIndex.value } })
+onDeactivated(() => {
+  sessionStorage.setItem(SCROLL_KEY, String(window.scrollY))
+})
+
+const loadPage = async (page: number) => {
+  loading.value = true
+  const result = await api.hot({ params: { page, limit: pageSize } })
   if (!result.success) {
     showToast(result.message || '加载热门列表失败')
-    topicsDom.value?.endLoad()
-    skeletonLoading.value = false
+    loading.value = false
     return
   }
-  if (pageIndex.value === 1) {
-    topics.length = 0
-  }
+  topics.length = 0
   topics.push(...result.data.results)
-  pageIndex.value++
-  skeletonLoading.value = false
-  topicsDom.value?.endLoad()
+  totalItems.value = result.data.page.total
+  pageIndex.value = page
+  sessionStorage.setItem('hotPageIndex', String(page))
+  loading.value = false
+  sessionStorage.removeItem(SCROLL_KEY)
+  window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 </script>
 
 <template>
-  <template v-if="skeletonLoading">
-    <div v-for="i in 5" :key="i" class="skeleton-card">
-      <van-skeleton title avatar :row="2" :loading="true" />
-    </div>
-  </template>
-  <Topics v-else ref="topicsDom" :topics="topics" :skeletonLoading="false" @load="loadHot()" />
+  <Topics
+    mode="pagination"
+    :topics="topics"
+    :skeletonLoading="loading"
+    :pageIndex="pageIndex"
+    :totalItems="totalItems"
+    :pageSize="pageSize"
+    @pageChange="loadPage"
+  />
 </template>
 
 <style scoped>
-.skeleton-card {
-  padding: 15px;
-}
 </style>

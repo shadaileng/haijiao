@@ -62,9 +62,15 @@ const publicPages = ['Login', 'Settings', 'ImageViewer']
 const router = createRouter({
   history: createWebHistory(),
   routes,
-  scrollBehavior(_to, _from, savedPosition) {
+  scrollBehavior(to, _from, savedPosition) {
     if (savedPosition) {
       return savedPosition
+    }
+    const key = `scrollPos_${to.name as string}`
+    const savedPos = sessionStorage.getItem(key)
+    if (savedPos) {
+      sessionStorage.removeItem(key)
+      return { top: parseInt(savedPos) }
     }
     return { top: 0 }
   },

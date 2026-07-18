@@ -58,6 +58,7 @@ export interface Page {
   index: number
   size: number
   total: number
+  totalPage?: number
 }
 
 export interface TopicUser {

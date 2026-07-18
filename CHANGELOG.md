@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.24.0] - 2026-07-18
+
+### Added
+
+- 主页无限滚动改为分页模式
+  - `src/components/Topics.vue`：新增 `mode` prop（`scroll`/`pagination`），分页模式渲染 `van-pagination`
+  - `src/views/HotTopicsView.vue`：从 `van-list` 无限滚动重构为分页模式，`sessionStorage` 记住页码与滚动位置
+  - `src/router/index.ts`：`scrollBehavior` 支持 `sessionStorage` 保存/恢复滚动位置
+  - `src/types/index.ts`：`Page` 接口新增 `totalPage` 字段
+
 ## [1.23.0] - 2026-07-15
 
 ### Added
