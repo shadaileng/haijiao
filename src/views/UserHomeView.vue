@@ -34,6 +34,8 @@ watch(() => route.params.userId, async (newId) => {
     userId.value = newId as string
     nickname.value = (route.params.nickname as string) || ''
     userInfo.value = null
+    topics.length = 0
+    loading.value = true
     pageIndex.value = 1
     totalItems.value = 0
     await loadUserInfo(userId.value)

@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.24.1] - 2026-07-22
+
+### Fixed
+
+- 修复 keep-alive 下跨用户主页切换旧内容闪现
+  - `src/views/UserHomeView.vue`：watch 处理器同步阶段添加 `topics.length = 0` 和 `loading.value = true`，消除异步时序间隙中的旧数据渲染
+
 ## [1.24.0] - 2026-07-18
 
 ### Added
