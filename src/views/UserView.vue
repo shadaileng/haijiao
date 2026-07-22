@@ -3,50 +3,55 @@ import { ref, reactive, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { showToast } from 'vant'
 import { api } from '@/api/request'
-import type { LiteTopicPage } from '@/types'
+import type { LiteTopic } from '@/types'
 import Topics from '@/components/Topics.vue'
 
 const route = useRoute()
 const userId = ref((route.params.userId as string) || '')
-const topicsDom = ref()
-const skeletonLoading = ref(true)
 
-const liteTopics: LiteTopicPage = reactive({ results: [], page: { index: 1, size: 10, total: 0 } })
+const topics: LiteTopic[] = reactive([])
+const pageIndex = ref(1)
+const totalItems = ref(0)
+const pageSize = 15
+const loading = ref(true)
 
 onMounted(async () => {
-  topicsDom.value?.endLoad()
-  await pageto(1)
-  skeletonLoading.value = false
+  await loadPage(1)
 })
 
 const onClickLeft = () => history.back()
 
-const pageto = async (index: number) => {
-  if (!userId.value) return
-  const resp = await api.topics({ params: { userId: userId.value, page: index, type: 1 } })
+const loadPage = async (page: number) => {
+  loading.value = true
+  if (!userId.value) { loading.value = false; return }
+  const resp = await api.topics({ params: { userId: userId.value, page, type: 1 } })
   if (!resp.success) {
     showToast(resp.message || '获取主题失败')
+    loading.value = false
     return
   }
   const data = resp.data
   if (data?.results) {
-    liteTopics.results.splice(0, liteTopics.results.length, ...data.results)
+    topics.length = 0
+    topics.push(...data.results)
   }
   if (data?.page) {
-    liteTopics.page.index = data.page.page
-    liteTopics.page.size = data.page.limit
-    liteTopics.page.total = data.page.total
+    totalItems.value = data.page.total
+    pageIndex.value = page
   }
-}
-
-const loadMore = () => {
-  if (liteTopics.page.index < Math.ceil(liteTopics.page.total / liteTopics.page.size)) {
-    pageto(liteTopics.page.index + 1)
-  }
+  loading.value = false
 }
 </script>
 
 <template>
   <van-nav-bar title="用户帖子" left-text="返回" left-arrow @click-left="onClickLeft" :fixed="true" :placeholder="true" />
-  <Topics ref="topicsDom" :topics="liteTopics.results" :skeletonLoading="skeletonLoading" @load="loadMore()" />
+  <Topics
+    mode="pagination"
+    :topics="topics"
+    :skeletonLoading="loading"
+    :pageIndex="pageIndex"
+    :totalItems="totalItems"
+    :pageSize="pageSize"
+    @pageChange="loadPage"
+  />
 </template>

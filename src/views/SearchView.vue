@@ -1,17 +1,21 @@
 <script setup lang="ts">
 defineOptions({ name: 'SearchView' })
-import { ref, reactive, onMounted, watch, nextTick } from 'vue'
+import { ref, reactive, onMounted, watch } from 'vue'
 import { showToast } from 'vant'
 import type { LiteTopic } from '@/types'
 import { api } from '@/api/request'
 import Topics from '@/components/Topics.vue'
-const topicsDom = ref()
+
 const key = ref('')
-const index = ref(1)
 const skeletonLoading = ref(true)
 const hasSearched = ref(false)
+const loading = ref(false)
 
 const topics: LiteTopic[] = reactive([])
+const pageIndex = ref(1)
+const totalItems = ref(0)
+const pageSize = 20
+
 const tags = reactive<any[]>([])
 
 onMounted(async () => {
@@ -27,7 +31,8 @@ const onClear = () => {
   key.value = ''
   hasSearched.value = false
   topics.splice(0, topics.length)
-  index.value = 1
+  pageIndex.value = 1
+  totalItems.value = 0
 }
 
 watch(key, (val) => {
@@ -44,28 +49,27 @@ const search = async (tag?: string) => {
     showToast('请输入搜索关键词')
     return
   }
-  const isFirstPage = topics.length === 0
-  if (isFirstPage) {
-    skeletonLoading.value = true
-  }
   hasSearched.value = true
-  topicsDom.value?.startLoad()
-  const result = await api.search({ params: { page: index.value, node_id: 0, key: key.value } })
+  await loadPage(1)
+}
+
+const loadPage = async (page: number) => {
+  loading.value = true
+  const result = await api.search({ params: { page, node_id: 0, key: key.value } })
   if (!result.success) {
     showToast(result.message || '搜索失败')
-    if (isFirstPage) skeletonLoading.value = false
-    topicsDom.value?.endLoad()
+    loading.value = false
     return
   }
   if (result.data?.results) {
+    topics.length = 0
     topics.push(...result.data.results)
   }
-  index.value++
-  if (isFirstPage) {
-    skeletonLoading.value = false
-    await nextTick()
+  if (result.data?.page) {
+    totalItems.value = result.data.page.total
+    pageIndex.value = page
   }
-  topicsDom.value?.endLoad()
+  loading.value = false
 }
 </script>
 
@@ -97,12 +101,16 @@ const search = async (tag?: string) => {
       </div>
     </div>
   </template>
-  <template v-else-if="skeletonLoading">
-    <div v-for="i in 5" :key="i" class="skeleton-card">
-      <van-skeleton title avatar :row="2" :loading="true" />
-    </div>
-  </template>
-  <Topics v-else ref="topicsDom" :topics="topics" :skeletonLoading="false" @load="search()" />
+  <Topics
+    v-else
+    mode="pagination"
+    :topics="topics"
+    :skeletonLoading="loading"
+    :pageIndex="pageIndex"
+    :totalItems="totalItems"
+    :pageSize="pageSize"
+    @pageChange="loadPage"
+  />
 </template>
 
 <style scoped>

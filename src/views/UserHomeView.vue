@@ -1,10 +1,10 @@
 <script setup lang="ts">
 defineOptions({ name: 'UserHomeView' })
-import { ref, reactive, onMounted, watch, nextTick } from 'vue'
+import { ref, reactive, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { showToast } from 'vant'
 import { api } from '@/api/request'
-import type { User, LiteTopicPage } from '@/types'
+import type { User, LiteTopic } from '@/types'
 import UserInfo from '@/components/UserInfo.vue'
 import Topics from '@/components/Topics.vue'
 
@@ -13,10 +13,12 @@ const route = useRoute()
 const userId = ref((route.params.userId as string) || '')
 const nickname = ref((route.params.nickname as string) || '')
 const userInfo = ref<User | null>(null)
-const topicsDom = ref()
-const skeletonLoading = ref(true)
 
-const liteTopics: LiteTopicPage = reactive({ results: [], page: { index: 1, size: 10, total: 0 } })
+const topics: LiteTopic[] = reactive([])
+const pageIndex = ref(1)
+const totalItems = ref(0)
+const pageSize = 15
+const loading = ref(true)
 
 const onClickLeft = () => history.back()
 
@@ -24,26 +26,18 @@ onMounted(async () => {
   if (userId.value) {
     await loadUserInfo(userId.value)
   }
-  await pageto(1)
-  skeletonLoading.value = false
-  await nextTick()
-  topicsDom.value?.endLoad()
+  await loadPage(1)
 })
 
 watch(() => route.params.userId, async (newId) => {
   if (newId && newId !== userId.value) {
-    skeletonLoading.value = true
     userId.value = newId as string
     nickname.value = (route.params.nickname as string) || ''
     userInfo.value = null
-    liteTopics.results.splice(0, liteTopics.results.length)
-    liteTopics.page.index = 1
-    liteTopics.page.total = 0
+    pageIndex.value = 1
+    totalItems.value = 0
     await loadUserInfo(userId.value)
-    await pageto(1)
-    skeletonLoading.value = false
-    await nextTick()
-    topicsDom.value?.endLoad()
+    await loadPage(1)
   }
 })
 
@@ -56,63 +50,39 @@ const loadUserInfo = async (id: string) => {
   }
 }
 
-const pageto = async (index: number) => {
-  if (!userId.value) return
-  const resp = await api.topics({ params: { userId: userId.value, page: index, type: 1 } })
+const loadPage = async (page: number) => {
+  loading.value = true
+  if (!userId.value) { loading.value = false; return }
+  const resp = await api.topics({ params: { userId: userId.value, page, type: 1 } })
   if (!resp.success) {
     showToast(resp.message || '获取主题失败')
+    loading.value = false
     return
   }
   const data = resp.data
   if (data?.results) {
-    liteTopics.results.splice(0, liteTopics.results.length, ...data.results)
+    topics.length = 0
+    topics.push(...data.results)
   }
   if (data?.page) {
-    liteTopics.page.index = data.page.page
-    liteTopics.page.size = data.page.limit
-    liteTopics.page.total = data.page.total
+    totalItems.value = data.page.total
+    pageIndex.value = page
   }
-}
-
-const loadMore = async () => {
-  if (liteTopics.page.index < Math.ceil(liteTopics.page.total / liteTopics.page.size)) {
-    topicsDom.value?.startLoad()
-    await pageto(liteTopics.page.index + 1)
-    topicsDom.value?.endLoad()
-  } else {
-    topicsDom.value?.finishLoad()
-  }
+  loading.value = false
 }
 </script>
 
 <template>
   <van-nav-bar :title="nickname || '用户主页'" left-text="返回" left-arrow @click-left="onClickLeft" :fixed="true" :placeholder="true" />
-  <template v-if="skeletonLoading">
-    <div class="skeleton-card van-hairline--bottom">
-      <van-row>
-        <van-col span="6">
-          <van-skeleton-avatar :row="0" />
-        </van-col>
-        <van-col span="16">
-          <van-skeleton-title :row="1" />
-          <van-skeleton-title :row="1" style="width: 60%;" />
-          <van-skeleton-title :row="1" style="width: 40%;" />
-        </van-col>
-      </van-row>
-    </div>
-    <div v-for="i in 3" :key="i" class="skeleton-card">
-      <van-skeleton title avatar :row="2" :loading="true" />
-    </div>
-  </template>
-  <template v-else>
-    <UserInfo v-if="userInfo" :userInfo="userInfo" />
-    <van-divider v-if="userInfo" />
-    <Topics ref="topicsDom" :topics="liteTopics.results" :skeletonLoading="false" @load="loadMore()" />
-  </template>
+  <UserInfo v-if="userInfo" :userInfo="userInfo" />
+  <van-divider v-if="userInfo" />
+  <Topics
+    mode="pagination"
+    :topics="topics"
+    :skeletonLoading="loading"
+    :pageIndex="pageIndex"
+    :totalItems="totalItems"
+    :pageSize="pageSize"
+    @pageChange="loadPage"
+  />
 </template>
-
-<style scoped>
-.skeleton-card {
-  padding: 15px;
-}
-</style>

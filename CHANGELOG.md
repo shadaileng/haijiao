@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `src/views/HotTopicsView.vue`：从 `van-list` 无限滚动重构为分页模式，`sessionStorage` 记住页码与滚动位置
   - `src/router/index.ts`：`scrollBehavior` 支持 `sessionStorage` 保存/恢复滚动位置
   - `src/types/index.ts`：`Page` 接口新增 `totalPage` 字段
+- 扩展 UserView / UserHomeView / SearchView 无限滚动→分页模式，翻页骨架屏统一管理
+  - `src/views/UserView.vue`：从无限滚动重构为分页模式，`loadPage()` 统一管理骨架屏 loading
+  - `src/views/UserHomeView.vue`：从无限滚动重构为分页模式，移除外层自定义骨架屏，改用 Topics 统一管理
+  - `src/views/SearchView.vue`：从无限滚动重构为分页模式，移除中间自定义骨架屏，改用 Topics 统一管理
 
 ## [1.23.0] - 2026-07-15
 
