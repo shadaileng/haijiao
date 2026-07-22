@@ -61,7 +61,6 @@ export default defineConfig({
     sidebar: {
       '/architecture/': [
         { text: '架构概览', link: '/architecture/01-架构概览/' },
-        { text: '架构演进', link: '/architecture/02-架构演进/' },
       ],
       '/guides/': [
         { text: '开发指南', link: '/guides/01-开发指南/' },
@@ -80,6 +79,13 @@ export default defineConfig({
         { text: '数据驱动重构方案', link: '/plans/09-数据驱动重构方案/' },
         { text: 'Emoji 解析移植方案', link: '/plans/10-Emoji解析移植方案/' },
         { text: '批量图片加载模块方案', link: '/plans/11-批量图片加载模块方案/' },
+        { text: 'v-content 适配 Door 标签方案', link: '/plans/12-v-content适配Door标签方案/' },
+        { text: 'v-content 适配 Sell 标签方案', link: '/plans/13-v-content适配Sell标签方案/' },
+        { text: '移除视频 30 秒预览限制', link: '/plans/14-移除视频30秒预览限制/' },
+        { text: '配置页复制粘贴 Token 方案', link: '/plans/15-配置页复制粘贴Token方案/' },
+        { text: '分页按钮改造方案', link: '/plans/16-主页无限滚动加载修复方案/' },
+        { text: '用户主页缓存闪现修复方案', link: '/plans/17-用户主页缓存闪现修复方案/' },
+        { text: '帖子 1742505 视频播放调试方案', link: '/plans/18-帖子1742505视频播放调试方案/' },
       ],
       '/references/': [
         { text: 'API 参考', link: '/references/01-API 参考/' },

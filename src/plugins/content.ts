@@ -10,6 +10,87 @@ import router from '@/router'
 
 let player: DPlayer | null = null
 
+let wasmInstance: WebAssembly.Instance | null = null
+let wasmPromise: Promise<WebAssembly.Instance> | null = null
+
+async function getWasmInstance(): Promise<WebAssembly.Instance> {
+  if (wasmInstance) return wasmInstance
+  if (!wasmPromise) {
+    wasmPromise = (async () => {
+      const resp = await fetch('/jquery.wasm')
+      const buf = await resp.arrayBuffer()
+      const module = new WebAssembly.Module(buf)
+      const memory = new WebAssembly.Memory({ initial: 256 })
+      const table = new WebAssembly.Table({ initial: 0, element: 'anyfunc' })
+      const stub = () => {}
+      const instance = new WebAssembly.Instance(module, {
+        env: {
+          memory,
+          __indirect_function_table: table,
+          __wasm_call_ctors: stub,
+          emscripten_stack_init: stub,
+          emscripten_stack_get_free: () => 65536,
+          emscripten_stack_get_base: () => 65536,
+          emscripten_stack_get_end: () => 0,
+          emscripten_stack_get_current: () => 65536,
+          _emscripten_stack_restore: stub,
+          _emscripten_stack_alloc: () => 0,
+          _abort_js: stub,
+          emscripten_resize_heap: () => 1,
+          fd_close: () => 0,
+          fd_write: () => 0,
+          fd_seek: () => 0,
+          strerror: () => 0,
+          fflush: () => 0,
+        },
+        wasi_snapshot_preview1: {
+          fd_close: () => 0,
+          fd_write: () => 0,
+          fd_seek: () => 0,
+        },
+      })
+      wasmInstance = instance as WebAssembly.Instance
+      return instance as WebAssembly.Instance
+    })()
+  }
+  return wasmPromise
+}
+
+async function getWrapKey(m3u8Url: string): Promise<Uint8Array | null> {
+  try {
+    const wrapKeyUrl = m3u8Url.replace('.m3u8', '.jpg')
+    const resp = await fetch(wrapKeyUrl)
+    const text = await resp.text()
+    const decoded = atob(text.trim())
+    const buf = new Uint8Array(decoded.length)
+    for (let i = 0; i < decoded.length; i++) buf[i] = decoded.charCodeAt(i)
+    return buf
+  } catch {
+    return null
+  }
+}
+
+function decryptWasmKey(wasm: WebAssembly.Instance, wrapKey: Uint8Array, encryptedKey: ArrayBuffer): ArrayBuffer {
+  const memory = wasm.exports.memory as WebAssembly.Memory
+  const malloc = wasm.exports.malloc as Function
+  const freeFn = wasm.exports.free as Function
+  const encArr = new Uint8Array(encryptedKey)
+
+  const encPtr = malloc(encArr.length)
+  const wrapPtr = malloc(wrapKey.length)
+  const heap = new Uint8Array(memory.buffer)
+  heap.set(encArr, encPtr)
+  heap.set(wrapKey, wrapPtr)
+
+  const jqueryKey = wasm.exports.jquery_key as Function
+  jqueryKey(encPtr, encArr.length, wrapPtr, wrapKey.length)
+
+  const decrypted = new Uint8Array(memory.buffer.slice(encPtr, encPtr + 16))
+  freeFn(encPtr)
+  freeFn(wrapPtr)
+  return decrypted.buffer as ArrayBuffer
+}
+
 function formatCount(n: number): string {
   if (n >= 10000) return (n / 10000).toFixed(1) + 'w'
   if (n >= 1000) return (n / 1000).toFixed(1) + 'k'
@@ -203,9 +284,14 @@ const vContent: Directive = {
               const keyPath = (videoDiv?.getAttribute('key-path') || '') === 'undefined' ? '' : (videoDiv?.getAttribute('key-path') || '')
 
               handleClick?.({ overlayShow: true, overlayVideo: true })
+              const wasmP = getWasmInstance()
               loadVideoSrc(String(atta.id), String(topicId), 'normal1')
-                .then((data: any) => resolveRealUrl(data.remoteUrl))
-                .then((fullUrl: string) => {
+                .then((data: any) => {
+                  if (!sale || sale.buyIndex > 0) return data.remoteUrl
+                  return resolveRealUrl(data.remoteUrl)
+                })
+                .then(async (fullUrl: string) => {
+                  const [wasm, wrapKey] = await Promise.all([wasmP, getWrapKey(fullUrl)])
                   const target = img as HTMLImageElement
                   if (player) {
                     player.destroy()
@@ -220,28 +306,77 @@ const vContent: Directive = {
                       type: 'customHls',
                       customType: {
                         customHls: (video: HTMLVideoElement) => {
-                          const hls = new Hls()
-                          if (keyPath) {
-                            hls.on(Hls.Events.MANIFEST_PARSED, (_event, manifestData) => {
-                              const fragments = manifestData.levels[0]?.details?.fragments
-                              if (!fragments?.length) return
-                              const f0 = fragments[0] as any
-                              const keyUri = keyPath + (f0.levelkey?.reluri || f0.levelkeys?.['identity']?.uri || '')
-                              for (const frag of fragments) {
-                                const f = frag as any
-                                if (f.levelkey) {
-                                  f.levelkey.reluri = keyUri
-                                } else if (f.levelkeys?.['identity']) {
-                                  f.levelkeys['identity'].uri = keyUri
-                                }
-                                if (f.relurl && !f.relurl.startsWith('http')) {
-                                  f.relurl = keyPath + f.relurl
-                                }
+                          if (wasm && wrapKey) {
+                            const DefaultLoader = (Hls as any).DefaultConfig.loader
+                            class WasmM3u8Loader {
+                              private defaultLoader: any
+                              constructor(config: any) {
+                                this.defaultLoader = new DefaultLoader(config)
                               }
-                            })
+                              load(context: any, config: any, callbacks: any) {
+                                const isPlaylist = (context.type === 'manifest' || context.type === 'level') && context.url?.includes('.m3u8')
+                                if (isPlaylist) {
+                                  fetch(context.url)
+                                    .then(r => r.text())
+                                    .then(text => {
+                                      const keyMatch = text.match(/URI="([^"]+\.key)"/)
+                                      if (keyMatch) {
+                                        const keyUrl = new URL(keyMatch[1], context.url).href
+                                        return fetch(keyUrl)
+                                          .then(r => r.arrayBuffer())
+                                          .then(keyBuf => {
+                                            const decrypted = decryptWasmKey(wasm!, wrapKey!, keyBuf)
+                                            const bytes = new Uint8Array(decrypted)
+                                            let binary = ''
+                                            bytes.forEach(b => binary += String.fromCharCode(b))
+                                            const b64 = btoa(binary)
+                                            const newText = text.replace(/URI="[^"]+\.key"/, `URI="data:application/octet-stream;base64,${b64}"`)
+                                            callbacks.onSuccess(
+                                              { url: context.url, data: newText },
+                                              { total: newText.length, loaded: newText.length, aborted: false, retry: 0, chunkCount: 0, bwEstimate: 0, loading: {} as any, parsing: {} as any, buffering: {} as any },
+                                              context,
+                                              null
+                                            )
+                                          })
+                                      }
+                                      this.defaultLoader.load(context, config, callbacks)
+                                    })
+                                    .catch(() => this.defaultLoader.load(context, config, callbacks))
+                                  return
+                                }
+                                this.defaultLoader.load(context, config, callbacks)
+                              }
+                              abort() { this.defaultLoader.abort() }
+                              destroy() { this.defaultLoader.destroy() }
+                              get stats() { return this.defaultLoader.stats }
+                            }
+                            const hls = new Hls({ loader: WasmM3u8Loader as any })
+                            hls.loadSource(video.src)
+                            hls.attachMedia(video)
+                          } else {
+                            const hls = new Hls()
+                            if (keyPath) {
+                              hls.on(Hls.Events.MANIFEST_PARSED, (_event, manifestData) => {
+                                const fragments = manifestData.levels[0]?.details?.fragments
+                                if (!fragments?.length) return
+                                const f0 = fragments[0] as any
+                                const keyUri = keyPath + (f0.levelkey?.reluri || f0.levelkeys?.['identity']?.uri || '')
+                                for (const frag of fragments) {
+                                  const f = frag as any
+                                  if (f.levelkey) {
+                                    f.levelkey.reluri = keyUri
+                                  } else if (f.levelkeys?.['identity']) {
+                                    f.levelkeys['identity'].uri = keyUri
+                                  }
+                                  if (f.relurl && !f.relurl.startsWith('http')) {
+                                    f.relurl = keyPath + f.relurl
+                                  }
+                                }
+                              })
+                            }
+                            hls.loadSource(video.src)
+                            hls.attachMedia(video)
                           }
-                          hls.loadSource(video.src)
-                          hls.attachMedia(video)
                         },
                       },
                     },

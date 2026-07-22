@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.25.0] - 2026-07-22
+
+### Added
+
+- 帖子 1742505 WASM 视频解密支持（m3u8 内联 key 方案）
+  - `src/plugins/content.ts`：新增 `getWasmInstance` / `getWrapKey` / `decryptWasmKey` 函数
+  - `src/plugins/content.ts`：新增 `WasmM3u8Loader` 拦截 m3u8 playlist，内联解密后的 data: URI key
+  - `public/jquery.wasm`：WASM 解密模块（12KB）
+  - `public/hls.legacy.min.js`：hls.js v0.13.2 回退（调试用）
+  - `docs/plans/18-帖子1742505视频播放调试方案.md`：方案文档（v3.0.0 🏁）
+- 更新 docs 索引：README.md / index.md / .vitepress/config.ts 同步文档状态
+  - 移除已不存在的 `02-架构演进.md` 引用
+  - 新增 plan 18 条目和侧边栏链接
+  - 更新 plan 15/16 为 🏁 已完成
+
+### Changed
+
+- `docs/plans/14-移除视频30秒预览限制.md`：更新为 v5.0.0，新增 videoLines/resolveRealUrl/sell 预加载详细说明
+
 ## [1.24.1] - 2026-07-22
 
 ### Fixed

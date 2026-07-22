@@ -26,9 +26,9 @@ docs/
 │   ├── 15-配置页复制粘贴Token方案.md
 │   ├── 16-主页无限滚动加载修复方案.md
 │   ├── 17-用户主页缓存闪现修复方案.md
+│   └── 18-帖子1742505视频播放调试方案.md
 ├── architecture/                    # 架构类（持续维护）
-│   ├── 01-架构概览.md
-│   └── 02-架构演进.md
+│   └── 01-架构概览.md
 ├── references/                      # 参考类（持续维护）
 │   ├── 01-API 参考.md
 │   ├── 02-数据字典.md
@@ -64,10 +64,10 @@ docs/
 | `13-v-content适配Sell标签方案.md` | v1.2.0 | 方案 | `plans/` | v-content 插件解析 `sell-btn` HTML 渲染 + 视频预览 | 🏁 |
 | `14-移除视频30秒预览限制.md` | v5.0.0 | 方案 | `plans/` | preview 解析 + keyPath 修复 + sell 视频预加载 | 🏁 |
 | `15-配置页复制粘贴Token方案.md` | v1.0.0 | 方案 | `plans/` | 配置页复制/粘贴 Token 按钮 | 🏁 |
-| `16-主页无限滚动加载修复方案.md` | v3.0.0 | 方案 | `plans/` | 所有帖子列表视图无限滚动→分页按钮 | 🚧 |
+| `16-主页无限滚动加载修复方案.md` | v3.1.0 | 方案 | `plans/` | 所有帖子列表视图无限滚动→分页按钮 | 🏁 |
 | `17-用户主页缓存闪现修复方案.md` | v1.0.0 | 方案 | `plans/` | keep-alive 下跨用户主页切换旧内容闪现 | 🏁 |
+| `18-帖子1742505视频播放调试方案.md` | v3.0.0 | 方案 | `plans/` | 帖子 1742505 视频无法播放调试 | 🏁 |
 | `01-架构概览.md` | v1.1.0 | 架构 | `architecture/` | 系统架构与请求链路 | 🏁 |
-| `02-架构演进.md` | v1.0.0 | 架构 | `architecture/` | 从 Vue2/ElementUI 到 Vue3/Vant 的迁移 | 🏁 |
 | `01-API 参考.md` | v1.1.0 | 参考 | `references/` | 所有 API 端点定义 | 🏁 |
 | `02-数据字典.md` | v1.1.0 | 参考 | `references/` | 核心类型定义 | 🏁 |
 | `03-Origin 代码剖析.md` | v1.0.0 | 参考 | `references/` | origin/app.js 与 chunk-vendors.js 深度剖析 | 🏁 |
@@ -255,10 +255,6 @@ docs/
 | 6 | 验证：`pnpm run build` 类型检查 + 构建通过 | ✅ |
 | 7 | 文档同步：更新本方案状态为 🏁，更新 `docs/README.md` | ✅ |
 
-| `12-v-content适配Door标签方案.md` | v1.1.0 | 方案 | `plans/` | v-content 插件解析 `[door]` 标签渲染跳转 | 🏁 |
-| `13-v-content适配Sell标签方案.md` | v1.0.0 | 方案 | `plans/` | v-content 插件解析 `[sell]` 标签渲染购买信息 | 🏁 |
-| `14-移除视频30秒预览限制.md` | v1.0.0 | 方案 | `plans/` | 移除出售视频的 30 秒客户端预览截断 | 🏁 |
-
 ### 12-v-content适配Door标签方案
 
 | 步骤 | 任务 | 状态 |
@@ -315,9 +311,9 @@ docs/
 | 步骤 | 任务 | 状态 |
 |:---:|------|:----:|
 | 1 | 创建方案文档 | ✅ |
-| 2 | SettingsView.vue 实现复制/粘贴函数与按钮 | 🚧 进行中 |
+| 2 | SettingsView.vue 实现复制/粘贴函数与按钮 | ✅ |
 | 3 | 更新 docs/README.md | ✅ |
-| 4 | `pnpm run build` 构建验证 | ⬜ 待执行 |
+| 4 | `pnpm run build` 构建验证 | ✅ |
 
 ### 16-帖子列表分页改造方案
 

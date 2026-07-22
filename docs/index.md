@@ -16,8 +16,6 @@ hero:
 features:
   - title: 📐 架构概览
     link: /architecture/01-架构概览/
-  - title: 📐 架构演进
-    link: /architecture/02-架构演进/
   - title: 📘 API 参考
     link: /references/01-API 参考/
   - title: 📘 数据字典
@@ -52,4 +50,18 @@ features:
     link: /plans/10-Emoji解析移植方案/
   - title: 📋 批量图片加载模块
     link: /plans/11-批量图片加载模块方案/
+  - title: 📋 v-content 适配 Door 标签
+    link: /plans/12-v-content适配Door标签方案/
+  - title: 📋 v-content 适配 Sell 标签
+    link: /plans/13-v-content适配Sell标签方案/
+  - title: 📋 移除视频 30 秒预览限制
+    link: /plans/14-移除视频30秒预览限制/
+  - title: 📋 配置页复制粘贴 Token
+    link: /plans/15-配置页复制粘贴Token方案/
+  - title: 📋 分页按钮改造
+    link: /plans/16-主页无限滚动加载修复方案/
+  - title: 📋 用户主页缓存闪现修复
+    link: /plans/17-用户主页缓存闪现修复方案/
+  - title: 📋 帖子 1742505 视频调试
+    link: /plans/18-帖子1742505视频播放调试方案/
 ---
