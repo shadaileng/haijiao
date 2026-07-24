@@ -7,6 +7,7 @@ import { LOADING_URL } from '@/utils/constant'
 import DPlayer from 'dplayer'
 import Hls from 'hls.js'
 import router from '@/router'
+import { showToast } from 'vant'
 
 let player: DPlayer | null = null
 
@@ -331,6 +332,7 @@ const vContent: Directive = {
                                             bytes.forEach(b => binary += String.fromCharCode(b))
                                             const b64 = btoa(binary)
                                             const newText = text.replace(/URI="[^"]+\.key"/, `URI="data:application/octet-stream;base64,${b64}"`)
+                                            console.log('[wasm] decrypted key, replacing m3u8 URI')
                                             callbacks.onSuccess(
                                               { url: context.url, data: newText },
                                               { total: newText.length, loaded: newText.length, aborted: false, retry: 0, chunkCount: 0, bwEstimate: 0, loading: {} as any, parsing: {} as any, buffering: {} as any },
@@ -339,7 +341,7 @@ const vContent: Directive = {
                                             )
                                           })
                                       }
-                                      this.defaultLoader.load(context, config, callbacks)
+                                      return this.defaultLoader.load(context, config, callbacks)
                                     })
                                     .catch(() => this.defaultLoader.load(context, config, callbacks))
                                   return
@@ -377,6 +379,10 @@ const vContent: Directive = {
                             hls.loadSource(video.src)
                             hls.attachMedia(video)
                           }
+                          video.play().catch((err) => {
+                            console.warn('video play failed:', err.message || err)
+                            showToast('视频播放失败')
+                          })
                         },
                       },
                     },
