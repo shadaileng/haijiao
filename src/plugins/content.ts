@@ -380,6 +380,7 @@ const vContent: Directive = {
                             hls.attachMedia(video)
                           }
                           video.play().catch((err) => {
+                            if (err?.message?.includes('interrupted by a call to pause')) return
                             console.warn('video play failed:', err.message || err)
                             showToast('视频播放失败')
                           })
