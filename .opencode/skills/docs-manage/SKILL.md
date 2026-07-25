@@ -209,6 +209,7 @@ docs/ 目录的 README.md 必须包含以下章节：
 5. 编写正文内容
 6. 添加「关联文档」交叉引用
 7. 更新 `README.md`「文档一览」表
+8. 更新 `docs/.vitepress/config.ts` 侧边栏（sidebar 对应子目录数组追加条目）
 
 ### 更新现有文档
 
