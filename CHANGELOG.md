@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.26.0] - 2026-07-25
+
+### Added
+
+- 添加海角图标作为网站 favicon
+  - `public/favicon.svg`：SVG 格式图标，绿色圆角矩形背景 + 白色"海角"文字
+  - `index.html`：修正 favicon 引用，从 `/favicon.ico` 改为 `/favicon.svg`
+
 ## [1.25.1] - 2026-07-25
 
 ### Fixed
