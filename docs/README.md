@@ -26,7 +26,8 @@ docs/
 │   ├── 15-配置页复制粘贴Token方案.md
 │   ├── 16-主页无限滚动加载修复方案.md
 │   ├── 17-用户主页缓存闪现修复方案.md
-│   └── 18-帖子1742505视频播放调试方案.md
+│   ├── 18-帖子1742505视频播放调试方案.md
+│   └── 19-足迹功能方案.md
 ├── architecture/                    # 架构类（持续维护）
 │   └── 01-架构概览.md
 ├── references/                      # 参考类（持续维护）
@@ -67,6 +68,7 @@ docs/
 | `16-主页无限滚动加载修复方案.md` | v3.1.0 | 方案 | `plans/` | 所有帖子列表视图无限滚动→分页按钮 | 🏁 |
 | `17-用户主页缓存闪现修复方案.md` | v1.0.0 | 方案 | `plans/` | keep-alive 下跨用户主页切换旧内容闪现 | 🏁 |
 | `18-帖子1742505视频播放调试方案.md` | v3.0.0 | 方案 | `plans/` | 帖子 1742505 视频无法播放调试 | 🏁 |
+| `19-足迹功能方案.md` | v1.0.0 | 方案 | `plans/` | 设置页足迹入口 + 独立页面用户/帖子浏览记录 | 📋 |
 | `01-架构概览.md` | v1.1.0 | 架构 | `architecture/` | 系统架构与请求链路 | 🏁 |
 | `01-API 参考.md` | v1.1.0 | 参考 | `references/` | 所有 API 端点定义 | 🏁 |
 | `02-数据字典.md` | v1.1.0 | 参考 | `references/` | 核心类型定义 | 🏁 |
@@ -348,6 +350,20 @@ docs/
 | 2 | 修复 watch 同步清数据 | ✅ |
 | 3 | 更新 docs/README.md | ✅ |
 | 4 | 构建验证 | ✅ |
+
+### 19-足迹功能方案
+
+| 步骤 | 文件 | 操作 | 状态 |
+|:----:|:-----|:-----|:----:|
+| 1 | `src/stores/history.ts` | 新建足迹 store | ⬜ |
+| 2 | `src/views/HistoryView.vue` | 新建足迹页面 | ⬜ |
+| 3 | `src/router/index.ts` | 新增路由 + publicPages | ⬜ |
+| 4 | `src/views/SettingsView.vue` | 足迹入口 cell | ⬜ |
+| 5 | `src/views/UserView.vue` | 埋点 | ⬜ |
+| 6 | `src/views/UserHomeView.vue` | 埋点 | ⬜ |
+| 7 | `src/views/TopicView.vue` | 埋点 | ⬜ |
+| 8 | — | 构建验证 | ⬜ |
+| 9 | `docs/README.md` | 文档同步 | ⬜ |
 
 ## 参考代码
 
