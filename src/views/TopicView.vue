@@ -7,8 +7,10 @@ import type { Topic } from '@/types'
 import Comment from '@/components/Comment.vue'
 import TopicContent from '@/components/TopicContent.vue'
 import UserMeta from '@/components/UserMeta.vue'
+import { useSafeBack } from '@/utils/navigation'
 
 const route = useRoute()
+const safeBack = useSafeBack()
 
 const pid = ref((route.params.pid as string) || '')
 const commentDivider = ref<HTMLElement>()
@@ -28,7 +30,7 @@ const defaultTopic = (): Topic => ({
 
 const topicLocal = ref<Topic>(defaultTopic())
 
-const onClickLeft = () => history.back()
+const onClickLeft = () => safeBack()
 
 const loadTopic = async (topicPid: string) => {
   if (!topicPid) return

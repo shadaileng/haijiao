@@ -7,8 +7,9 @@ import { useMirrorConfig } from '@/composables/useMirrorConfig'
 import { showSuccessToast, showDialog as showConfirmDialog, showToast } from 'vant'
 import UserInfo from '@/components/UserInfo.vue'
 import { useClipboard } from '@/composables/useClipboard'
-
+import { useSafeBack } from '@/utils/navigation'
 const router = useRouter()
+const safeBack = useSafeBack()
 const settings = useSettingsStore()
 const userStore = useUserStore()
 const { showDialog, mirrorUrl, mirrorDisplay, openConfig, saveConfig } = useMirrorConfig()
@@ -69,7 +70,7 @@ async function handlePasteCredentials() {
 
 <template>
   <div class="settings-view">
-    <van-nav-bar title="配置" left-arrow @click-left="router.back()" />
+    <van-nav-bar title="配置" left-arrow @click-left="safeBack" />
 
     <van-skeleton title avatar :row="3" :loading="loadingUser">
       <UserInfo v-if="currentUser" :userInfo="currentUser" />

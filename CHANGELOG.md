@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.25.1] - 2026-07-25
+
+### Fixed
+
+- 修复 KeepAlive 组件中 inject() 上下文丢失导致 safeBack 崩溃
+  - `src/utils/navigation.ts`：将 `safeBack` 改为 composable `useSafeBack`，在 setup 阶段获取 router 实例
+  - 返回上一级，无历史记录时兜底到 `/hot`
+- 修复 router 守卫中直接调用 `useSettingsStore` 导致的 inject 问题
+  - `src/router/index.ts`：改为直接读 localStorage 判断登录状态
+
 ## [1.25.0] - 2026-07-22
 
 ### Added

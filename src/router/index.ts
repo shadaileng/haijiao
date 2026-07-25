@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useSettingsStore } from '@/stores/settings'
 
 const routes = [
   {
@@ -59,6 +58,17 @@ const routes = [
 
 const publicPages = ['Login', 'Settings', 'ImageViewer']
 
+function isLoggedIn(): boolean {
+  try {
+    const raw = localStorage.getItem('settings')
+    if (!raw) return false
+    const cfg = JSON.parse(raw)
+    return !!cfg.uid && !!cfg.token
+  } catch {
+    return false
+  }
+}
+
 const router = createRouter({
   history: createWebHistory(),
   routes,
@@ -77,12 +87,13 @@ const router = createRouter({
 })
 
 router.beforeEach((to, _from, next) => {
-  const settings = useSettingsStore()
-  if (settings.isLoggedIn || publicPages.includes(to.name as string)) {
+  if (isLoggedIn() || publicPages.includes(to.name as string)) {
     next()
   } else {
     next({ name: 'Login' })
   }
 })
+
+;(window as any).__router__ = router
 
 export default router

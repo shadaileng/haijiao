@@ -7,8 +7,10 @@ import { api } from '@/api/request'
 import type { User, LiteTopic } from '@/types'
 import UserInfo from '@/components/UserInfo.vue'
 import Topics from '@/components/Topics.vue'
+import { useSafeBack } from '@/utils/navigation'
 
 const route = useRoute()
+const safeBack = useSafeBack()
 
 const userId = ref((route.params.userId as string) || '')
 const nickname = ref((route.params.nickname as string) || '')
@@ -20,7 +22,7 @@ const totalItems = ref(0)
 const pageSize = 15
 const loading = ref(true)
 
-const onClickLeft = () => history.back()
+const onClickLeft = () => safeBack()
 
 onMounted(async () => {
   if (userId.value) {

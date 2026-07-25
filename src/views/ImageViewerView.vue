@@ -2,8 +2,11 @@
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { imageLoader } from '@/utils/imageLoader'
+import { useSafeBack } from '@/utils/navigation'
 
 const route = useRoute()
+const safeBack = useSafeBack()
+
 const imgUrl = ref('')
 
 onMounted(async () => {
@@ -14,7 +17,7 @@ onMounted(async () => {
   if (result) imgUrl.value = result
 })
 
-const onClickLeft = () => history.back()
+const onClickLeft = () => safeBack()
 </script>
 
 <template>

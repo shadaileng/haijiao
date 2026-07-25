@@ -3,10 +3,12 @@ import { ref, reactive, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { showToast } from 'vant'
 import { api } from '@/api/request'
+import { useSafeBack } from '@/utils/navigation'
 import type { LiteTopic } from '@/types'
 import Topics from '@/components/Topics.vue'
 
 const route = useRoute()
+const safeBack = useSafeBack()
 const userId = ref((route.params.userId as string) || '')
 
 const topics: LiteTopic[] = reactive([])
@@ -19,7 +21,7 @@ onMounted(async () => {
   await loadPage(1)
 })
 
-const onClickLeft = () => history.back()
+const onClickLeft = () => safeBack()
 
 const loadPage = async (page: number) => {
   loading.value = true
