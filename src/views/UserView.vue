@@ -4,11 +4,13 @@ import { useRoute } from 'vue-router'
 import { showToast } from 'vant'
 import { api } from '@/api/request'
 import { useSafeBack } from '@/utils/navigation'
+import { useHistoryStore } from '@/stores/history'
 import type { LiteTopic } from '@/types'
 import Topics from '@/components/Topics.vue'
 
 const route = useRoute()
 const safeBack = useSafeBack()
+const historyStore = useHistoryStore()
 const userId = ref((route.params.userId as string) || '')
 
 const topics: LiteTopic[] = reactive([])
@@ -18,6 +20,9 @@ const pageSize = 15
 const loading = ref(true)
 
 onMounted(async () => {
+  if (userId.value) {
+    historyStore.addRecord('user', userId.value, '用户 ' + userId.value)
+  }
   await loadPage(1)
 })
 

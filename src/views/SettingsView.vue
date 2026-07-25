@@ -116,6 +116,12 @@ async function handlePasteCredentials() {
       </van-cell>
     </van-cell-group>
 
+    <van-cell-group inset class="history-group">
+      <van-cell title="足迹" is-link @click="router.push('/history')">
+        <template #right-icon><van-icon name="arrow" /></template>
+      </van-cell>
+    </van-cell-group>
+
     <van-dialog v-model:show="showDialog" title="配置镜像源" @confirm="saveConfig" show-cancel-button>
       <van-field v-model="mirrorUrl" placeholder="https://你的镜像域名" clearable label="地址" label-width="60px" />
     </van-dialog>
@@ -142,6 +148,9 @@ async function handlePasteCredentials() {
   font-size: 12px;
 }
 .info-group {
+  margin: 12px;
+}
+.history-group {
   margin: 12px;
 }
 </style>

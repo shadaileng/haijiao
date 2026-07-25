@@ -8,9 +8,11 @@ import type { User, LiteTopic } from '@/types'
 import UserInfo from '@/components/UserInfo.vue'
 import Topics from '@/components/Topics.vue'
 import { useSafeBack } from '@/utils/navigation'
+import { useHistoryStore } from '@/stores/history'
 
 const route = useRoute()
 const safeBack = useSafeBack()
+const historyStore = useHistoryStore()
 
 const userId = ref((route.params.userId as string) || '')
 const nickname = ref((route.params.nickname as string) || '')
@@ -51,6 +53,7 @@ const loadUserInfo = async (id: string) => {
     const u = resp.data.user
     u.userId = u.id
     userInfo.value = u
+    historyStore.addRecord('user', id, u.nickname || '用户 ' + id)
   }
 }
 

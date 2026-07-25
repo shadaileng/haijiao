@@ -54,9 +54,14 @@ const routes = [
     name: 'ImageViewer',
     component: () => import('@/views/ImageViewerView.vue'),
   },
+  {
+    path: '/history',
+    name: 'History',
+    component: () => import('@/views/HistoryView.vue'),
+  },
 ]
 
-const publicPages = ['Login', 'Settings', 'ImageViewer']
+const publicPages = ['Login', 'Settings', 'ImageViewer', 'History']
 
 function isLoggedIn(): boolean {
   try {

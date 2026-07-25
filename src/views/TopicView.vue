@@ -8,9 +8,11 @@ import Comment from '@/components/Comment.vue'
 import TopicContent from '@/components/TopicContent.vue'
 import UserMeta from '@/components/UserMeta.vue'
 import { useSafeBack } from '@/utils/navigation'
+import { useHistoryStore } from '@/stores/history'
 
 const route = useRoute()
 const safeBack = useSafeBack()
+const historyStore = useHistoryStore()
 
 const pid = ref((route.params.pid as string) || '')
 const commentDivider = ref<HTMLElement>()
@@ -43,6 +45,9 @@ const loadTopic = async (topicPid: string) => {
     return
   }
   Object.assign(topicLocal.value, resp.data)
+  if (topicLocal.value.title) {
+    historyStore.addRecord('topic', topicPid, topicLocal.value.title)
+  }
   loading.value = false
 }
 
