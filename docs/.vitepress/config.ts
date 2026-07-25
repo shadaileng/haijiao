@@ -86,6 +86,7 @@ export default defineConfig({
         { text: '分页按钮改造方案', link: '/plans/16-主页无限滚动加载修复方案/' },
         { text: '用户主页缓存闪现修复方案', link: '/plans/17-用户主页缓存闪现修复方案/' },
         { text: '帖子 1742505 视频播放调试方案', link: '/plans/18-帖子1742505视频播放调试方案/' },
+        { text: '足迹功能方案', link: '/plans/19-足迹功能方案/' },
       ],
       '/references/': [
         { text: 'API 参考', link: '/references/01-API 参考/' },
