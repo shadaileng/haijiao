@@ -2,6 +2,7 @@ import { md5 } from 'js-md5'
 import { useSettingsStore } from '@/stores/settings'
 import { toCamelCase } from '@/utils/transform'
 import type { ApiResult, LoginParams, LoginResponse, VideoLine } from '@/types'
+import { showToast } from 'vant'
 
 function utf8Decode(binary: string): string {
   const bytes = new Uint8Array(binary.length)
@@ -83,6 +84,7 @@ export async function request<T = any>(options: RequestOptions): Promise<T> {
       result = JSON.parse(decodeEncrypted(String(data.data))) as T
     } catch (e) {
       console.error('decrypt error:', e)
+      showToast({ message: '数据解密失败，请检查镜像源配置', type: 'fail' })
     }
   }
   return toCamelCase(result) as T
@@ -144,7 +146,8 @@ export async function getTopicWithVideo(topicId: string | number): Promise<any> 
       if (item.category === 'video') {
         try {
           return await loadVideoSrc(item.id, topicId)
-        } catch {
+        } catch (e) {
+          console.warn('video parse failed:', e)
           return item
         }
       }

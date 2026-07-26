@@ -27,7 +27,8 @@ docs/
 │   ├── 16-主页无限滚动加载修复方案.md
 │   ├── 17-用户主页缓存闪现修复方案.md
 │   ├── 18-帖子1742505视频播放调试方案.md
-│   └── 19-足迹功能方案.md
+│   ├── 19-足迹功能方案.md
+│   └── 20-后台请求静默异常修复方案.md
 ├── architecture/                    # 架构类（持续维护）
 │   └── 01-架构概览.md
 ├── references/                      # 参考类（持续维护）
@@ -69,6 +70,7 @@ docs/
 | `17-用户主页缓存闪现修复方案.md` | v1.0.0 | 方案 | `plans/` | keep-alive 下跨用户主页切换旧内容闪现 | 🏁 |
 | `18-帖子1742505视频播放调试方案.md` | v3.0.0 | 方案 | `plans/` | 帖子 1742505 视频无法播放调试 | 🏁 |
 | `19-足迹功能方案.md` | v1.1.0 | 方案 | `plans/` | 设置页足迹入口 + 独立页面用户/帖子浏览记录 | 🚧 |
+| `20-后台请求静默异常修复方案.md` | v1.2.0 | 方案 | `plans/` | API 调用静默异常处理、用户错误提示、unhandled rejection 防护、视频加载失败关闭模态框 | 🏁 |
 | `01-架构概览.md` | v1.1.0 | 架构 | `architecture/` | 系统架构与请求链路 | 🏁 |
 | `01-API 参考.md` | v1.1.0 | 参考 | `references/` | 所有 API 端点定义 | 🏁 |
 | `02-数据字典.md` | v1.1.0 | 参考 | `references/` | 核心类型定义 | 🏁 |
@@ -364,6 +366,21 @@ docs/
 | 7 | `src/views/TopicView.vue` | 埋点 | ✅ |
 | 8 | — | 构建验证 | ✅ |
 | 9 | `docs/README.md` | 文档同步 | ✅ |
+
+### 20-后台请求静默异常修复方案
+
+| 步骤 | 文件 | 操作 | 状态 |
+|:----:|:-----|:-----|:----:|
+| 1 | `src/api/request.ts` | 解密失败 + showToast | ✅ |
+| 2 | `src/plugins/content.ts` | 视频加载失败 + showToast | ✅ |
+| 3 | `src/plugins/content.ts` | sell 视频 catch 加日志 | ✅ |
+| 4 | `src/api/request.ts` | 视频解析失败 + warn | ✅ |
+| 5 | `src/utils/image.ts` | 图片解码失败 + warn | ✅ |
+| 6 | `src/plugins/content.ts` | async IIFE 外层 catch | ✅ |
+| 7 | `SettingsView.vue` / `UserHomeView.vue` | 生命周期 try/catch | ✅ |
+| 8 | `src/plugins/content.ts` | 视频加载失败关闭模态背景 | ✅ |
+| 9 | — | 构建验证 | ✅ |
+| 10 | `docs/` | 文档同步 | ✅ |
 
 ## 参考代码
 

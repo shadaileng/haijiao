@@ -218,7 +218,9 @@ const vContent: Directive = {
               remoteUrl: data.remoteUrl || '',
               status: 1,
             } as Attachment
-          } catch {}
+          } catch (e) {
+            console.warn('sell video load failed:', e)
+          }
         }
       }
 
@@ -393,6 +395,8 @@ const vContent: Directive = {
                 })
                 .catch((err: any) => {
                   console.error('load video error:', err)
+                  showToast({ message: '视频加载失败', type: 'fail' })
+                  handleClick?.({ overlayShow: false })
                 })
             })
             imageLoader.observe(img, atta.coverUrl)
@@ -400,7 +404,9 @@ const vContent: Directive = {
         }
       })
 
-    })()
+    })().catch((err) => {
+      console.error('[v-content] render error:', err)
+    })
   },
   unmounted(el: HTMLDivElement) {
     el.querySelectorAll<HTMLImageElement>('img:not([data-emoji])').forEach(img => {

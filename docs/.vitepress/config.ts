@@ -87,6 +87,7 @@ export default defineConfig({
         { text: '用户主页缓存闪现修复方案', link: '/plans/17-用户主页缓存闪现修复方案/' },
         { text: '帖子 1742505 视频播放调试方案', link: '/plans/18-帖子1742505视频播放调试方案/' },
         { text: '足迹功能方案', link: '/plans/19-足迹功能方案/' },
+        { text: '后台请求静默异常修复方案', link: '/plans/20-后台请求静默异常修复方案/' },
       ],
       '/references/': [
         { text: 'API 参考', link: '/references/01-API 参考/' },

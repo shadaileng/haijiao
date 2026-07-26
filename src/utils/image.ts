@@ -33,7 +33,10 @@ export function loadImg(items: { remoteUrl: string }[]): Promise<{ remoteUrl: st
         const trim = base64Part.length % 4 || 0
         return result.substring(0, result.length - trim)
       })
-      .catch(() => item.remoteUrl)
+      .catch((e) => {
+        console.warn('image decode failed:', e)
+        return item.remoteUrl
+      })
     return item
   })
   return Promise.all(props)

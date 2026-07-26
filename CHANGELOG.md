@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.26.1] - 2026-07-25
+
+### Fixed
+
+- 后台请求静默异常处理增强
+  - `src/api/request.ts`：解密失败 showToast 提示用户检查镜像源配置
+  - `src/plugins/content.ts`：sell 视频 catch 加 warn 日志，视频加载失败 showToast + 关闭模态框
+  - `src/utils/image.ts`：图片解码失败加 warn 日志
+  - `src/views/SettingsView.vue` / `src/views/UserHomeView.vue`：生命周期 try/catch 防止 unhandled rejection
+
 ## [1.26.0] - 2026-07-25
 
 ### Added

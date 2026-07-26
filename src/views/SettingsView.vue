@@ -20,7 +20,11 @@ const loadingUser = ref(settings.isLoggedIn)
 
 onMounted(async () => {
   if (settings.isLoggedIn) {
-    await loadCurrentUser()
+    try {
+      await loadCurrentUser()
+    } catch (e) {
+      console.warn('load current user failed:', e)
+    }
     loadingUser.value = false
   }
 })

@@ -27,10 +27,14 @@ const loading = ref(true)
 const onClickLeft = () => safeBack()
 
 onMounted(async () => {
-  if (userId.value) {
-    await loadUserInfo(userId.value)
+  try {
+    if (userId.value) {
+      await loadUserInfo(userId.value)
+    }
+    await loadPage(1)
+  } catch (e) {
+    console.warn('user home init failed:', e)
   }
-  await loadPage(1)
 })
 
 watch(() => route.params.userId, async (newId) => {
@@ -42,8 +46,12 @@ watch(() => route.params.userId, async (newId) => {
     loading.value = true
     pageIndex.value = 1
     totalItems.value = 0
-    await loadUserInfo(userId.value)
-    await loadPage(1)
+    try {
+      await loadUserInfo(userId.value)
+      await loadPage(1)
+    } catch (e) {
+      console.warn('user home watch failed:', e)
+    }
   }
 })
 
