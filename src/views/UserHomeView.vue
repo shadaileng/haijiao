@@ -15,7 +15,6 @@ const safeBack = useSafeBack()
 const historyStore = useHistoryStore()
 
 const userId = ref((route.params.userId as string) || '')
-const nickname = ref((route.params.nickname as string) || '')
 const userInfo = ref<User | null>(null)
 
 const topics: LiteTopic[] = reactive([])
@@ -40,7 +39,6 @@ onMounted(async () => {
 watch(() => route.params.userId, async (newId) => {
   if (newId && newId !== userId.value) {
     userId.value = newId as string
-    nickname.value = (route.params.nickname as string) || ''
     userInfo.value = null
     topics.length = 0
     loading.value = true
@@ -88,7 +86,7 @@ const loadPage = async (page: number) => {
 </script>
 
 <template>
-  <van-nav-bar :title="nickname || '用户主页'" left-text="返回" left-arrow @click-left="onClickLeft" :fixed="true" :placeholder="true" />
+  <van-nav-bar :title="userInfo?.nickname || '用户主页'" left-text="返回" left-arrow @click-left="onClickLeft" :fixed="true" :placeholder="true" />
   <UserInfo v-if="userInfo" :userInfo="userInfo" />
   <van-divider v-if="userInfo" />
   <Topics

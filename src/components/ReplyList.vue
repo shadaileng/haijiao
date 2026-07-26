@@ -13,8 +13,8 @@
         />
         <div class="reply_body">
           <div class="reply-text-row">
-            <span class="hv-nickname hv-pointer" @click.stop="$router.push(`/homepage/${replies[0].userId}/${replies[0].nickname}`)">
-              {{ replies[0].nickname }}
+            <span class="hv-nickname hv-pointer" @click.stop="$router.push(`/homepage/${replies[0].userId}`)">
+               {{ replies[0].nickname }}
             </span>
             <span class="reply-colon">：</span>
             <span class="reply-text-preview" v-html="$emoji.render(replies[0].content)"></span>
@@ -40,8 +40,8 @@
         />
         <div class="reply_body">
           <div class="reply-text-row">
-            <span class="hv-nickname hv-pointer" @click="$router.push(`/homepage/${reply.userId}/${reply.nickname}`)">
-              {{ reply.nickname }}
+            <span class="hv-nickname hv-pointer" @click="$router.push(`/homepage/${reply.userId}`)">
+               {{ reply.nickname }}
             </span>
             <span class="reply-colon">：</span>
             <div class="reply-text" v-content="{ content: reply.content, attachments: reply.attachments, handleClick }"></div>

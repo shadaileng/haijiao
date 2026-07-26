@@ -117,7 +117,7 @@ pnpm run cf:deploy    # 部署到 Cloudflare Workers
 | `/hot` | HotTopicsView | 热门 |
 | `/topic/:pid?` | TopicView | 帖子详情（含视频 + 评论） |
 | `/user/:userId?` | UserView | 按 uid 查帖子 |
-| `/homepage/:userId/:nickname?` | UserHomeView | 用户主页 |
+| `/homepage/:userId` | UserHomeView | 用户主页 |
 | `/follow/:userId?` | FollowView | 关注列表 |
 | `/search` | SearchView | 搜索 |
 | `/login` | LoginView | 登录 |

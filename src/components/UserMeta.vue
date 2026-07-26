@@ -9,7 +9,7 @@
       class="user-meta-avatar"
     />
     <div class="user-meta-info">
-      <span class="hv-nickname hv-pointer" @click="$router.push(`/homepage/${userId}/${nickname}`)">
+      <span class="hv-nickname hv-pointer" @click="$router.push(`/homepage/${userId}`)">
         {{ nickname }}
       </span>
       <span class="user-meta-time">{{ displayTime }}</span>

@@ -42,7 +42,7 @@
               <div class="topic-meta">
                 <span
                   class="topic-meta-user"
-                  @click="$router.push(`/homepage/${item.user?.id}/${item.user?.nickname}`)"
+                  @click="$router.push(`/homepage/${item.user?.id}`)"
                   :title="item.user?.nickname"
                 >
                   <van-image

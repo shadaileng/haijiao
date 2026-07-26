@@ -75,7 +75,7 @@ const usernameFilter = () => {
                 />
                   <div class="follow-body">
                     <div class="follow-top">
-                      <a class="hv-link" @click="$router.push(`/homepage/${item.userId}/${item.nickname}`)">{{ item.nickname }}</a>
+                      <a class="hv-link" @click="$router.push(`/homepage/${item.userId}`)">{{ item.nickname }}</a>
                       <van-tag plain type="primary">{{ item.fansCount }}</van-tag>
                     </div>
                     <div class="follow-sign">签名:{{ item.description || '这家伙很懒什么也没留下' }}</div>

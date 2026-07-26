@@ -22,7 +22,7 @@ const routes = [
     component: () => import('@/views/TopicView.vue'),
   },
   {
-    path: '/homepage/:userId/:nickname?',
+    path: '/homepage/:userId',
     name: 'Homepage',
     component: () => import('@/views/UserHomeView.vue'),
   },
