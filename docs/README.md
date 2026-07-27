@@ -405,7 +405,7 @@ docs/
 | 2 | `src/components/common/TabBar.vue` | 移除 `follow` tab | ✅ |
 | 3 | `src/views/SettingsView.vue` | 新增「关注」cell 入口 | ✅ |
 | 4 | `src/views/FollowView.vue` | 添加 nav-bar + 滚动保存 | ✅ |
-| 5 | `src/App.vue` | keep-alive 移除 `FollowView` | ✅ |
+| 5 | `src/App.vue` | keep-alive 保留 `FollowView`（与列表页保持一致） | ✅ |
 | 6 | — | `pnpm run build` 构建验证 | ✅ |
 
 ## 参考代码

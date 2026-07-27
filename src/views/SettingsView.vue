@@ -139,6 +139,7 @@ async function handlePasteCredentials() {
 .settings-view {
   min-height: 100vh;
   background: #f7f8fa;
+  padding-bottom: 50px;
 }
 .status-group {
   margin: 12px;

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 defineOptions({ name: 'FollowView' })
-import { ref, reactive, onMounted, onBeforeUnmount } from 'vue'
+import { ref, reactive, onMounted, onDeactivated } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import { api } from '@/api/request'
@@ -32,7 +32,7 @@ onMounted(async () => {
   skeletonLoading.value = false
 })
 
-onBeforeUnmount(() => {
+onDeactivated(() => {
   sessionStorage.setItem('scrollPos_SettingsFollow', String(window.scrollY))
 })
 
