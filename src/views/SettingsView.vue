@@ -124,6 +124,9 @@ async function handlePasteCredentials() {
       <van-cell title="足迹" is-link @click="router.push('/history')">
         <template #right-icon><van-icon name="arrow" /></template>
       </van-cell>
+      <van-cell title="关注" is-link @click="router.push('/settings/follow')">
+        <template #right-icon><van-icon name="arrow" /></template>
+      </van-cell>
     </van-cell-group>
 
     <van-dialog v-model:show="showDialog" title="配置镜像源" @confirm="saveConfig" show-cancel-button>

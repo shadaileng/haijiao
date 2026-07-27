@@ -32,10 +32,9 @@ const routes = [
     component: () => import('@/views/UserView.vue'),
   },
   {
-    path: '/follow/:userId?',
-    name: 'Follow',
+    path: '/settings/follow',
+    name: 'SettingsFollow',
     component: () => import('@/views/FollowView.vue'),
-    meta: { showTabBar: true },
   },
   {
     path: '/search',

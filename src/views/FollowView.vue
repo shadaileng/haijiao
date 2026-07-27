@@ -1,12 +1,14 @@
 <script setup lang="ts">
 defineOptions({ name: 'FollowView' })
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, onBeforeUnmount } from 'vue'
+import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import { api } from '@/api/request'
 import { useSettingsStore } from '@/stores/settings'
 import type { FollowUser } from '@/types'
 import { LOADING_URL } from '@/utils/constant'
 
+const router = useRouter()
 const settings = useSettingsStore()
 const loading = ref(false)
 const skeletonLoading = ref(true)
@@ -30,6 +32,10 @@ onMounted(async () => {
   skeletonLoading.value = false
 })
 
+onBeforeUnmount(() => {
+  sessionStorage.setItem('scrollPos_SettingsFollow', String(window.scrollY))
+})
+
 const usernameFilter = () => {
   items.splice(
     0,
@@ -40,6 +46,7 @@ const usernameFilter = () => {
 </script>
 
 <template>
+  <van-nav-bar title="关注" left-arrow @click-left="router.push('/settings')" />
   <van-search
     v-model="username"
     @search="usernameFilter"

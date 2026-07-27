@@ -89,6 +89,7 @@ export default defineConfig({
         { text: '足迹功能方案', link: '/plans/19-足迹功能方案/' },
         { text: '后台请求静默异常修复方案', link: '/plans/20-后台请求静默异常修复方案/' },
         { text: '首页 Tab 系统实现方案', link: '/plans/21-首页Tab系统实现方案/' },
+        { text: '关注页迁移配置子页面', link: '/plans/22-关注页迁移配置子页面/' },
       ],
       '/references/': [
         { text: 'API 参考', link: '/references/01-API 参考/' },

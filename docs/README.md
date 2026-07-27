@@ -29,7 +29,8 @@ docs/
 │   ├── 18-帖子1742505视频播放调试方案.md
 │   ├── 19-足迹功能方案.md
 │   ├── 20-后台请求静默异常修复方案.md
-│   └── 21-首页Tab系统实现方案.md
+│   ├── 21-首页Tab系统实现方案.md
+│   └── 22-关注页迁移配置子页面.md
 ├── architecture/                    # 架构类（持续维护）
 │   └── 01-架构概览.md
 ├── references/                      # 参考类（持续维护）
@@ -73,6 +74,7 @@ docs/
 | `19-足迹功能方案.md` | v1.1.0 | 方案 | `plans/` | 设置页足迹入口 + 独立页面用户/帖子浏览记录 | 🚧 |
 | `20-后台请求静默异常修复方案.md` | v1.2.0 | 方案 | `plans/` | API 调用静默异常处理、用户错误提示、unhandled rejection 防护、视频加载失败关闭模态框 | 🏁 |
 | `21-首页Tab系统实现方案.md` | v1.2.0 | 方案 | `plans/` | HotTopicsView 添加 Tab 切换，对齐原版首页 tab 系统，每个 Tab 独立缓存数据与滚动位置 | 🏁 |
+| `22-关注页迁移配置子页面.md` | v1.0.0 | 方案 | `plans/` | 将 FollowView 从 TabBar 迁移为 /settings 子页面 | 🏁 |
 | `01-架构概览.md` | v1.1.0 | 架构 | `architecture/` | 系统架构与请求链路 | 🏁 |
 | `01-API 参考.md` | v1.1.0 | 参考 | `references/` | 所有 API 端点定义 | 🏁 |
 | `02-数据字典.md` | v1.1.0 | 参考 | `references/` | 核心类型定义 | 🏁 |
@@ -394,6 +396,17 @@ docs/
 | 4 | `src/api/request.ts` | `api` 对象新增 `tabTopics` 方法 | ✅ |
 | 5 | `src/views/HotTopicsView.vue` | 重构：`topicsMap`/`pageMap`/`totalMap`/`scrollMap` 四映射 + `van-tabs` + 单个 Topics + `onTabChange` 保存/恢复滚动 | ✅ |
 | 6 | — | `pnpm run build` 类型检查 + 构建验证 | ✅ |
+
+### 22-关注页迁移配置子页面
+
+| 步骤 | 文件 | 操作 | 状态 |
+|:----:|:-----|:-----|:----:|
+| 1 | `src/router/index.ts` | 新增 `/settings/follow` 路由，移除旧 `/follow` 路由 | ✅ |
+| 2 | `src/components/common/TabBar.vue` | 移除 `follow` tab | ✅ |
+| 3 | `src/views/SettingsView.vue` | 新增「关注」cell 入口 | ✅ |
+| 4 | `src/views/FollowView.vue` | 添加 nav-bar + 滚动保存 | ✅ |
+| 5 | `src/App.vue` | keep-alive 移除 `FollowView` | ✅ |
+| 6 | — | `pnpm run build` 构建验证 | ✅ |
 
 ## 参考代码
 
