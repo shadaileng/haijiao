@@ -5,15 +5,16 @@
 > | 项目 | 内容 |
 > |------|------|
 > | 文档编号 | 03 |
-> | 文档版本 | v1.0.0 |
+> | 文档版本 | v1.1.0 |
 > | 文档状态 | 🏁 已完成 |
-> | 最后更新 | 2026-07-13 |
+> | 最后更新 | 2026-07-27 |
 > | 对应内容 | docs/reference/origin 目录下 app.js 与 chunk-vendors.js 的深度剖析 |
 >
 > **变更历史**
 >
 > | 日期 | 版本 | 说明 |
 > |------|:----:|------|
+> | 2026-07-27 | v1.1.0 | 补充首页 Tab 系统（s[t] 端点映射表） |
 > | 2026-07-13 | v1.0.0 | 初版 |
 >
 > **关联文档**：[01-架构概览.md](../architecture/01-架构概览.md)、[01-API 参考.md](./01-API%20参考.md)、[02-数据字典.md](./02-数据字典.md)
@@ -349,6 +350,26 @@ interface RelationState {
 | `B` (signOut) | `/login/signout` | GET | 登出 |
 | `r` (rank) | `/ranking/rank` | GET | 排行榜 |
 | `s` (quantify) | `/topic/quantify` | GET | 定量帖子 |
+
+**首页 Tab 系统**（`app.js:4924-4932`）— 通过函数 `c(e)` 根据 `e.type` 选择端点加载列表：
+
+```javascript
+let s = {
+  0: "/topic/hot/topics",                       // 🔥 热门（默认）
+  1: "/topic/node/news",                        // 📰 最新
+  2: "/topic/node/topics?type=1&nodeId=258",    // 指定板块（如"美女"）
+  3: "/topic/node/topics?type=7",               // 精华
+  4: "/topic/node/topics?type=3&nodeId=0",      // 悬赏
+  5: "/topic/node/topics?type=0&nodeId=14",     // 其他板块
+  6: "/topic/node/topics?type=1&nodeId=0"       // 全部
+}
+```
+
+调用方式：`c({ type: n, page: 1, limit: 20 })`，默认 `type=0`（热门）。
+
+另外还有两个独立列表入口：
+- `l()` → `/topic/foot/topics`（当前用户关注的帖子动态）
+- `d` (globalTopics) → `/topic/global/topics`（全站帖子，不分板块）
 
 #### 2.5.4 VIP/商城模块（81ee）
 

@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.27.0] - 2026-07-27
+
+### Added
+
+- 首页新增 Tab 系统（热门/最新/全部），对齐原版首页 tab 系统
+  - `src/api/request.ts`：新增 `TAB_CONFIG` 映射表、`getTabTopics()`、`api.tabTopics()`
+  - `src/views/HotTopicsView.vue`：重构为 van-tabs，每个 Tab 独立 `topicsMap`/`pageMap`/`totalMap`/`scrollMap`
+  - CSS `position: sticky` 吸顶（替代 Vant JS sticky 以避免切换竞态）
+  - Tab 切换保留数据和滚动位置，仅在首次访问时请求
+
 ## [1.26.1] - 2026-07-25
 
 ### Fixed

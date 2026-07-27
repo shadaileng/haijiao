@@ -157,6 +157,17 @@ export async function getTopicWithVideo(topicId: string | number): Promise<any> 
   return data
 }
 
+export const TAB_CONFIG: Record<number, { url: string; label: string }> = {
+  0: { url: '/topic/hot/topics',                    label: '热门' },
+  1: { url: '/topic/node/news',                     label: '最新' },
+  2: { url: '/topic/node/topics?type=1&nodeId=0',   label: '全部' },
+}
+
+export async function getTabTopics(tabIndex: number, page: number, limit = 20): Promise<any> {
+  const cfg = TAB_CONFIG[tabIndex] || TAB_CONFIG[0]
+  return request({ url: cfg.url, params: { page, limit } })
+}
+
 export async function getHotTopics(page: number, limit = 20): Promise<any> {
   return request({ url: '/topic/hot/topics', params: { page, limit } })
 }
@@ -235,6 +246,7 @@ export async function login(params: LoginParams): Promise<LoginResponse> {
 export interface Api {
   topic(params: { params: { topicId: string | number } }): Promise<ApiResult>
   hot(params: { params: { page: number; limit?: number } }): Promise<ApiResult>
+  tabTopics(params: { params: { tabIndex: number; page: number; limit?: number } }): Promise<ApiResult>
   search(params: { params: { key: string; page: number; node_id?: number } }): Promise<ApiResult>
   tags(params?: { params?: any }): Promise<ApiResult>
   follow(): Promise<ApiResult>
@@ -259,6 +271,14 @@ export const api: Api = {
   async hot({ params }: { params: { page: number; limit?: number } }) {
     try {
       const data = await getHotTopics(params.page, params.limit)
+      return { success: true, data }
+    } catch (e: any) {
+      return { success: false, message: e.message }
+    }
+  },
+  async tabTopics({ params }: { params: { tabIndex: number; page: number; limit?: number } }) {
+    try {
+      const data = await getTabTopics(params.tabIndex, params.page, params.limit)
       return { success: true, data }
     } catch (e: any) {
       return { success: false, message: e.message }

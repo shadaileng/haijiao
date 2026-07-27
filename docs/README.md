@@ -28,7 +28,8 @@ docs/
 │   ├── 17-用户主页缓存闪现修复方案.md
 │   ├── 18-帖子1742505视频播放调试方案.md
 │   ├── 19-足迹功能方案.md
-│   └── 20-后台请求静默异常修复方案.md
+│   ├── 20-后台请求静默异常修复方案.md
+│   └── 21-首页Tab系统实现方案.md
 ├── architecture/                    # 架构类（持续维护）
 │   └── 01-架构概览.md
 ├── references/                      # 参考类（持续维护）
@@ -71,10 +72,11 @@ docs/
 | `18-帖子1742505视频播放调试方案.md` | v3.0.0 | 方案 | `plans/` | 帖子 1742505 视频无法播放调试 | 🏁 |
 | `19-足迹功能方案.md` | v1.1.0 | 方案 | `plans/` | 设置页足迹入口 + 独立页面用户/帖子浏览记录 | 🚧 |
 | `20-后台请求静默异常修复方案.md` | v1.2.0 | 方案 | `plans/` | API 调用静默异常处理、用户错误提示、unhandled rejection 防护、视频加载失败关闭模态框 | 🏁 |
+| `21-首页Tab系统实现方案.md` | v1.2.0 | 方案 | `plans/` | HotTopicsView 添加 Tab 切换，对齐原版首页 tab 系统，每个 Tab 独立缓存数据与滚动位置 | 🏁 |
 | `01-架构概览.md` | v1.1.0 | 架构 | `architecture/` | 系统架构与请求链路 | 🏁 |
 | `01-API 参考.md` | v1.1.0 | 参考 | `references/` | 所有 API 端点定义 | 🏁 |
 | `02-数据字典.md` | v1.1.0 | 参考 | `references/` | 核心类型定义 | 🏁 |
-| `03-Origin 代码剖析.md` | v1.0.0 | 参考 | `references/` | origin/app.js 与 chunk-vendors.js 深度剖析 | 🏁 |
+| `03-Origin 代码剖析.md` | v1.1.0 | 参考 | `references/` | origin/app.js 与 chunk-vendors.js 深度剖析 | 🏁 |
 | `01-开发指南.md` | v1.1.0 | 指南 | `guides/` | 开发、构建、部署指引 | 🏁 |
 | `02-用户手册.md` | v1.1.0 | 手册 | `guides/` | 功能使用说明 | 🏁 |
 | `03-E2E代理踩坑排查.md` | v1.0.0 | 指南 | `guides/` | Vite 6 + http-proxy-3 动态代理踩坑记录 | 🏁 |
@@ -381,6 +383,17 @@ docs/
 | 8 | `src/plugins/content.ts` | 视频加载失败关闭模态背景 | ✅ |
 | 9 | — | 构建验证 | ✅ |
 | 10 | `docs/` | 文档同步 | ✅ |
+
+### 21-首页 Tab 系统实现方案
+
+| 步骤 | 文件 | 操作 | 状态 |
+|:----:|:-----|:-----|:----:|
+| 1 | `src/api/request.ts` | 新增 `TAB_CONFIG` 映射表 | ✅ |
+| 2 | `src/api/request.ts` | 新增 `getTabTopics()` 导出函数 | ✅ |
+| 3 | `src/api/request.ts` | `Api` 接口新增 `tabTopics` | ✅ |
+| 4 | `src/api/request.ts` | `api` 对象新增 `tabTopics` 方法 | ✅ |
+| 5 | `src/views/HotTopicsView.vue` | 重构：`topicsMap`/`pageMap`/`totalMap`/`scrollMap` 四映射 + `van-tabs` + 单个 Topics + `onTabChange` 保存/恢复滚动 | ✅ |
+| 6 | — | `pnpm run build` 类型检查 + 构建验证 | ✅ |
 
 ## 参考代码
 
