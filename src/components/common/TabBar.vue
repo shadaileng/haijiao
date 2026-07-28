@@ -15,6 +15,7 @@ const active = ref('hot')
 
 const tabs = ref<TabItem[]>([
   { name: 'hot', icon: 'home-o', to: '/hot', label: '主页' },
+  { name: 'node', icon: 'category', to: '/node', label: '板块' },
   { name: 'search', icon: 'search', to: '/search', label: '搜索' },
 
   { name: 'settings', icon: 'setting-o', to: '/settings', label: '配置' },

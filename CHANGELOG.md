@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.27.1] - 2026-07-27
+
+### Added
+
+- 新增「板块」Tab 入口与 NodeView + NodeTopicsView 两级视图
+  - `src/types/index.ts`：补充 `NodePage` 类型定义
+  - `src/api/request.ts`：新增 `getNodes()` / `getNodeTopics()` 及 `api.nodes()` / `api.nodeTopics()`
+  - `src/views/NodeView.vue`：板块列表页（网格卡片布局）
+  - `src/views/NodeTopicsView.vue`：指定板块帖子列表页（复用 Topics 组件）
+  - `src/router/index.ts`：新增 `/node` 与 `/node/:nodeId` 路由
+  - `src/components/common/TabBar.vue`：新增「板块」tab 项（icon: category）
+
 ## [1.27.0] - 2026-07-27
 
 ### Added

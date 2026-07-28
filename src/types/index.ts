@@ -73,6 +73,11 @@ export interface Node {
   icon: string
 }
 
+export interface NodePage {
+  results: Node[]
+  page: Page
+}
+
 export interface Attachment {
   id: number
   remoteUrl: string

@@ -12,6 +12,18 @@ const routes = [
     meta: { showTabBar: true },
   },
   {
+    path: '/node',
+    name: 'Node',
+    component: () => import('@/views/NodeView.vue'),
+    meta: { showTabBar: true },
+  },
+  {
+    path: '/node/:nodeId',
+    name: 'NodeTopics',
+    component: () => import('@/views/NodeTopicsView.vue'),
+    meta: { showTabBar: true },
+  },
+  {
     path: '/login',
     name: 'Login',
     component: () => import('@/views/LoginView.vue'),

@@ -197,6 +197,19 @@ export async function getTags(params?: Record<string, any>): Promise<any> {
   return request({ url: '/tag/tags', params })
 }
 
+export async function getNodes(): Promise<any> {
+  return request({ url: '/tag/tags' })
+}
+
+export async function getNodeTopics(
+  nodeId: number,
+  page: number,
+  type = 2,
+  limit = 20
+): Promise<any> {
+  return request({ url: '/topic/node/topics', params: { nodeId, type, page, limit } })
+}
+
 export async function getUserInfo(uid: string | number): Promise<any> {
   return request({ url: `/user/info/${uid}` })
 }
@@ -249,6 +262,8 @@ export interface Api {
   tabTopics(params: { params: { tabIndex: number; page: number; limit?: number } }): Promise<ApiResult>
   search(params: { params: { key: string; page: number; node_id?: number } }): Promise<ApiResult>
   tags(params?: { params?: any }): Promise<ApiResult>
+  nodes(): Promise<ApiResult>
+  nodeTopics(params: { params: { nodeId: number; page: number; type?: number; limit?: number } }): Promise<ApiResult>
   follow(): Promise<ApiResult>
   topics(params: { params: { userId: string; page: number; type: number } }): Promise<ApiResult>
   userinfo(params: { uid: string | number }): Promise<ApiResult>
@@ -295,6 +310,22 @@ export const api: Api = {
   async tags({ params }: { params?: any } = {}) {
     try {
       const data = await getTags(params)
+      return { success: true, data }
+    } catch (e: any) {
+      return { success: false, message: e.message }
+    }
+  },
+  async nodes() {
+    try {
+      const data = await getNodes()
+      return { success: true, data }
+    } catch (e: any) {
+      return { success: false, message: e.message }
+    }
+  },
+  async nodeTopics({ params }: { params: { nodeId: number; page: number; type?: number; limit?: number } }) {
+    try {
+      const data = await getNodeTopics(params.nodeId, params.page, params.type, params.limit)
       return { success: true, data }
     } catch (e: any) {
       return { success: false, message: e.message }
