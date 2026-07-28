@@ -30,21 +30,53 @@ const goToNode = (nodeId: string) => {
 </script>
 
 <template>
+  <van-nav-bar title="板块" />
   <van-skeleton title avatar :row="3" :loading="loading">
     <van-empty v-if="nodes.length === 0" description="暂无板块数据" />
-    <van-grid v-else :column-num="3" :border="false" :gutter="10" class="node-grid">
-      <van-grid-item
+    <div v-else class="node-list">
+      <div
         v-for="node in nodes"
         :key="node.nodeId"
-        :text="node.name"
+        class="node-item"
         @click="goToNode(node.nodeId)"
-      />
-    </van-grid>
+      >
+        <van-image
+          v-if="node.icon"
+          width="2rem"
+          height="2rem"
+          fit="contain"
+          :src="node.icon"
+          class="node-icon"
+        />
+        <van-icon v-else name="apps-o" size="1.5rem" color="#969799" class="node-icon" />
+        <span class="node-name">{{ node.name }}</span>
+        <van-icon name="arrow" size="0.8rem" color="#c8c9cc" />
+      </div>
+    </div>
   </van-skeleton>
 </template>
 
 <style scoped>
-.node-grid {
-  padding: 12px;
+.node-list {
+  padding: 0 12px;
+}
+.node-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f5f5f5;
+  cursor: pointer;
+}
+.node-item:active {
+  background: #f8f8f8;
+}
+.node-icon {
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+.node-name {
+  flex: 1;
+  font-size: 14px;
+  color: #323233;
 }
 </style>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 defineOptions({ name: 'NodeTopicsView' })
-import { ref, reactive, onActivated } from 'vue'
+import { ref, reactive, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import { api } from '@/api/request'
@@ -40,9 +40,16 @@ const loadPage = async (page: number) => {
   loading.value = false
 }
 
-onActivated(() => {
+onMounted(() => {
   nodeId.value = Number(route.params.nodeId)
   loadPage(1)
+})
+
+watch(() => route.params.nodeId, (newId) => {
+  if (newId) {
+    nodeId.value = Number(newId)
+    loadPage(1)
+  }
 })
 </script>
 
