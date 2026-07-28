@@ -12,11 +12,11 @@ test.describe('板块页面', () => {
     })
   })
 
-  test('板块列表页加载并显示列表', async ({ page }) => {
+  test('板块列表页加载并显示网格', async ({ page }) => {
     await page.goto('/node')
-    await page.waitForSelector('.node-list', { timeout: 15000 })
+    await page.waitForSelector('.van-grid', { timeout: 15000 })
     await page.screenshot({ path: 'test-results/node-list.png', fullPage: true })
-    const items = page.locator('.node-item')
+    const items = page.locator('.van-grid-item')
     const count = await items.count()
     console.log(`板块数量: ${count}`)
     expect(count).toBeGreaterThan(0)
@@ -24,8 +24,8 @@ test.describe('板块页面', () => {
 
   test('点击板块跳转到帖子列表', async ({ page }) => {
     await page.goto('/node')
-    await page.waitForSelector('.node-list', { timeout: 15000 })
-    const firstItem = page.locator('.node-item').first()
+    await page.waitForSelector('.van-grid', { timeout: 15000 })
+    const firstItem = page.locator('.van-grid-item').first()
     await firstItem.click()
     await page.waitForURL(/\/node\/\d+/, { timeout: 10000 })
     await page.screenshot({ path: 'test-results/node-topics.png', fullPage: true })
