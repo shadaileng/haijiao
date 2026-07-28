@@ -21,7 +21,7 @@ const routes = [
     path: '/node/:nodeId',
     name: 'NodeTopics',
     component: () => import('@/views/NodeTopicsView.vue'),
-    meta: { showTabBar: true },
+    meta: {},
   },
   {
     path: '/login',
