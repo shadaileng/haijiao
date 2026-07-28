@@ -30,7 +30,8 @@ docs/
 │   ├── 19-足迹功能方案.md
 │   ├── 20-后台请求静默异常修复方案.md
 │   ├── 21-首页Tab系统实现方案.md
-│   └── 22-关注页迁移配置子页面.md
+│   ├── 22-关注页迁移配置子页面.md
+│   └── 23-板块页面实施方案.md
 ├── architecture/                    # 架构类（持续维护）
 │   └── 01-架构概览.md
 ├── references/                      # 参考类（持续维护）
@@ -75,6 +76,7 @@ docs/
 | `20-后台请求静默异常修复方案.md` | v1.2.0 | 方案 | `plans/` | API 调用静默异常处理、用户错误提示、unhandled rejection 防护、视频加载失败关闭模态框 | 🏁 |
 | `21-首页Tab系统实现方案.md` | v1.2.0 | 方案 | `plans/` | HotTopicsView 添加 Tab 切换，对齐原版首页 tab 系统，每个 Tab 独立缓存数据与滚动位置 | 🏁 |
 | `22-关注页迁移配置子页面.md` | v1.0.0 | 方案 | `plans/` | 将 FollowView 从 TabBar 迁移为 /settings 子页面 | 🏁 |
+| `23-板块页面实施方案.md` | v1.2.0 | 方案 | `plans/` | 新增板块导航入口，支持列表页与专题页两级视图 | 🏁 |
 | `01-架构概览.md` | v1.1.0 | 架构 | `architecture/` | 系统架构与请求链路 | 🏁 |
 | `01-API 参考.md` | v1.1.0 | 参考 | `references/` | 所有 API 端点定义 | 🏁 |
 | `02-数据字典.md` | v1.1.0 | 参考 | `references/` | 核心类型定义 | 🏁 |
@@ -407,6 +409,18 @@ docs/
 | 4 | `src/views/FollowView.vue` | 添加 nav-bar + 滚动保存 | ✅ |
 | 5 | `src/App.vue` | keep-alive 保留 `FollowView`（与列表页保持一致） | ✅ |
 | 6 | — | `pnpm run build` 构建验证 | ✅ |
+
+### 23-板块页面实施方案
+
+| 步骤 | 文件 | 操作 | 状态 |
+|:----:|:-----|:-----|:----:|
+| 1 | `src/types/index.ts` | 补充 `NodePage` 类型定义 | ⬜ |
+| 2 | `src/api/request.ts` | 新增 `getNodes()` / `getNodeTopics()` + API 注册 | ⬜ |
+| 3 | `src/views/NodeView.vue` | 新建板块列表页组件 | ⬜ |
+| 4 | `src/views/NodeTopicsView.vue` | 新建板块帖子列表页组件 | ⬜ |
+| 5 | `src/router/index.ts` | 新增 `/node` 与 `/node/:nodeId` 路由 | ⬜ |
+| 6 | `src/components/common/TabBar.vue` | 新增「板块」tab 项 | ⬜ |
+| 7 | — | `pnpm run build` 构建验证 | ⬜ |
 
 ## 参考代码
 
