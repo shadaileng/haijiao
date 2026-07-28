@@ -198,7 +198,7 @@ export async function getTags(params?: Record<string, any>): Promise<any> {
 }
 
 export async function getNodes(): Promise<any> {
-  return request({ url: '/topic/node' })
+  return request({ url: '/topic/nodes_by_ver/v2', params: { ver: 0 } })
 }
 
 export async function getNodeTopics(

@@ -12,10 +12,12 @@ const nodes = reactive<Node[]>([])
 onMounted(async () => {
   const result = await api.nodes()
   if (result.success && result.data) {
-    const list = Array.isArray(result.data) ? result.data : (result.data.results || [])
+    const list = Array.isArray(result.data)
+      ? result.data
+      : (result.data.list || result.data.results || [])
     nodes.splice(0, nodes.length, ...list.map((item: any) => ({
-      nodeId: String(item.nodeId || item.id),
-      name: item.nodeName || item.name || item.tagName,
+      nodeId: String(item.nodeId),
+      name: item.name,
       icon: item.icon || '',
     })))
   }
