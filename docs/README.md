@@ -76,7 +76,7 @@ docs/
 | `20-后台请求静默异常修复方案.md` | v1.2.0 | 方案 | `plans/` | API 调用静默异常处理、用户错误提示、unhandled rejection 防护、视频加载失败关闭模态框 | 🏁 |
 | `21-首页Tab系统实现方案.md` | v1.2.0 | 方案 | `plans/` | HotTopicsView 添加 Tab 切换，对齐原版首页 tab 系统，每个 Tab 独立缓存数据与滚动位置 | 🏁 |
 | `22-关注页迁移配置子页面.md` | v1.0.0 | 方案 | `plans/` | 将 FollowView 从 TabBar 迁移为 /settings 子页面 | 🏁 |
-| `23-板块页面实施方案.md` | v1.2.0 | 方案 | `plans/` | 新增板块导航入口，支持列表页与专题页两级视图 | 🏁 |
+| `23-板块页面实施方案.md` | v1.6.0 | 方案 | `plans/` | 新增板块导航入口，支持列表页与专题页两级视图 | 🏁 |
 | `01-架构概览.md` | v1.1.0 | 架构 | `architecture/` | 系统架构与请求链路 | 🏁 |
 | `01-API 参考.md` | v1.1.0 | 参考 | `references/` | 所有 API 端点定义 | 🏁 |
 | `02-数据字典.md` | v1.1.0 | 参考 | `references/` | 核心类型定义 | 🏁 |
@@ -414,13 +414,23 @@ docs/
 
 | 步骤 | 文件 | 操作 | 状态 |
 |:----:|:-----|:-----|:----:|
-| 1 | `src/types/index.ts` | 补充 `NodePage` 类型定义 | ⬜ |
-| 2 | `src/api/request.ts` | 新增 `getNodes()` / `getNodeTopics()` + API 注册 | ⬜ |
-| 3 | `src/views/NodeView.vue` | 新建板块列表页组件 | ⬜ |
-| 4 | `src/views/NodeTopicsView.vue` | 新建板块帖子列表页组件 | ⬜ |
-| 5 | `src/router/index.ts` | 新增 `/node` 与 `/node/:nodeId` 路由 | ⬜ |
-| 6 | `src/components/common/TabBar.vue` | 新增「板块」tab 项 | ⬜ |
-| 7 | — | `pnpm run build` 构建验证 | ⬜ |
+| 1 | `src/types/index.ts` | 补充 `NodePage` 类型定义 | ✅ |
+| 2 | `src/api/request.ts` | 新增 `getNodes()` / `getNodeTopics()` + API 注册 | ✅ |
+| 3 | `src/views/NodeView.vue` | 新建板块列表页组件 | ✅ |
+| 4 | `src/views/NodeTopicsView.vue` | 新建板块帖子列表页组件 | ✅ |
+| 5 | `src/router/index.ts` | 新增 `/node` 与 `/node/:nodeId` 路由 | ✅ |
+| 6 | `src/components/common/TabBar.vue` | 新增「板块」tab 项 | ✅ |
+| 7 | — | `pnpm run build` 构建验证 | ✅ |
+| 8 | `src/api/request.ts` | `getNodes()` URL 改为 `/topic/nodes_by_ver/v2?ver=0` | ✅ |
+| 9 | `src/views/NodeView.vue` | 参考首页样式：sticky 标题 + 窗口滚动 + sessionStorage 滚动位置记忆 | ✅ |
+| 10 | `src/views/NodeTopicsView.vue` | onActivated→onMounted 修复加载问题 | ✅ |
+| 11 | `src/router/index.ts` | NodeTopics 路由隐藏 TabBar；scrollBehavior 优先读 sessionStorage | ✅ |
+| 12 | `src/App.vue` | keep-alive include 加入 `'NodeView'` | ✅ |
+| 13 | `e2e/node.spec.ts` | Playwright 端到端测试 | ✅ |
+| 14 | `e2e/node-keepalive.spec.ts` | keep-alive 缓存 + 滚动位置记忆测试 | ✅ |
+| 15 | `src/App.vue` | keep-alive include 加入 `'NodeTopicsView'` | ✅ |
+| 16 | `src/views/NodeTopicsView.vue` | keep-alive 缓存 + 滚动位置记忆（onBeforeRouteLeave + setTimeout） | ✅ |
+| 17 | `e2e/node-topics-keepalive.spec.ts` | NodeTopicsView keep-alive + 滚动位置恢复测试 | ✅ |
 
 ## 参考代码
 
