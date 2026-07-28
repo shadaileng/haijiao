@@ -89,14 +89,15 @@ const router = createRouter({
   history: createWebHistory(),
   routes,
   scrollBehavior(to, _from, savedPosition) {
+    // 优先从 sessionStorage 恢复 keep-alive 组件的滚动位置
+    const scrollKey = `scrollPos_${String(to.name)}`
+    const saved = sessionStorage.getItem(scrollKey)
+    if (saved) {
+      sessionStorage.removeItem(scrollKey)
+      return { top: parseInt(saved) }
+    }
     if (savedPosition) {
       return savedPosition
-    }
-    const key = `scrollPos_${to.name as string}`
-    const savedPos = sessionStorage.getItem(key)
-    if (savedPos) {
-      sessionStorage.removeItem(key)
-      return { top: parseInt(savedPos) }
     }
     return { top: 0 }
   },

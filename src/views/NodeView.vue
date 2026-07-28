@@ -1,6 +1,6 @@
 <script setup lang="ts">
 defineOptions({ name: 'NodeView' })
-import { ref, reactive, onMounted, onDeactivated, onActivated } from 'vue'
+import { ref, reactive, onMounted, onActivated, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { api } from '@/api/request'
 import type { Node } from '@/types'
@@ -8,9 +8,13 @@ import type { Node } from '@/types'
 const router = useRouter()
 const loading = ref(true)
 const nodes = reactive<Node[]>([])
-const scrollRef = ref<HTMLElement | null>(null)
+
+let savedScrollY = 0
+
+function captureScroll() { savedScrollY = window.scrollY }
 
 onMounted(async () => {
+  window.addEventListener('scroll', captureScroll, { capture: true, passive: true })
   const result = await api.nodes()
   if (result.success && result.data) {
     const list = Array.isArray(result.data)
@@ -26,34 +30,28 @@ onMounted(async () => {
 })
 
 const goToNode = (nodeId: string) => {
+  sessionStorage.setItem('scrollPos_Node', String(savedScrollY))
   router.push(`/node/${nodeId}`)
 }
 
 onActivated(() => {
-  const el = scrollRef.value
-  if (el) {
-    const saved = sessionStorage.getItem('scrollPos_Node')
-    if (saved) {
-      el.scrollTop = parseInt(saved)
-      sessionStorage.removeItem('scrollPos_Node')
-    }
-  }
-})
-
-onDeactivated(() => {
-  const el = scrollRef.value
-  if (el) {
-    sessionStorage.setItem('scrollPos_Node', String(el.scrollTop))
-  }
+  window.addEventListener('scroll', captureScroll, { capture: true, passive: true })
+  const saved = Number(sessionStorage.getItem('scrollPos_Node') || '0')
+  sessionStorage.removeItem('scrollPos_Node')
+  nextTick(() => {
+    if (saved > 0) window.scrollTo(0, saved)
+  })
 })
 </script>
 
 <template>
-  <van-nav-bar title="板块" />
-  <van-skeleton title avatar :row="3" :loading="loading">
-    <van-empty v-if="nodes.length === 0" description="暂无板块数据" />
-    <div v-else ref="scrollRef" class="node-scroll">
-      <van-grid :column-num="3" :border="false" :gutter="10" class="node-grid">
+  <div class="node-container">
+    <div class="node-header-sticky">
+      <van-nav-bar title="板块" />
+    </div>
+    <van-skeleton title avatar :row="3" :loading="loading">
+      <van-empty v-if="nodes.length === 0" description="暂无板块数据" />
+      <van-grid v-else :column-num="3" :border="false" :gutter="10" class="node-grid">
         <van-grid-item
           v-for="node in nodes"
           :key="node.nodeId"
@@ -72,14 +70,17 @@ onDeactivated(() => {
           </template>
         </van-grid-item>
       </van-grid>
-    </div>
-  </van-skeleton>
+    </van-skeleton>
+  </div>
 </template>
 
 <style scoped>
-.node-scroll {
-  height: calc(100vh - 46px - 50px);
-  overflow-y: auto;
+.node-container {}
+.node-header-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 99;
+  background: #fff;
 }
 .node-grid {
   padding: 12px 0;
