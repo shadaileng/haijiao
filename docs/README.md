@@ -32,7 +32,8 @@ docs/
 │   ├── 21-首页Tab系统实现方案.md
 │   ├── 22-关注页迁移配置子页面.md
 │   ├── 23-板块页面实施方案.md
-│   └── 24-帖子详情页内容区布局修复方案.md
+│   ├── 24-帖子详情页内容区布局修复方案.md
+│   └── 25-帖子收藏功能方案.md
 ├── architecture/                    # 架构类（持续维护）
 │   └── 01-架构概览.md
 ├── references/                      # 参考类（持续维护）
@@ -79,6 +80,7 @@ docs/
 | `22-关注页迁移配置子页面.md` | v1.0.0 | 方案 | `plans/` | 将 FollowView 从 TabBar 迁移为 /settings 子页面 | 🏁 |
 | `23-板块页面实施方案.md` | v1.6.0 | 方案 | `plans/` | 新增板块导航入口，支持列表页与专题页两级视图 | 🏁 |
 | `24-帖子详情页内容区布局修复方案.md` | v1.0.0 | 方案 | `plans/` | 帖子详情页 `.content` 在 flex 容器中宽度塌陷修复 | 🏁 |
+| `25-帖子收藏功能方案.md` | v1.0.0 | 方案 | `plans/` | 帖子收藏/取消收藏、收藏列表查看、设置页入口 | 📋 |
 | `01-架构概览.md` | v1.1.0 | 架构 | `architecture/` | 系统架构与请求链路 | 🏁 |
 | `01-API 参考.md` | v1.1.0 | 参考 | `references/` | 所有 API 端点定义 | 🏁 |
 | `02-数据字典.md` | v1.1.0 | 参考 | `references/` | 核心类型定义 | 🏁 |
@@ -443,6 +445,19 @@ docs/
 | 3 | `TopicContent.vue` 添加 `width: 100%` | ✅ |
 | 4 | 修复 `topic-debug-full.spec.ts` 测试 bug | ✅ |
 | 5 | 测试验证通过 | ✅ |
+
+### 25-帖子收藏功能方案
+
+| 步骤 | 文件 | 操作 | 状态 |
+|:----:|:-----|:-----|:----:|
+| 1 | `src/types/index.ts` | `Topic` 新增 `isFavorite` 字段 | ⬜ |
+| 2 | `src/api/request.ts` | 新增 `addFavorite` / `delFavorite` / `getFavoriteTopics` + Api 接口 + api 对象 | ⬜ |
+| 3 | `src/views/TopicView.vue` | 添加收藏按钮 + 交互逻辑 | ⬜ |
+| 4 | `src/views/FavoritesView.vue` | 新建收藏列表页 | ⬜ |
+| 5 | `src/router/index.ts` | 新增 `/favorites` 路由 | ⬜ |
+| 6 | `src/views/SettingsView.vue` | 添加"收藏"入口 cell | ⬜ |
+| 7 | — | `pnpm run build` 构建验证 | ⬜ |
+| 8 | `docs/README.md` | 文档同步 | ⬜ |
 
 ## 参考代码
 
