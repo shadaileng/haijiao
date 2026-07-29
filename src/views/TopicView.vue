@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, nextTick } from 'vue'
+import { ref, watch, nextTick, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { showToast } from 'vant'
 import { api } from '@/api/request'
@@ -33,6 +33,7 @@ const defaultTopic = (): Topic => ({
 })
 
 const topicLocal = ref<Topic>(defaultTopic())
+const defaultFolderId = ref<number | undefined>()
 
 const onClickLeft = () => safeBack()
 
@@ -75,7 +76,7 @@ const toggleFavorite = async () => {
       showToast(resp.message || '操作失败')
     }
   } else {
-    const resp = await api.addFavorite({ params: { topicId: tid } })
+    const resp = await api.addFavorite({ params: { topicId: tid, folderId: defaultFolderId.value } })
     if (resp.success) {
       topicLocal.value.isFavorite = true
       showToast('已收藏')
@@ -84,6 +85,13 @@ const toggleFavorite = async () => {
     }
   }
 }
+
+onMounted(async () => {
+  const resp = await api.favoriteFolders()
+  if (resp.success && Array.isArray(resp.data) && resp.data.length > 0) {
+    defaultFolderId.value = resp.data[0].id
+  }
+})
 
 watch(() => route.params.pid, async (newPid) => {
   if (newPid) {

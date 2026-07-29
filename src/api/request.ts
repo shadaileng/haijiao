@@ -226,13 +226,15 @@ export async function getCurrentUser(): Promise<any> {
 }
 
 // 收藏帖子
-export async function addFavorite(topicId: string | number): Promise<any> {
-  return request({ url: '/favorite/add', params: { entityId: topicId, entityType: 'topic' } })
+export async function addFavorite(topicId: string | number, folderId?: number): Promise<any> {
+  const params: Record<string, any> = { entityType: 'topic', entityId: topicId }
+  if (folderId !== undefined) params.folderId = folderId
+  return request({ url: '/favorite/v2/add', params })
 }
 
 // 取消收藏
 export async function delFavorite(topicId: string | number): Promise<any> {
-  return request({ url: '/favorite/delete', params: { entityId: topicId, entityType: 'topic' } })
+  return request({ url: '/favorite/v2/delete', params: { entityType: 'topic', entityIds: topicId } })
 }
 
 // 检查帖子是否已收藏
@@ -304,7 +306,7 @@ export interface Api {
   current(): Promise<ApiResult>
   login(params: LoginParams): Promise<ApiResult>
   videoLines(params: { attachmentId: string | number }): Promise<ApiResult>
-  addFavorite(params: { params: { topicId: string | number } }): Promise<ApiResult>
+  addFavorite(params: { params: { topicId: string | number; folderId?: number } }): Promise<ApiResult>
   delFavorite(params: { params: { topicId: string | number } }): Promise<ApiResult>
   checkFavorite(params: { params: { topicId: string | number } }): Promise<ApiResult>
   favoriteFolders(): Promise<ApiResult>
@@ -425,9 +427,9 @@ export const api: Api = {
       return { success: false, message: e.message }
     }
   },
-  async addFavorite({ params }: { params: { topicId: string | number } }) {
+  async addFavorite({ params }: { params: { topicId: string | number; folderId?: number } }) {
     try {
-      const data = await addFavorite(params.topicId)
+      const data = await addFavorite(params.topicId, params.folderId)
       return { success: true, data }
     } catch (e: any) {
       return { success: false, message: e.message }
