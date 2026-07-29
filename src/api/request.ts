@@ -240,9 +240,22 @@ export async function checkFavorite(topicId: string | number): Promise<any> {
   return request({ url: '/favorite/favorite', params: { entityId: topicId, entityType: 'topic' } })
 }
 
-// 收藏列表（分页）
-export async function getFavoriteTopics(page: number, limit = 20): Promise<any> {
-  return request({ url: '/favorite/favorite', params: { page, limit, entityType: 'topic' } })
+// 收藏夹列表
+export async function getFavoriteFolders(): Promise<any> {
+  return request({ url: '/favorite/v2/folderList', params: {} })
+}
+
+// 收藏夹内帖子列表（分页）
+export async function getFavoriteTopics(
+  page: number,
+  limit = 20,
+  folderId?: number,
+  total?: number
+): Promise<any> {
+  const params: Record<string, any> = { page, limit }
+  if (folderId !== undefined) params.folderId = folderId
+  if (total !== undefined) params.total = total
+  return request({ url: '/favorite/v2/topics', params })
 }
 
 export async function login(params: LoginParams): Promise<LoginResponse> {
@@ -294,7 +307,8 @@ export interface Api {
   addFavorite(params: { params: { topicId: string | number } }): Promise<ApiResult>
   delFavorite(params: { params: { topicId: string | number } }): Promise<ApiResult>
   checkFavorite(params: { params: { topicId: string | number } }): Promise<ApiResult>
-  favoriteTopics(params: { params: { page: number; limit?: number } }): Promise<ApiResult>
+  favoriteFolders(): Promise<ApiResult>
+  favoriteTopics(params: { params: { page: number; limit?: number; folderId?: number; total?: number } }): Promise<ApiResult>
 }
 
 // 统一 API 对象，所有视图直接 import 使用
@@ -435,9 +449,17 @@ export const api: Api = {
       return { success: false, message: e.message }
     }
   },
-  async favoriteTopics({ params }: { params: { page: number; limit?: number } }) {
+  async favoriteFolders() {
     try {
-      const data = await getFavoriteTopics(params.page, params.limit)
+      const data = await getFavoriteFolders()
+      return { success: true, data }
+    } catch (e: any) {
+      return { success: false, message: e.message }
+    }
+  },
+  async favoriteTopics({ params }: { params: { page: number; limit?: number; folderId?: number; total?: number } }) {
+    try {
+      const data = await getFavoriteTopics(params.page, params.limit, params.folderId, params.total)
       return { success: true, data }
     } catch (e: any) {
       return { success: false, message: e.message }
