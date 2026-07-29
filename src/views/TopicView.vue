@@ -10,11 +10,13 @@ import UserMeta from '@/components/UserMeta.vue'
 import { useSafeBack } from '@/utils/navigation'
 import { useHistoryStore } from '@/stores/history'
 import { useSettingsStore } from '@/stores/settings'
+import { useClipboard } from '@/composables/useClipboard'
 
 const route = useRoute()
 const safeBack = useSafeBack()
 const historyStore = useHistoryStore()
 const settings = useSettingsStore()
+const { copy } = useClipboard()
 
 const pid = ref((route.params.pid as string) || '')
 const commentDivider = ref<HTMLElement>()
@@ -103,6 +105,17 @@ const onFolderSelect = async (folder: { id: number; name: string }) => {
   await doAddFavorite(pendingTopicId.value, folder.id)
 }
 
+const handleShare = async () => {
+  const url = `${window.location.origin}/topic/${topicLocal.value.topicId}`
+  const text = `${topicLocal.value.title}\n\n${url}\n\n来自「海角助手」`
+  const ok = await copy(text)
+  if (ok) {
+    showToast('链接已复制')
+  } else {
+    showToast('复制失败')
+  }
+}
+
 onMounted(async () => {
   const resp = await api.favoriteFolders()
   if (resp.success && Array.isArray(resp.data) && resp.data.length > 0) {
@@ -150,6 +163,9 @@ const onCommentLoaded = () => {
       </van-col>
       <van-col span="6" class="hv-topic-state" @click="toggleFavorite">
         <van-icon :name="topicLocal.isFavorite ? 'star' : 'star-o'" :class="{ 'favorite-active': topicLocal.isFavorite }" />
+      </van-col>
+      <van-col span="6" class="hv-topic-state" @click="handleShare">
+        <van-icon name="share" />
       </van-col>
     </van-row>
     <van-row class="hv-box-padding">
