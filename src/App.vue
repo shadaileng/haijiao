@@ -46,7 +46,7 @@ watch(() => overlay.show, (val) => {
 <template>
   <div class="app-container">
     <RouterView v-slot="{ Component }">
-      <keep-alive :include="['HotTopicsView', 'SearchView', 'UserHomeView', 'FollowView', 'NodeView', 'NodeTopicsView']">
+      <keep-alive :include="['HotTopicsView', 'SearchView', 'UserHomeView', 'FollowView', 'NodeView', 'NodeTopicsView', 'FavoritesView']">
         <component :is="Component" />
       </keep-alive>
     </RouterView>

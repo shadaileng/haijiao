@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, nextTick, onActivated, onDeactivated } from 'vue'
+import { showToast } from 'vant'
 import { api } from '@/api/request'
-import Topics from '@/components/Topics.vue'
 import type { LiteTopic } from '@/types'
+import Topics from '@/components/Topics.vue'
 import { useSafeBack } from '@/utils/navigation'
 
 defineOptions({ name: 'FavoritesView' })
@@ -18,49 +19,71 @@ interface Folder {
 }
 
 const folders = ref<Folder[]>([])
-const selectedFolder = ref<Folder | null>(null)
-const topics = ref<LiteTopic[]>([])
+const activeFolderIndex = ref(0)
+const topicsMap: Record<number, LiteTopic[]> = {}
+const pageMap: Record<number, number> = {}
+const totalMap: Record<number, number> = {}
+const scrollMap: Record<number, number> = {}
 const loading = ref(true)
-const pageIndex = ref(1)
-const totalItems = ref(0)
 const pageSize = 20
+const loaded = ref(false)
 
 const loadFolders = async () => {
-  loading.value = true
   const resp = await api.favoriteFolders()
-  if (resp.success && resp.data) {
-    folders.value = resp.data as Folder[]
-    // 默认选中第一个收藏夹
-    if (folders.value.length > 0 && !selectedFolder.value) {
-      selectFolder(folders.value[0])
-    } else {
-      loading.value = false
-    }
-  } else {
-    loading.value = false
+  if (resp.success && Array.isArray(resp.data) && resp.data.length > 0) {
+    folders.value = resp.data
+    return true
   }
-}
-
-const selectFolder = async (folder: Folder) => {
-  selectedFolder.value = folder
-  await loadPage(1)
+  loading.value = false
+  return false
 }
 
 const loadPage = async (page: number) => {
-  if (!selectedFolder.value) return
+  const folder = folders.value[activeFolderIndex.value]
+  if (!folder) return
   loading.value = true
   const resp = await api.favoriteTopics({
-    params: { page, limit: pageSize, folderId: selectedFolder.value.id, total: selectedFolder.value.count }
+    params: { page, limit: pageSize, folderId: folder.id, total: folder.count }
   })
   if (resp.success && resp.data) {
-    topics.value = resp.data.results || []
-    totalItems.value = resp.data.page?.total || 0
-    pageIndex.value = page
+    const tab = activeFolderIndex.value
+    topicsMap[tab] = resp.data.results || []
+    pageMap[tab] = page
+    totalMap[tab] = resp.data.page?.total || 0
+  } else {
+    showToast(resp.message || '加载失败')
   }
   loading.value = false
 }
 
-onMounted(() => loadFolders())
+const onFolderChange = (newIndex: number) => {
+  scrollMap[activeFolderIndex.value] = window.scrollY
+  activeFolderIndex.value = newIndex
+  if (!topicsMap[newIndex]) {
+    loadPage(1)
+  } else {
+    nextTick(() => {
+      window.scrollTo({ top: scrollMap[newIndex] || 0 })
+    })
+  }
+}
+
+onActivated(async () => {
+  if (!loaded.value) {
+    const ok = await loadFolders()
+    if (ok) {
+      loaded.value = true
+      await loadPage(1)
+    }
+  }
+  nextTick(() => {
+    window.scrollTo({ top: scrollMap[activeFolderIndex.value] || 0 })
+  })
+})
+
+onDeactivated(() => {
+  scrollMap[activeFolderIndex.value] = window.scrollY
+})
 
 const onPageChange = (p: number) => loadPage(p)
 </script>
@@ -69,26 +92,18 @@ const onPageChange = (p: number) => loadPage(p)
   <div class="favorites-view">
     <van-nav-bar title="我的收藏" left-arrow @click-left="safeBack" :fixed="true" :placeholder="true" />
 
-    <!-- 收藏夹选择 -->
-    <div v-if="folders.length > 1" class="folder-tabs">
-      <div
-        v-for="folder in folders"
-        :key="folder.id"
-        class="folder-tab"
-        :class="{ active: selectedFolder?.id === folder.id }"
-        @click="selectFolder(folder)"
-      >
-        {{ folder.name }} ({{ folder.count }})
-      </div>
+    <div v-if="folders.length > 1" class="folder-tabs-sticky">
+      <van-tabs v-model:active="activeFolderIndex" @change="onFolderChange">
+        <van-tab v-for="folder in folders" :key="folder.id" :title="`${folder.name} (${folder.count})`" />
+      </van-tabs>
     </div>
 
-    <!-- 帖子列表 -->
     <Topics
-      :topics="topics"
+      :topics="topicsMap[activeFolderIndex] || []"
       :skeleton-loading="loading"
       mode="pagination"
-      :page-index="pageIndex"
-      :total-items="totalItems"
+      :page-index="pageMap[activeFolderIndex] || 1"
+      :total-items="totalMap[activeFolderIndex] || 0"
       :page-size="pageSize"
       @page-change="onPageChange"
     />
@@ -101,26 +116,10 @@ const onPageChange = (p: number) => loadPage(p)
   background: #f7f8fa;
 }
 
-.folder-tabs {
-  display: flex;
-  gap: 8px;
-  padding: 12px 16px;
-  overflow-x: auto;
+.folder-tabs-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 99;
   background: #fff;
-}
-
-.folder-tab {
-  flex-shrink: 0;
-  padding: 6px 12px;
-  border-radius: 16px;
-  font-size: 13px;
-  background: #f7f8fa;
-  color: #666;
-  cursor: pointer;
-}
-
-.folder-tab.active {
-  background: #07c160;
-  color: #fff;
 }
 </style>
