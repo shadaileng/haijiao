@@ -34,6 +34,9 @@ const defaultTopic = (): Topic => ({
 
 const topicLocal = ref<Topic>(defaultTopic())
 const defaultFolderId = ref<number | undefined>()
+const folders = ref<{ id: number; name: string; count: number }[]>([])
+const showFolderPicker = ref(false)
+const pendingTopicId = ref<string | number>(0)
 
 const onClickLeft = () => safeBack()
 
@@ -76,19 +79,34 @@ const toggleFavorite = async () => {
       showToast(resp.message || '操作失败')
     }
   } else {
-    const resp = await api.addFavorite({ params: { topicId: tid, folderId: defaultFolderId.value } })
-    if (resp.success) {
-      topicLocal.value.isFavorite = true
-      showToast('已收藏')
+    if (folders.value.length <= 1) {
+      await doAddFavorite(tid, defaultFolderId.value)
     } else {
-      showToast(resp.message || '操作失败')
+      pendingTopicId.value = tid
+      showFolderPicker.value = true
     }
   }
+}
+
+const doAddFavorite = async (topicId: string | number, folderId?: number) => {
+  const resp = await api.addFavorite({ params: { topicId, folderId } })
+  if (resp.success) {
+    topicLocal.value.isFavorite = true
+    showToast('已收藏')
+  } else {
+    showToast(resp.message || '操作失败')
+  }
+}
+
+const onFolderSelect = async (folder: { id: number; name: string }) => {
+  showFolderPicker.value = false
+  await doAddFavorite(pendingTopicId.value, folder.id)
 }
 
 onMounted(async () => {
   const resp = await api.favoriteFolders()
   if (resp.success && Array.isArray(resp.data) && resp.data.length > 0) {
+    folders.value = resp.data
     defaultFolderId.value = resp.data[0].id
   }
 })
@@ -156,6 +174,15 @@ const onCommentLoaded = () => {
   <div ref="commentDivider"></div>
   <van-divider :hairline="false">评论</van-divider>
   <Comment v-if="topicLocal.topicId" :key="topicLocal.topicId" :topicId="topicLocal.topicId" @loaded="onCommentLoaded" />
+
+  <!-- 收藏夹选择弹窗 -->
+  <van-action-sheet
+    v-model:show="showFolderPicker"
+    title="选择收藏夹"
+    :actions="folders.map(f => ({ name: `${f.name} (${f.count})`, value: f.id }))"
+    @select="(action: any) => onFolderSelect({ id: action.value, name: action.name })"
+    cancel-text="取消"
+  />
 </template>
 
 <style scoped>
