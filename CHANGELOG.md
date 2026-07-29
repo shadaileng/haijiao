@@ -17,6 +17,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 帖子详情页统计栏布局修复
   - `src/views/TopicView.vue`：统计栏从 `van-row`/`van-col` 改为 flex `space-around` 布局，5 项不再换行且均匀分布
 
+### Changed
+
+- 文档部署到 GitHub Pages
+  - `docs/.vitepress/config.ts`：添加 `base: '/haijiao/'`
+  - `.github/workflows/docs.yml`：新增自动构建部署工作流
+
 ## [1.30.0] - 2026-07-29
 
 ### Added

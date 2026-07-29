@@ -21,6 +21,7 @@ export default defineConfig({
   lang: 'zh-CN',
   title: '海角助手文档',
   description: '海角助手 Web 应用项目文档',
+  base: '/haijiao/',
   srcExclude: ['reference/**'],
   cleanUrls: true,
   ignoreDeadLinks: true,
