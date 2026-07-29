@@ -107,7 +107,9 @@ const onFolderSelect = async (folder: { id: number; name: string }) => {
 
 const handleShare = async () => {
   const url = `${window.location.origin}/topic/${topicLocal.value.topicId}`
-  const text = `${topicLocal.value.title}\n\n${url}\n\n来自「海角助手」`
+  const author = topicLocal.value.user?.nickname || ''
+  const time = topicLocal.value.createTime || ''
+  const text = `${topicLocal.value.title}\n\n作者：${author}\n发布时间：${time}\n\n${url}\n\n来自「海角助手」`
   const ok = await copy(text)
   if (ok) {
     showToast('链接已复制')
