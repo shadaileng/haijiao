@@ -11,9 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - 帖子收藏功能
   - `src/types/index.ts`：`Topic` 新增 `isFavorite` 字段
-  - `src/api/request.ts`：新增 `addFavorite()` / `delFavorite()` / `checkFavorite()` / `getFavoriteTopics()`，API 参数使用 `entityId`（Playwright 调试原站确认）
-  - `src/views/TopicView.vue`：操作栏新增收藏按钮（star/star-o），加载时通过 `checkFavorite` 初始化收藏状态
-  - `src/views/FavoritesView.vue`：新建收藏列表页（复用 Topics 组件分页展示）
+  - `src/api/request.ts`：新增 `addFavorite()` / `delFavorite()` / `checkFavorite()` / `getFavoriteFolders()` / `getFavoriteTopics()`，使用 v2 收藏 API（`/favorite/v2/add`、`/favorite/v2/delete`、`/favorite/v2/folderList`、`/favorite/v2/topics`）
+  - `src/views/TopicView.vue`：操作栏新增收藏按钮，多收藏夹时弹出 ActionSheet 选择收藏夹
+  - `src/views/FavoritesView.vue`：新建收藏列表页，支持多收藏夹 tab 切换
   - `src/router/index.ts`：新增 `/favorites` 路由
   - `src/views/SettingsView.vue`：设置页新增"收藏"入口
   - `e2e/favorite.spec.ts`：Playwright E2E 测试（收藏按钮渲染、状态切换、API 调用验证、入口可见性）
