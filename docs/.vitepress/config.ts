@@ -91,6 +91,7 @@ export default defineConfig({
         { text: '首页 Tab 系统实现方案', link: '/plans/21-首页Tab系统实现方案/' },
         { text: '关注页迁移配置子页面', link: '/plans/22-关注页迁移配置子页面/' },
         { text: '板块页面实施方案', link: '/plans/23-板块页面实施方案/' },
+        { text: '帖子详情页内容区布局修复方案', link: '/plans/24-帖子详情页内容区布局修复方案/' },
       ],
       '/references/': [
         { text: 'API 参考', link: '/references/01-API 参考/' },

@@ -29,6 +29,7 @@ const handleClick = inject('overlay') as (data: any) => void
 
 <style scoped>
 .content {
+  width: 100%;
   overflow: auto;
   text-align: left;
   font-size: 1.2rem;

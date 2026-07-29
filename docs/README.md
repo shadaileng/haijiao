@@ -31,7 +31,8 @@ docs/
 │   ├── 20-后台请求静默异常修复方案.md
 │   ├── 21-首页Tab系统实现方案.md
 │   ├── 22-关注页迁移配置子页面.md
-│   └── 23-板块页面实施方案.md
+│   ├── 23-板块页面实施方案.md
+│   └── 24-帖子详情页内容区布局修复方案.md
 ├── architecture/                    # 架构类（持续维护）
 │   └── 01-架构概览.md
 ├── references/                      # 参考类（持续维护）
@@ -77,6 +78,7 @@ docs/
 | `21-首页Tab系统实现方案.md` | v1.2.0 | 方案 | `plans/` | HotTopicsView 添加 Tab 切换，对齐原版首页 tab 系统，每个 Tab 独立缓存数据与滚动位置 | 🏁 |
 | `22-关注页迁移配置子页面.md` | v1.0.0 | 方案 | `plans/` | 将 FollowView 从 TabBar 迁移为 /settings 子页面 | 🏁 |
 | `23-板块页面实施方案.md` | v1.6.0 | 方案 | `plans/` | 新增板块导航入口，支持列表页与专题页两级视图 | 🏁 |
+| `24-帖子详情页内容区布局修复方案.md` | v1.0.0 | 方案 | `plans/` | 帖子详情页 `.content` 在 flex 容器中宽度塌陷修复 | 🏁 |
 | `01-架构概览.md` | v1.1.0 | 架构 | `architecture/` | 系统架构与请求链路 | 🏁 |
 | `01-API 参考.md` | v1.1.0 | 参考 | `references/` | 所有 API 端点定义 | 🏁 |
 | `02-数据字典.md` | v1.1.0 | 参考 | `references/` | 核心类型定义 | 🏁 |
@@ -431,6 +433,16 @@ docs/
 | 15 | `src/App.vue` | keep-alive include 加入 `'NodeTopicsView'` | ✅ |
 | 16 | `src/views/NodeTopicsView.vue` | keep-alive 缓存 + 滚动位置记忆（onBeforeRouteLeave + setTimeout） | ✅ |
 | 17 | `e2e/node-topics-keepalive.spec.ts` | NodeTopicsView keep-alive + 滚动位置恢复测试 | ✅ |
+
+### 24-帖子详情页内容区布局修复方案
+
+| 步骤 | 任务 | 状态 |
+|:---:|------|:----:|
+| 1 | Playwright 调试收集 DOM 布局信息 | ✅ |
+| 2 | 定位根因：`.content` flex 宽度塌陷 | ✅ |
+| 3 | `TopicContent.vue` 添加 `width: 100%` | ✅ |
+| 4 | 修复 `topic-debug-full.spec.ts` 测试 bug | ✅ |
+| 5 | 测试验证通过 | ✅ |
 
 ## 参考代码
 
