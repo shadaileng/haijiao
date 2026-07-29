@@ -151,23 +151,23 @@ const onCommentLoaded = () => {
     <van-row justify="space-between">
       <van-col span="24" class="hv-title hv-box-padding-lt">{{ topicLocal.title }}</van-col>
     </van-row>
-    <van-row justify="space-between" class="hv-box-padding-lt">
-      <van-col span="6" class="hv-topic-state">
+    <div class="hv-stats-row hv-box-padding-lt">
+      <span class="hv-topic-state">
         <van-tag plain type="primary">{{ topicLocal.node?.name }}</van-tag>
-      </van-col>
-      <van-col span="6" class="hv-topic-state">
+      </span>
+      <span class="hv-topic-state">
         <van-icon name="chat-o" />{{ topicLocal.commentCount }}
-      </van-col>
-      <van-col span="6" class="hv-topic-state">
+      </span>
+      <span class="hv-topic-state">
         <van-icon name="good-job" />{{ topicLocal.likeCount }}
-      </van-col>
-      <van-col span="6" class="hv-topic-state" @click="toggleFavorite">
+      </span>
+      <span class="hv-topic-state hv-pointer" @click="toggleFavorite">
         <van-icon :name="topicLocal.isFavorite ? 'star' : 'star-o'" :class="{ 'favorite-active': topicLocal.isFavorite }" />
-      </van-col>
-      <van-col span="6" class="hv-topic-state" @click="handleShare">
+      </span>
+      <span class="hv-topic-state hv-pointer" @click="handleShare">
         <van-icon name="share" />
-      </van-col>
-    </van-row>
+      </span>
+    </div>
     <van-row class="hv-box-padding">
       <UserMeta
         :avatar="topicLocal.user?.avatar || ''"
@@ -202,6 +202,13 @@ const onCommentLoaded = () => {
 </template>
 
 <style scoped>
+.hv-stats-row {
+  display: flex;
+  align-items: center;
+  gap: 1.2em;
+  padding: 6px 0;
+  flex-wrap: nowrap;
+}
 .favorite-active {
   color: #ffc107;
 }
