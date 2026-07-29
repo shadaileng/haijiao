@@ -10,7 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - 帖子详情页一键分享功能
-  - `src/views/TopicView.vue`：统计行新增分享按钮，点击复制标题+链接+来源文案到剪贴板
+  - `src/views/TopicView.vue`：统计行新增分享按钮，点击复制标题+作者+发布时间+链接+来源文案到剪贴板
+
+### Fixed
+
+- 帖子详情页统计栏布局修复
+  - `src/views/TopicView.vue`：统计栏从 `van-row`/`van-col` 改为 flex `space-around` 布局，5 项不再换行且均匀分布
 
 ## [1.30.0] - 2026-07-29
 
