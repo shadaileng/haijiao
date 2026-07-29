@@ -125,6 +125,7 @@ export interface Topic {
   commentCount: number
   doors: DoorData[]
   sale?: SaleData
+  isFavorite?: boolean
 }
 
 export interface LiteTopic extends Topic {

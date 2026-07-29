@@ -225,6 +225,21 @@ export async function getCurrentUser(): Promise<any> {
   })
 }
 
+// 收藏帖子
+export async function addFavorite(topicId: string | number): Promise<any> {
+  return request({ url: '/favorite/add', params: { topicId, entityType: 'topic' } })
+}
+
+// 取消收藏
+export async function delFavorite(topicId: string | number): Promise<any> {
+  return request({ url: '/favorite/delete', params: { topicId, entityType: 'topic' } })
+}
+
+// 收藏列表（分页）
+export async function getFavoriteTopics(page: number, limit = 20): Promise<any> {
+  return request({ url: '/favorite/favorite', params: { page, limit } })
+}
+
 export async function login(params: LoginParams): Promise<LoginResponse> {
   const sign = md5(params.username + params.password + navigator.userAgent)
   const response = await fetch('/api/login/signin', {
@@ -271,6 +286,9 @@ export interface Api {
   current(): Promise<ApiResult>
   login(params: LoginParams): Promise<ApiResult>
   videoLines(params: { attachmentId: string | number }): Promise<ApiResult>
+  addFavorite(params: { params: { topicId: string | number } }): Promise<ApiResult>
+  delFavorite(params: { params: { topicId: string | number } }): Promise<ApiResult>
+  favoriteTopics(params: { params: { page: number; limit?: number } }): Promise<ApiResult>
 }
 
 // 统一 API 对象，所有视图直接 import 使用
@@ -382,6 +400,30 @@ export const api: Api = {
   async videoLines({ attachmentId }: { attachmentId: string | number }) {
     try {
       const data = await getVideoLines(attachmentId)
+      return { success: true, data }
+    } catch (e: any) {
+      return { success: false, message: e.message }
+    }
+  },
+  async addFavorite({ params }: { params: { topicId: string | number } }) {
+    try {
+      const data = await addFavorite(params.topicId)
+      return { success: true, data }
+    } catch (e: any) {
+      return { success: false, message: e.message }
+    }
+  },
+  async delFavorite({ params }: { params: { topicId: string | number } }) {
+    try {
+      const data = await delFavorite(params.topicId)
+      return { success: true, data }
+    } catch (e: any) {
+      return { success: false, message: e.message }
+    }
+  },
+  async favoriteTopics({ params }: { params: { page: number; limit?: number } }) {
+    try {
+      const data = await getFavoriteTopics(params.page, params.limit)
       return { success: true, data }
     } catch (e: any) {
       return { success: false, message: e.message }

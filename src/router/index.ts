@@ -70,6 +70,11 @@ const routes = [
     name: 'History',
     component: () => import('@/views/HistoryView.vue'),
   },
+  {
+    path: '/favorites',
+    name: 'Favorites',
+    component: () => import('@/views/FavoritesView.vue'),
+  },
 ]
 
 const publicPages = ['Login', 'Settings', 'ImageViewer', 'History']

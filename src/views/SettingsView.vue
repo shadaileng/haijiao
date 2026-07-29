@@ -121,6 +121,9 @@ async function handlePasteCredentials() {
     </van-cell-group>
 
     <van-cell-group inset class="history-group">
+      <van-cell title="收藏" is-link @click="router.push('/favorites')">
+        <template #right-icon><van-icon name="arrow" /></template>
+      </van-cell>
       <van-cell title="足迹" is-link @click="router.push('/history')">
         <template #right-icon><van-icon name="arrow" /></template>
       </van-cell>

@@ -9,10 +9,12 @@ import TopicContent from '@/components/TopicContent.vue'
 import UserMeta from '@/components/UserMeta.vue'
 import { useSafeBack } from '@/utils/navigation'
 import { useHistoryStore } from '@/stores/history'
+import { useSettingsStore } from '@/stores/settings'
 
 const route = useRoute()
 const safeBack = useSafeBack()
 const historyStore = useHistoryStore()
+const settings = useSettingsStore()
 
 const pid = ref((route.params.pid as string) || '')
 const commentDivider = ref<HTMLElement>()
@@ -51,6 +53,31 @@ const loadTopic = async (topicPid: string) => {
   loading.value = false
 }
 
+const toggleFavorite = async () => {
+  if (!settings.isLoggedIn) {
+    showToast('请先登录')
+    return
+  }
+  const tid = topicLocal.value.topicId
+  if (topicLocal.value.isFavorite) {
+    const resp = await api.delFavorite({ params: { topicId: tid } })
+    if (resp.success) {
+      topicLocal.value.isFavorite = false
+      showToast('已取消收藏')
+    } else {
+      showToast(resp.message || '操作失败')
+    }
+  } else {
+    const resp = await api.addFavorite({ params: { topicId: tid } })
+    if (resp.success) {
+      topicLocal.value.isFavorite = true
+      showToast('已收藏')
+    } else {
+      showToast(resp.message || '操作失败')
+    }
+  }
+}
+
 watch(() => route.params.pid, async (newPid) => {
   if (newPid) {
     pid.value = newPid as string
@@ -79,14 +106,17 @@ const onCommentLoaded = () => {
       <van-col span="24" class="hv-title hv-box-padding-lt">{{ topicLocal.title }}</van-col>
     </van-row>
     <van-row justify="space-between" class="hv-box-padding-lt">
-      <van-col span="8" class="hv-topic-state">
+      <van-col span="6" class="hv-topic-state">
         <van-tag plain type="primary">{{ topicLocal.node?.name }}</van-tag>
       </van-col>
-      <van-col span="8" class="hv-topic-state">
+      <van-col span="6" class="hv-topic-state">
         <van-icon name="chat-o" />{{ topicLocal.commentCount }}
       </van-col>
-      <van-col span="8" class="hv-topic-state">
+      <van-col span="6" class="hv-topic-state">
         <van-icon name="good-job" />{{ topicLocal.likeCount }}
+      </van-col>
+      <van-col span="6" class="hv-topic-state" @click="toggleFavorite">
+        <van-icon :name="topicLocal.isFavorite ? 'star' : 'star-o'" :class="{ 'favorite-active': topicLocal.isFavorite }" />
       </van-col>
     </van-row>
     <van-row class="hv-box-padding">
@@ -113,4 +143,8 @@ const onCommentLoaded = () => {
   <Comment v-if="topicLocal.topicId" :key="topicLocal.topicId" :topicId="topicLocal.topicId" @loaded="onCommentLoaded" />
 </template>
 
-<style scoped></style>
+<style scoped>
+.favorite-active {
+  color: #ffc107;
+}
+</style>
