@@ -51,6 +51,13 @@ const loadTopic = async (topicPid: string) => {
     historyStore.addRecord('topic', topicPid, topicLocal.value.title)
   }
   loading.value = false
+  // 检查收藏状态
+  if (settings.isLoggedIn) {
+    const favResp = await api.checkFavorite({ params: { topicId: topicPid } })
+    if (favResp.success && favResp.data) {
+      topicLocal.value.isFavorite = !!favResp.data.favorite
+    }
+  }
 }
 
 const toggleFavorite = async () => {

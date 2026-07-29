@@ -227,17 +227,22 @@ export async function getCurrentUser(): Promise<any> {
 
 // 收藏帖子
 export async function addFavorite(topicId: string | number): Promise<any> {
-  return request({ url: '/favorite/add', params: { topicId, entityType: 'topic' } })
+  return request({ url: '/favorite/add', params: { entityId: topicId, entityType: 'topic' } })
 }
 
 // 取消收藏
 export async function delFavorite(topicId: string | number): Promise<any> {
-  return request({ url: '/favorite/delete', params: { topicId, entityType: 'topic' } })
+  return request({ url: '/favorite/delete', params: { entityId: topicId, entityType: 'topic' } })
+}
+
+// 检查帖子是否已收藏
+export async function checkFavorite(topicId: string | number): Promise<any> {
+  return request({ url: '/favorite/favorite', params: { entityId: topicId, entityType: 'topic' } })
 }
 
 // 收藏列表（分页）
 export async function getFavoriteTopics(page: number, limit = 20): Promise<any> {
-  return request({ url: '/favorite/favorite', params: { page, limit } })
+  return request({ url: '/favorite/favorite', params: { page, limit, entityType: 'topic' } })
 }
 
 export async function login(params: LoginParams): Promise<LoginResponse> {
@@ -288,6 +293,7 @@ export interface Api {
   videoLines(params: { attachmentId: string | number }): Promise<ApiResult>
   addFavorite(params: { params: { topicId: string | number } }): Promise<ApiResult>
   delFavorite(params: { params: { topicId: string | number } }): Promise<ApiResult>
+  checkFavorite(params: { params: { topicId: string | number } }): Promise<ApiResult>
   favoriteTopics(params: { params: { page: number; limit?: number } }): Promise<ApiResult>
 }
 
@@ -416,6 +422,14 @@ export const api: Api = {
   async delFavorite({ params }: { params: { topicId: string | number } }) {
     try {
       const data = await delFavorite(params.topicId)
+      return { success: true, data }
+    } catch (e: any) {
+      return { success: false, message: e.message }
+    }
+  },
+  async checkFavorite({ params }: { params: { topicId: string | number } }) {
+    try {
+      const data = await checkFavorite(params.topicId)
       return { success: true, data }
     } catch (e: any) {
       return { success: false, message: e.message }
