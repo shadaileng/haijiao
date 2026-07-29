@@ -205,7 +205,7 @@ const onCommentLoaded = () => {
 .hv-stats-row {
   display: flex;
   align-items: center;
-  gap: 1.2em;
+  justify-content: space-around;
   padding: 6px 0;
   flex-wrap: nowrap;
 }
