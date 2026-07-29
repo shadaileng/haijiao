@@ -28,12 +28,11 @@
       </div>
     </div>
   </van-skeleton>
-  <van-pagination
+  <Pagination
     v-model="comments.page.index"
     :total-items="comments.page.total"
     :items-per-page="comments.page.size"
     v-if="comments.page.total > comments.page.size"
-    force-ellipses
     @change="(index: number) => loadComments(index, true)"
   />
 </template>
@@ -45,6 +44,7 @@ import { api } from '@/api/request'
 import UserMeta from '@/components/UserMeta.vue'
 import { showToast } from 'vant'
 import ReplyList from './ReplyList.vue'
+import Pagination from './Pagination.vue'
 
 const props = defineProps({
   topicId: {

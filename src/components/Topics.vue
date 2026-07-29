@@ -127,7 +127,7 @@
         </template>
       </van-cell>
       <div v-if="totalItems > pageSize" class="pagination-wrapper">
-        <van-pagination
+        <Pagination
           :model-value="pageIndex"
           :total-items="totalItems"
           :items-per-page="pageSize"
@@ -142,6 +142,7 @@
 import { LiteTopic } from '@/types'
 import { LOADING_URL } from '@/utils/constant'
 import { ref, type PropType } from 'vue'
+import Pagination from './Pagination.vue'
 
 const props = defineProps({
   topics: {

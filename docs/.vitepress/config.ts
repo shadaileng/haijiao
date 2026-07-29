@@ -93,6 +93,7 @@ export default defineConfig({
         { text: '板块页面实施方案', link: '/plans/23-板块页面实施方案/' },
         { text: '帖子详情页内容区布局修复方案', link: '/plans/24-帖子详情页内容区布局修复方案/' },
         { text: '帖子收藏功能方案', link: '/plans/25-帖子收藏功能方案/' },
+        { text: '分页按钮首尾页方案', link: '/plans/26-分页按钮首尾页方案/' },
       ],
       '/references/': [
         { text: 'API 参考', link: '/references/01-API 参考/' },
