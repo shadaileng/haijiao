@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.33.0] - 2026-07-31
+
+### Added
+
+- 设置页添加签到和金币/钻石余额显示功能
+  - `src/types/index.ts`：新增 `SignInResult`、`UserWealth` 类型定义
+  - `src/api/request.ts`：新增 `signIn()`、`wealth()` API 方法
+  - `src/views/SettingsView.vue`：新增钱包卡片（金币/钻石）和签到按钮
+
 ## [1.32.1] - 2026-07-31
 
 ### Fixed

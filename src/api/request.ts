@@ -1,7 +1,7 @@
 import { md5 } from 'js-md5'
 import { useSettingsStore } from '@/stores/settings'
 import { toCamelCase } from '@/utils/transform'
-import type { ApiResult, LoginParams, LoginResponse, VideoLine } from '@/types'
+import type { ApiResult, LoginParams, LoginResponse, VideoLine, SignInResult, UserWealth } from '@/types'
 import { showToast } from 'vant'
 
 function utf8Decode(binary: string): string {
@@ -311,6 +311,8 @@ export interface Api {
   checkFavorite(params: { params: { topicId: string | number } }): Promise<ApiResult>
   favoriteFolders(): Promise<ApiResult>
   favoriteTopics(params: { params: { page: number; limit?: number; folderId?: number; total?: number } }): Promise<ApiResult>
+  signIn(): Promise<ApiResult<SignInResult>>
+  wealth(): Promise<ApiResult<UserWealth>>
 }
 
 // 统一 API 对象，所有视图直接 import 使用
@@ -462,6 +464,22 @@ export const api: Api = {
   async favoriteTopics({ params }: { params: { page: number; limit?: number; folderId?: number; total?: number } }) {
     try {
       const data = await getFavoriteTopics(params.page, params.limit, params.folderId, params.total)
+      return { success: true, data }
+    } catch (e: any) {
+      return { success: false, message: e.message }
+    }
+  },
+  async signIn() {
+    try {
+      const data = await request<SignInResult>({ url: '/user/user_sign_in', method: 'POST' })
+      return { success: true, data }
+    } catch (e: any) {
+      return { success: false, message: e.message }
+    }
+  },
+  async wealth() {
+    try {
+      const data = await request<UserWealth>({ url: '/user/wealth' })
       return { success: true, data }
     } catch (e: any) {
       return { success: false, message: e.message }

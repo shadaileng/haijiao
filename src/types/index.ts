@@ -183,3 +183,13 @@ export interface LoginResponse {
   type: number
   vip_domain: string
 }
+
+export interface SignInResult {
+  gold: number
+  consecutiveDays?: number
+}
+
+export interface UserWealth {
+  gold: number
+  diamond: number
+}

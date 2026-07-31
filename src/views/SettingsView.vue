@@ -8,6 +8,8 @@ import { showSuccessToast, showDialog as showConfirmDialog, showToast } from 'va
 import UserInfo from '@/components/UserInfo.vue'
 import { useClipboard } from '@/composables/useClipboard'
 import { useSafeBack } from '@/utils/navigation'
+import { api } from '@/api/request'
+import type { UserWealth } from '@/types'
 const router = useRouter()
 const safeBack = useSafeBack()
 const settings = useSettingsStore()
@@ -18,12 +20,16 @@ const { copy } = useClipboard()
 const currentUser = ref<any>(null)
 const loadingUser = ref(settings.isLoggedIn)
 
+const wealth = ref<UserWealth>({ gold: 0, diamond: 0 })
+const signedIn = ref(false)
+const signInLoading = ref(false)
+
 onMounted(async () => {
   if (settings.isLoggedIn) {
     try {
-      await loadCurrentUser()
+      await Promise.all([loadCurrentUser(), loadWealth()])
     } catch (e) {
-      console.warn('load current user failed:', e)
+      console.warn('load data failed:', e)
     }
     loadingUser.value = false
   }
@@ -32,6 +38,32 @@ onMounted(async () => {
 const loadCurrentUser = async () => {
   const data = await userStore.fetchCurrent()
   if (data) currentUser.value = data
+}
+
+const loadWealth = async () => {
+  const resp = await api.wealth()
+  if (resp.success && resp.data) {
+    wealth.value = resp.data
+  }
+}
+
+const handleSignIn = async () => {
+  if (signInLoading.value || signedIn.value) return
+  signInLoading.value = true
+  try {
+    const resp = await api.signIn()
+    if (resp.success) {
+      signedIn.value = true
+      showToast('签到成功')
+      await loadWealth()
+    } else {
+      showToast(resp.message || '签到失败')
+    }
+  } catch (e) {
+    showToast('签到失败')
+  } finally {
+    signInLoading.value = false
+  }
 }
 
 function handleLogout() {
@@ -79,6 +111,33 @@ async function handlePasteCredentials() {
     <van-skeleton title avatar :row="3" :loading="loadingUser">
       <UserInfo v-if="currentUser" :userInfo="currentUser" />
     </van-skeleton>
+
+    <van-cell-group v-if="settings.isLoggedIn" inset class="wallet-group">
+      <van-cell title="我的钱包" />
+      <div class="wallet-content">
+        <div class="wallet-item">
+          <div class="wallet-label">金币</div>
+          <div class="wallet-value gold">{{ wealth.gold }}</div>
+        </div>
+        <div class="wallet-item">
+          <div class="wallet-label">钻石</div>
+          <div class="wallet-value diamond">{{ (wealth.diamond / 100).toFixed(2) }}</div>
+        </div>
+      </div>
+      <van-cell>
+        <template #title>
+          <van-button
+            type="primary"
+            size="small"
+            :loading="signInLoading"
+            :disabled="signedIn"
+            @click="handleSignIn"
+          >
+            {{ signedIn ? '已签到' : '立即签到' }}
+          </van-button>
+        </template>
+      </van-cell>
+    </van-cell-group>
 
     <van-cell-group inset class="status-group">
       <van-cell title="登录状态" :value="settings.isLoggedIn ? '已登录' : '未登录'">
@@ -162,5 +221,31 @@ async function handlePasteCredentials() {
 }
 .history-group {
   margin: 12px;
+}
+.wallet-group {
+  margin: 12px;
+}
+.wallet-content {
+  display: flex;
+  justify-content: space-around;
+  padding: 16px;
+}
+.wallet-item {
+  text-align: center;
+}
+.wallet-label {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 8px;
+}
+.wallet-value {
+  font-size: 24px;
+  font-weight: bold;
+}
+.wallet-value.gold {
+  color: #ff9900;
+}
+.wallet-value.diamond {
+  color: #00ccff;
 }
 </style>
