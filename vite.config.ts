@@ -9,6 +9,80 @@ function dynamicProxyPlugin() {
   const p2pPeers = new Map<string, { id: string; nickname: string; lastSeen: number }>()
   const PEER_TIMEOUT = 30 * 60 * 1000
 
+  function handleP2PLocal(req: any, res: any) {
+    let body = ''
+    req.on('data', (chunk: any) => { body += chunk })
+    req.on('end', () => {
+      const url = new URL(req.url, 'http://localhost')
+      const path = url.pathname.replace('/api/p2p', '')
+
+      console.log('[P2P] Request:', req.method, path)
+
+      try {
+        const data = body ? JSON.parse(body) : {}
+
+        if (path === '/register' && req.method === 'POST') {
+          const { peerId, nickname } = data
+          // 清理超时节点
+          const now = Date.now()
+          for (const [id, peer] of p2pPeers) {
+            if (now - peer.lastSeen > PEER_TIMEOUT) {
+              p2pPeers.delete(id)
+            }
+          }
+          // 返回其他节点列表
+          const peers = Array.from(p2pPeers.values())
+            .filter(p => p.id !== peerId)
+            .map(p => p.id)
+          // 添加当前节点
+          p2pPeers.set(peerId, {
+            id: peerId,
+            nickname: nickname || `设备 ${peerId.slice(0, 8)}`,
+            lastSeen: now,
+          })
+          console.log('[P2P] Register:', peerId, 'Peers:', peers)
+          res.writeHead(200, { 'Content-Type': 'application/json' })
+          res.end(JSON.stringify({ success: true, peers }))
+          return
+        }
+
+        if (path === '/unregister' && req.method === 'POST') {
+          const { peerId } = data
+          p2pPeers.delete(peerId)
+          console.log('[P2P] Unregister:', peerId)
+          res.writeHead(200, { 'Content-Type': 'application/json' })
+          res.end(JSON.stringify({ success: true }))
+          return
+        }
+
+        if (path === '/heartbeat' && req.method === 'POST') {
+          const { peerId, nickname } = data
+          const peer = p2pPeers.get(peerId)
+          if (peer) {
+            peer.lastSeen = Date.now()
+            if (nickname) peer.nickname = nickname
+          }
+          res.writeHead(200, { 'Content-Type': 'application/json' })
+          res.end(JSON.stringify({ success: true }))
+          return
+        }
+
+        // offer/answer/candidate 简单返回成功
+        if (['/offer', '/answer', '/candidate'].includes(path) && req.method === 'POST') {
+          res.writeHead(200, { 'Content-Type': 'application/json' })
+          res.end(JSON.stringify({ success: true }))
+          return
+        }
+
+        res.writeHead(404, { 'Content-Type': 'application/json' })
+        res.end(JSON.stringify({ success: false, message: 'Not found' }))
+      } catch (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json' })
+        res.end(JSON.stringify({ success: false, message: 'Internal error' }))
+      }
+    })
+  }
+
   return {
     name: 'dynamic-proxy',
     configureServer(server: any) {
@@ -75,76 +149,6 @@ function dynamicProxyPlugin() {
         })
         req.pipe(proxyReq)
       })
-
-      function handleP2PLocal(req: any, res: any) {
-        let body = ''
-        req.on('data', (chunk: any) => { body += chunk })
-        req.on('end', () => {
-          const url = new URL(req.url, 'http://localhost')
-          const path = url.pathname.replace('/api/p2p', '')
-
-          try {
-            const data = body ? JSON.parse(body) : {}
-
-            if (path === '/register' && req.method === 'POST') {
-              const { peerId, nickname } = data
-              // 清理超时节点
-              const now = Date.now()
-              for (const [id, peer] of p2pPeers) {
-                if (now - peer.lastSeen > PEER_TIMEOUT) {
-                  p2pPeers.delete(id)
-                }
-              }
-              // 返回其他节点列表
-              const peers = Array.from(p2pPeers.values())
-                .filter(p => p.id !== peerId)
-                .map(p => p.id)
-              // 添加当前节点
-              p2pPeers.set(peerId, {
-                id: peerId,
-                nickname: nickname || `设备 ${peerId.slice(0, 8)}`,
-                lastSeen: now,
-              })
-              res.writeHead(200, { 'Content-Type': 'application/json' })
-              res.end(JSON.stringify({ success: true, peers }))
-              return
-            }
-
-            if (path === '/unregister' && req.method === 'POST') {
-              const { peerId } = data
-              p2pPeers.delete(peerId)
-              res.writeHead(200, { 'Content-Type': 'application/json' })
-              res.end(JSON.stringify({ success: true }))
-              return
-            }
-
-            if (path === '/heartbeat' && req.method === 'POST') {
-              const { peerId, nickname } = data
-              const peer = p2pPeers.get(peerId)
-              if (peer) {
-                peer.lastSeen = Date.now()
-                if (nickname) peer.nickname = nickname
-              }
-              res.writeHead(200, { 'Content-Type': 'application/json' })
-              res.end(JSON.stringify({ success: true }))
-              return
-            }
-
-            // offer/answer/candidate 简单返回成功
-            if (['/offer', '/answer', '/candidate'].includes(path) && req.method === 'POST') {
-              res.writeHead(200, { 'Content-Type': 'application/json' })
-              res.end(JSON.stringify({ success: true }))
-              return
-            }
-
-            res.writeHead(404, { 'Content-Type': 'application/json' })
-            res.end(JSON.stringify({ success: false, message: 'Not found' }))
-          } catch (err) {
-            res.writeHead(500, { 'Content-Type': 'application/json' })
-            res.end(JSON.stringify({ success: false, message: 'Internal error' }))
-          }
-        })
-      }
     },
   }
 }
