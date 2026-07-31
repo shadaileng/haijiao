@@ -90,7 +90,7 @@ docs/
 | `27-帖子分享功能方案.md` | v1.1.0 | 方案 | `plans/` | 帖子详情页一键复制分享链接 | 🏁 |
 | `28-签到与金额显示方案.md` | v1.1.0 | 方案 | `plans/` | 设置页钱包余额显示 + 签到按钮 | 🏁 |
 | `29-关注功能方案.md` | v1.3.0 | 方案 | `plans/` | 用户主页关注按钮 + 关注列表取消关注 | 🏁 |
-| `30-设置页布局优化方案.md` | v1.3.0 | 方案 | `plans/` | 设置页布局优化：钱包内嵌用户信息、签到改 cell、收藏/足迹/关注上移、登录态显隐、精简登录/退出 cell、移除返回按钮、合并镜像源与数据来源 | 📋 |
+| `30-设置页布局优化方案.md` | v1.3.0 | 方案 | `plans/` | 设置页布局优化：钱包内嵌用户信息、签到改 cell、收藏/足迹/关注上移、登录态显隐、精简登录/退出 cell、移除返回按钮、合并镜像源与数据来源 | 🏁 |
 | `01-架构概览.md` | v1.1.0 | 架构 | `architecture/` | 系统架构与请求链路 | 🏁 |
 | `01-API 参考.md` | v1.2.0 | 参考 | `references/` | 所有 API 端点定义 | 🏁 |
 | `02-数据字典.md` | v1.2.0 | 参考 | `references/` | 核心类型定义 | 🏁 |
@@ -505,15 +505,15 @@ docs/
 
 | 步骤 | 文件 | 操作 | 状态 |
 |:----:|:-----|:-----|:----:|
-| 1 | `src/components/UserInfo.vue` | 新增 `wealth` prop，内嵌金币/钻石显示 | ⬜ |
-| 2 | `src/views/SettingsView.vue` | 移除 nav-bar 返回按钮，删除 useSafeBack | ⬜ |
-| 3 | `src/views/SettingsView.vue` | 删除钱包 cell-group | ⬜ |
-| 4 | `src/views/SettingsView.vue` | 移动收藏/足迹/关注到 UserInfo 后，添加 `v-if` 登录限制 | ⬜ |
-| 5 | `src/views/SettingsView.vue` | 签到改用 van-cell 控件 | ⬜ |
-| 6 | `src/views/SettingsView.vue` | 删除 status-group，改为单个登录/退出 cell | ⬜ |
-| 7 | `src/views/SettingsView.vue` | 传递 wealth prop 给 UserInfo | ⬜ |
-| 8 | `src/views/SettingsView.vue` | 合并 mirror-group + info-group 为 source-group | ⬜ |
-| 9 | — | `pnpm run build` 构建验证 | ⬜ |
+| 1 | `src/components/UserInfo.vue` | 新增 `wealth` prop，内嵌金币/钻石显示 | ✅ |
+| 2 | `src/views/SettingsView.vue` | 移除 nav-bar 返回按钮，删除 useSafeBack | ✅ |
+| 3 | `src/views/SettingsView.vue` | 删除钱包 cell-group | ✅ |
+| 4 | `src/views/SettingsView.vue` | 移动收藏/足迹/关注到 UserInfo 后，添加 `v-if` 登录限制 | ✅ |
+| 5 | `src/views/SettingsView.vue` | 签到改用 van-cell 控件 | ✅ |
+| 6 | `src/views/SettingsView.vue` | 删除 status-group，改为单个登录/退出 cell | ✅ |
+| 7 | `src/views/SettingsView.vue` | 传递 wealth prop 给 UserInfo | ✅ |
+| 8 | `src/views/SettingsView.vue` | 合并 mirror-group + info-group 为 source-group | ✅ |
+| 9 | — | `pnpm run build` 构建验证 | ✅ |
 
 ## 参考代码
 
