@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useP2PStore } from '@/stores/p2p'
+import { useSettingsStore } from '@/stores/settings'
+import { p2pManager } from '@/p2p/manager'
 import { useSafeBack } from '@/utils/navigation'
 import DeviceList from '@/components/DeviceList.vue'
 
@@ -39,6 +41,13 @@ const goToItem = (item: any) => {
     router.push(`/homepage/${item.id}`)
   }
 }
+
+onMounted(async () => {
+  const settings = useSettingsStore()
+  if (settings.p2pEnabled && p2pStore.status === 'disconnected') {
+    await p2pManager.connect()
+  }
+})
 </script>
 
 <template>

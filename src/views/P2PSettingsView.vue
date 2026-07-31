@@ -24,16 +24,17 @@ onMounted(async () => {
   deviceNickname.value = settings.deviceNickname || ''
   maxOfflineDevices.value = settings.maxOfflineDevices || 10
 
-  if (!p2pStore.status || p2pStore.status === 'disconnected') {
-    await p2pManager.initialize()
-  }
-
   const identity = p2pManager.getIdentity()
   if (identity) {
     deviceId.value = identity.id
     if (!deviceNickname.value) {
       deviceNickname.value = identity.nickname
     }
+  }
+
+  // 如果之前启用了 P2P，自动重连
+  if (p2pEnabled.value && p2pStore.status === 'disconnected') {
+    await p2pManager.connect()
   }
 })
 

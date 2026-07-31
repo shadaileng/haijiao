@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.35.2] - 2026-07-31
+
+### Fixed
+
+- 修复 P2P 设备列表显示问题
+  - `src/stores/p2p.ts`：使用 `Record<string, PeerDevice>` 替代 `ref(new Map())` 解决 Vue 响应式追踪问题
+  - `src/views/P2PSettingsView.vue`：刷新页面后自动重连 P2P 网络
+  - `src/views/SharedView.vue`：刷新页面后自动重连 P2P 网络
+  - 移除调试日志
+
 ## [1.35.0] - 2026-07-31
 
 ### Added
