@@ -22,6 +22,10 @@
         <div class="user-info-sign hv-sign">
           <span>签名:{{ userInfo?.description || '这家伙很懒什么也没留下' }}</span>
         </div>
+        <div v-if="wealth" class="user-info-wealth">
+          <span class="wealth-gold">金币 {{ wealth.gold }}</span>
+          <span class="wealth-diamond">钻石 {{ (wealth.diamond / 100).toFixed(2) }}</span>
+        </div>
       </div>
     </div>
   </div>
@@ -33,6 +37,7 @@ import type { UserInfoProp } from '@/types'
 
 defineProps<{
   userInfo: UserInfoProp | null
+  wealth?: { gold: number; diamond: number }
 }>()
 </script>
 
@@ -78,4 +83,12 @@ defineProps<{
 .user-info-sign {
   font-size: 0.85rem;
 }
+.user-info-wealth {
+  display: flex;
+  gap: 16px;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+.wealth-gold { color: #ff9900; }
+.wealth-diamond { color: #00ccff; }
 </style>

@@ -7,11 +7,9 @@ import { useMirrorConfig } from '@/composables/useMirrorConfig'
 import { showSuccessToast, showDialog as showConfirmDialog, showToast } from 'vant'
 import UserInfo from '@/components/UserInfo.vue'
 import { useClipboard } from '@/composables/useClipboard'
-import { useSafeBack } from '@/utils/navigation'
 import { api } from '@/api/request'
 import type { UserWealth } from '@/types'
 const router = useRouter()
-const safeBack = useSafeBack()
 const settings = useSettingsStore()
 const userStore = useUserStore()
 const { showDialog, mirrorUrl, mirrorDisplay, openConfig, saveConfig } = useMirrorConfig()
@@ -114,51 +112,40 @@ async function handlePasteCredentials() {
 
 <template>
   <div class="settings-view">
-    <van-nav-bar title="配置" left-arrow @click-left="safeBack" />
+    <van-nav-bar title="配置" />
 
     <van-skeleton title avatar :row="3" :loading="loadingUser">
-      <UserInfo v-if="currentUser" :userInfo="currentUser" />
+      <UserInfo v-if="currentUser" :userInfo="currentUser" :wealth="settings.isLoggedIn ? wealth : undefined" />
     </van-skeleton>
 
-    <van-cell-group v-if="settings.isLoggedIn" inset class="wallet-group">
-      <van-cell title="我的钱包" />
-      <div class="wallet-content">
-        <div class="wallet-item">
-          <div class="wallet-label">金币</div>
-          <div class="wallet-value gold">{{ wealth.gold }}</div>
-        </div>
-        <div class="wallet-item">
-          <div class="wallet-label">钻石</div>
-          <div class="wallet-value diamond">{{ (wealth.diamond / 100).toFixed(2) }}</div>
-        </div>
-      </div>
-      <van-cell>
-        <template #title>
-          <van-button
-            type="primary"
-            size="small"
-            :loading="signInLoading"
-            :disabled="signedIn"
-            @click="handleSignIn"
-          >
-            {{ signedIn ? '已签到' : '立即签到' }}
-          </van-button>
-        </template>
+    <van-cell-group v-if="settings.isLoggedIn" inset class="history-group">
+      <van-cell title="收藏" is-link @click="router.push('/favorites')">
+        <template #right-icon><van-icon name="arrow" /></template>
       </van-cell>
-    </van-cell-group>
-
-    <van-cell-group inset class="status-group">
-      <van-cell title="登录状态" :value="settings.isLoggedIn ? '已登录' : '未登录'">
-        <template #label v-if="settings.isLoggedIn">UID: {{ settings.uid }}</template>
-        <template #label v-else><span>请在下方填写 UID 和 Token，或前往登录</span></template>
+      <van-cell title="足迹" is-link @click="router.push('/history')">
+        <template #right-icon><van-icon name="arrow" /></template>
       </van-cell>
-      <van-cell v-if="settings.isLoggedIn" title="退出登录" is-link @click="handleLogout">
-        <template #right-icon><van-icon name="warning-o" color="#ee0a24" /></template>
-      </van-cell>
-      <van-cell v-else title="去登录" is-link @click="router.push('/login')">
+      <van-cell title="关注" is-link @click="router.push('/settings/follow')">
         <template #right-icon><van-icon name="arrow" /></template>
       </van-cell>
     </van-cell-group>
+
+    <van-cell
+      v-if="settings.isLoggedIn"
+      :title="signedIn ? '今日已签到' : '立即签到'"
+      :is-link="!signedIn"
+      :loading="signInLoading"
+      inset
+      class="signin-cell"
+      @click="handleSignIn"
+    />
+
+    <van-cell v-if="settings.isLoggedIn" title="退出登录" is-link inset class="logout-cell" @click="handleLogout">
+      <template #right-icon><van-icon name="warning-o" color="#ee0a24" /></template>
+    </van-cell>
+    <van-cell v-else title="去登录" is-link inset class="login-cell" @click="router.push('/login')">
+      <template #right-icon><van-icon name="arrow" /></template>
+    </van-cell>
 
     <van-cell-group inset class="setting-group">
       <van-cell title="认证配置" />
@@ -174,28 +161,13 @@ async function handlePasteCredentials() {
       </van-cell>
     </van-cell-group>
 
-    <van-cell-group inset class="mirror-group">
+    <van-cell-group inset class="source-group">
       <van-cell title="镜像源（数据源地址）" :value="mirrorDisplay()" is-link @click="openConfig" />
-    </van-cell-group>
-
-    <van-cell-group inset class="info-group">
       <van-cell title="数据来源">
         <template #label>
           <div>{{ settings.apiBase }}</div>
           <div class="source-hint">官方域名国内被屏蔽，请填写后台提供的可用镜像地址</div>
         </template>
-      </van-cell>
-    </van-cell-group>
-
-    <van-cell-group inset class="history-group">
-      <van-cell title="收藏" is-link @click="router.push('/favorites')">
-        <template #right-icon><van-icon name="arrow" /></template>
-      </van-cell>
-      <van-cell title="足迹" is-link @click="router.push('/history')">
-        <template #right-icon><van-icon name="arrow" /></template>
-      </van-cell>
-      <van-cell title="关注" is-link @click="router.push('/settings/follow')">
-        <template #right-icon><van-icon name="arrow" /></template>
       </van-cell>
     </van-cell-group>
 
@@ -210,13 +182,10 @@ async function handlePasteCredentials() {
   min-height: 100vh;
   background: #f7f8fa;
 }
-.status-group {
-  margin: 12px;
-}
 .setting-group {
   margin: 12px;
 }
-.mirror-group {
+.source-group {
   margin: 12px;
 }
 .source-hint {
@@ -224,36 +193,16 @@ async function handlePasteCredentials() {
   color: #ee0a24;
   font-size: 12px;
 }
-.info-group {
-  margin: 12px;
-}
 .history-group {
   margin: 12px;
 }
-.wallet-group {
+.signin-cell {
   margin: 12px;
 }
-.wallet-content {
-  display: flex;
-  justify-content: space-around;
-  padding: 16px;
+.logout-cell {
+  margin: 12px;
 }
-.wallet-item {
-  text-align: center;
-}
-.wallet-label {
-  font-size: 14px;
-  color: #666;
-  margin-bottom: 8px;
-}
-.wallet-value {
-  font-size: 24px;
-  font-weight: bold;
-}
-.wallet-value.gold {
-  color: #ff9900;
-}
-.wallet-value.diamond {
-  color: #00ccff;
+.login-cell {
+  margin: 12px;
 }
 </style>
