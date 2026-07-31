@@ -98,6 +98,7 @@ export default defineConfig({
         { text: '帖子分享功能方案', link: '/plans/27-帖子分享功能方案/' },
         { text: '签到与金额显示方案', link: '/plans/28-签到与金额显示方案/' },
         { text: '关注功能方案', link: '/plans/29-关注功能方案/' },
+        { text: '设置页布局优化方案', link: '/plans/30-设置页布局优化方案/' },
       ],
       '/references/': [
         { text: 'API 参考', link: '/references/01-API 参考/' },
