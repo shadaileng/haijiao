@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `src/App.vue`：添加动态 class `has-tabbar`，TabBar 页面底部间距 66px，非 TabBar 页面 16px
   - `src/views/SettingsView.vue`：移除重复的 `padding-bottom: 50px`
   - `src/components/Topics.vue`：移除分页模式多余的 `padding-bottom: 60px`，由 App.vue 统一管理
-  - `src/views/TopicView.vue`：评论区底部增加 32px 间距
+  - `src/views/TopicView.vue`：导航栏与标题之间增加 20px 间距，评论区底部增加 32px 间距
 
 ## [1.32.0] - 2026-07-29
 

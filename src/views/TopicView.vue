@@ -150,7 +150,7 @@ const onCommentLoaded = () => {
     :placeholder="true"
   />
   <van-skeleton title avatar :row="3" :loading="loading">
-    <van-row justify="space-between">
+    <van-row justify="space-between" class="topic-header">
       <van-col span="24" class="hv-title hv-box-padding-lt">{{ topicLocal.title }}</van-col>
     </van-row>
     <div class="hv-stats-row hv-box-padding-lt">
@@ -217,5 +217,8 @@ const onCommentLoaded = () => {
 }
 .bottom-spacer {
   height: 32px;
+}
+.topic-header {
+  padding-top: 20px;
 }
 </style>
