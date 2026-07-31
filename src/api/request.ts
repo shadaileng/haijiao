@@ -1,7 +1,7 @@
 import { md5 } from 'js-md5'
 import { useSettingsStore } from '@/stores/settings'
 import { toCamelCase } from '@/utils/transform'
-import type { ApiResult, LoginParams, LoginResponse, VideoLine, SignInResult, UserWealth } from '@/types'
+import type { ApiResult, LoginParams, LoginResponse, VideoLine, SignInResult, UserWealth, FollowStatus } from '@/types'
 import { showToast } from 'vant'
 
 function utf8Decode(binary: string): string {
@@ -313,6 +313,9 @@ export interface Api {
   favoriteTopics(params: { params: { page: number; limit?: number; folderId?: number; total?: number } }): Promise<ApiResult>
   signIn(): Promise<ApiResult<SignInResult>>
   wealth(): Promise<ApiResult<UserWealth>>
+  addFollow(params: { params: { userId: string | number } }): Promise<ApiResult>
+  cancelFollow(params: { params: { userId: string | number } }): Promise<ApiResult>
+  checkFollow(params: { params: { userId: string | number } }): Promise<ApiResult<FollowStatus>>
 }
 
 // 统一 API 对象，所有视图直接 import 使用
@@ -481,6 +484,38 @@ export const api: Api = {
     try {
       const data = await request<UserWealth>({ url: '/user/wealth' })
       return { success: true, data }
+    } catch (e: any) {
+      return { success: false, message: e.message }
+    }
+  },
+  async addFollow({ params }: { params: { userId: string | number } }) {
+    try {
+      const data = await request({
+        url: '/user/favorite',
+        params: { targetId: params.userId, opt: 'add' }
+      })
+      return { success: true, data }
+    } catch (e: any) {
+      return { success: false, message: e.message }
+    }
+  },
+  async cancelFollow({ params }: { params: { userId: string | number } }) {
+    try {
+      const data = await request({
+        url: '/user/favorite',
+        params: { targetId: params.userId, opt: 'rm' }
+      })
+      return { success: true, data }
+    } catch (e: any) {
+      return { success: false, message: e.message }
+    }
+  },
+  async checkFollow({ params }: { params: { userId: string | number } }) {
+    try {
+      const data = await request({
+        url: '/user/info/' + params.userId
+      })
+      return { success: true, data: { isFollow: !!data?.isFavorite } }
     } catch (e: any) {
       return { success: false, message: e.message }
     }

@@ -193,3 +193,7 @@ export interface UserWealth {
   gold: number
   diamond: number
 }
+
+export interface FollowStatus {
+  isFollow: boolean
+}

@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.34.0] - 2026-07-31
+
+### Added
+
+- 用户主页添加关注/取消关注切换按钮
+  - `src/types/index.ts`：新增 `FollowStatus` 类型定义
+  - `src/api/request.ts`：新增 `addFollow`、`cancelFollow`、`checkFollow` API 方法
+  - `src/views/UserHomeView.vue`：新增关注按钮，支持关注/取消关注切换
+
 ## [1.33.0] - 2026-07-31
 
 ### Added
