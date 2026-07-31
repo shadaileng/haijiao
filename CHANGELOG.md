@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.32.1] - 2026-07-31
+
+### Fixed
+
+- 统一处理各页面底部间距，避免内容贴底
+  - `src/App.vue`：添加动态 class `has-tabbar`，TabBar 页面底部间距 66px，非 TabBar 页面 16px
+  - `src/views/SettingsView.vue`：移除重复的 `padding-bottom: 50px`
+
 ## [1.32.0] - 2026-07-29
 
 ### Added

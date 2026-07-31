@@ -44,7 +44,7 @@ watch(() => overlay.show, (val) => {
 </script>
 
 <template>
-  <div class="app-container">
+  <div class="app-container" :class="{ 'has-tabbar': route.meta?.showTabBar }">
     <RouterView v-slot="{ Component }">
       <keep-alive :include="['HotTopicsView', 'SearchView', 'UserHomeView', 'FollowView', 'NodeView', 'NodeTopicsView', 'FavoritesView']">
         <component :is="Component" />
@@ -77,6 +77,10 @@ watch(() => overlay.show, (val) => {
   margin: 0 auto;
   min-height: 100vh;
   background-color: #f7f8fa;
+  padding-bottom: 16px;
+}
+.app-container.has-tabbar {
+  padding-bottom: 66px;
 }
 
 .van-nav-bar--fixed {
