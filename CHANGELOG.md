@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.35.0] - 2026-07-31
+
+### Added
+
+- 设置页布局优化
+  - `src/components/UserInfo.vue`：新增 `wealth` prop，内嵌金币/钻石 inline 显示
+  - `src/views/SettingsView.vue`：
+    - 移除导航栏返回按钮（顶级页面）
+    - 删除钱包 cell-group，金币/钻石移入 UserInfo 组件
+    - 收藏/足迹/关注上移到 UserInfo 紧下方，仅登录显示
+    - 签到按钮改用纯 `van-cell` 控件
+    - 精简登录状态：去掉"登录状态"cell，未登录仅"去登录"，已登录变"退出登录"
+    - 合并镜像源与数据来源为一个 cell-group
+  - 文档更新：新增 30-设置页布局优化方案
+
 ## [1.34.1] - 2026-07-31
 
 ### Fixed
