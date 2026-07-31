@@ -36,6 +36,9 @@ export class P2PManager {
       const p2pStore = useP2PStore()
       p2pStore.setStatus('connected')
 
+      // 添加当前设备到设备列表
+      p2pStore.updateDeviceStatus(this.identity!.id, 'online', this.identity!.nickname)
+
       for (const peerId of response.peers) {
         if (!this.peers.has(peerId)) {
           await this.initiateConnection(peerId)
