@@ -140,12 +140,14 @@ async function handlePasteCredentials() {
       @click="handleSignIn"
     />
 
-    <van-cell v-if="settings.isLoggedIn" title="退出登录" is-link inset class="logout-cell" @click="handleLogout">
-      <template #right-icon><van-icon name="warning-o" color="#ee0a24" /></template>
-    </van-cell>
-    <van-cell v-else title="去登录" is-link inset class="login-cell" @click="router.push('/login')">
-      <template #right-icon><van-icon name="arrow" /></template>
-    </van-cell>
+    <van-cell-group inset class="auth-group">
+      <van-cell v-if="settings.isLoggedIn" title="退出登录" is-link @click="handleLogout">
+        <template #right-icon><van-icon name="warning-o" color="#ee0a24" /></template>
+      </van-cell>
+      <van-cell v-else title="去登录" is-link @click="router.push('/login')">
+        <template #right-icon><van-icon name="arrow" /></template>
+      </van-cell>
+    </van-cell-group>
 
     <van-cell-group inset class="setting-group">
       <van-cell title="认证配置" />
@@ -199,10 +201,7 @@ async function handlePasteCredentials() {
 .signin-cell {
   margin: 12px;
 }
-.logout-cell {
-  margin: 12px;
-}
-.login-cell {
+.auth-group {
   margin: 12px;
 }
 </style>
