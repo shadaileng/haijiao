@@ -14,10 +14,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `src/views/SettingsView.vue`：
     - 移除导航栏返回按钮（顶级页面）
     - 删除钱包 cell-group，金币/钻石移入 UserInfo 组件
-    - 收藏/足迹/关注上移到 UserInfo 紧下方，仅登录显示
-    - 签到按钮改用纯 `van-cell` 控件
-    - 精简登录状态：去掉"登录状态"cell，未登录仅"去登录"，已登录变"退出登录"
+    - 签到 cell 改为独立 `van-cell-group`，移至用户信息下方
+    - 收藏/足迹/关注上移到签到下方，仅登录显示
+    - 精简登录状态：去掉"登录状态"cell，去登录/退出登录独立 `van-cell-group`
     - 合并镜像源与数据来源为一个 cell-group
+    - 粘贴 Token 后自动加载用户信息并显示 UserInfo 卡片
   - 文档更新：新增 30-设置页布局优化方案
 
 ## [1.34.1] - 2026-07-31
