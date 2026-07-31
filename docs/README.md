@@ -521,26 +521,26 @@ docs/
 
 | 阶段 | 步骤 | 文件 | 操作 | 状态 |
 |:----:|:----:|:-----|:-----|:----:|
-| 1 | 1 | `src/p2p/identity.ts` | 设备指纹生成与管理 | 📋 |
-| 1 | 2 | `src/p2p/signaling.ts` | 信令服务器通信封装 | 📋 |
-| 1 | 3 | `src/p2p/manager.ts` | P2P 连接管理器 | 📋 |
-| 1 | 4 | `src/stores/p2p.ts` | P2P 状态管理（含设备列表、活跃度排序） | 📋 |
-| 1 | 5 | `worker.ts` | Worker 信令 API | 📋 |
-| 1 | 6 | `src/components/P2PStatus.vue` | P2P 状态指示器 | 📋 |
-| 1 | 7 | `src/views/SettingsView.vue` | 设置页添加 P2P 入口 cell | 📋 |
-| 1 | 8 | — | `pnpm run build` 构建验证 | 📋 |
+| 1 | 1 | `src/p2p/identity.ts` | 设备指纹生成与管理 | ✅ |
+| 1 | 2 | `src/p2p/signaling.ts` | 信令服务器通信封装 | ✅ |
+| 1 | 3 | `src/p2p/manager.ts` | P2P 连接管理器 | ✅ |
+| 1 | 4 | `src/stores/p2p.ts` | P2P 状态管理（含设备列表、活跃度排序） | ✅ |
+| 1 | 5 | `worker.ts` | Worker 信令 API | ✅ |
+| 1 | 6 | `src/components/P2PStatus.vue` | P2P 状态指示器 | ✅ |
+| 1 | 7 | `src/views/SettingsView.vue` | 设置页添加 P2P 入口 cell | ✅ |
+| 1 | 8 | — | `pnpm run build` 构建验证 | ✅ |
 | 2 | 9 | `src/p2p/protocol.ts` | 共享数据协议（含昵称同步） | 📋 |
 | 2 | 10 | `src/p2p/broadcaster.ts` | 数据广播器 | 📋 |
 | 2 | 11 | `src/p2p/receiver.ts` | 数据接收器 | 📋 |
 | 2 | 12 | `src/stores/shared.ts` | 共享数据存储（在线无限制，离线按配置限制） | 📋 |
-| 3 | 13 | `src/views/SharedView.vue` | 共享页面（设备/足迹/推荐 Tab） | 📋 |
-| 3 | 14 | `src/components/DeviceList.vue` | 设备列表组件（按活跃度排序） | 📋 |
+| 3 | 13 | `src/views/SharedView.vue` | 共享页面（设备/足迹/推荐 Tab） | ✅ |
+| 3 | 14 | `src/components/DeviceList.vue` | 设备列表组件（按活跃度排序） | ✅ |
 | 3 | 15 | `src/components/SharedItem.vue` | 共享条目组件 | 📋 |
-| 3 | 16 | `src/views/P2PSettingsView.vue` | P2P 设置子页面 | 📋 |
-| 3 | 17 | `src/router/index.ts` | 添加 `/settings/p2p` 和 `/shared` 路由 | 📋 |
+| 3 | 16 | `src/views/P2PSettingsView.vue` | P2P 设置子页面 | ✅ |
+| 3 | 17 | `src/router/index.ts` | 添加 `/settings/p2p` 和 `/shared` 路由 | ✅ |
 | 3 | 18 | `src/App.vue` | TabBar 添加共享标签 | 📋 |
-| 3 | 19 | — | `pnpm run build` 构建验证 | 📋 |
-| — | 20 | `docs/README.md` | 更新文档 | 📋 |
+| 3 | 19 | — | `pnpm run build` 构建验证 | ✅ |
+| — | 20 | `docs/README.md` | 更新文档 | ✅ |
 
 ## 参考代码
 
