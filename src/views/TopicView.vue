@@ -192,6 +192,7 @@ const onCommentLoaded = () => {
   <div ref="commentDivider"></div>
   <van-divider :hairline="false">评论</van-divider>
   <Comment v-if="topicLocal.topicId" :key="topicLocal.topicId" :topicId="topicLocal.topicId" @loaded="onCommentLoaded" />
+  <div class="bottom-spacer"></div>
 
   <!-- 收藏夹选择弹窗 -->
   <van-action-sheet
@@ -213,5 +214,8 @@ const onCommentLoaded = () => {
 }
 .favorite-active {
   color: #ffc107;
+}
+.bottom-spacer {
+  height: 32px;
 }
 </style>
