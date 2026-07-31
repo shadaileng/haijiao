@@ -99,6 +99,7 @@ export default defineConfig({
         { text: '签到与金额显示方案', link: '/plans/28-签到与金额显示方案/' },
         { text: '关注功能方案', link: '/plans/29-关注功能方案/' },
         { text: '设置页布局优化方案', link: '/plans/30-设置页布局优化方案/' },
+        { text: 'P2P 共享功能方案', link: '/plans/31-P2P共享功能方案/' },
       ],
       '/references/': [
         { text: 'API 参考', link: '/references/01-API 参考/' },

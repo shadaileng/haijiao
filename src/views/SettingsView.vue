@@ -146,6 +146,12 @@ async function handlePasteCredentials() {
       </van-cell>
     </van-cell-group>
 
+    <van-cell-group inset class="p2p-group">
+      <van-cell title="P2P 共享" is-link @click="router.push('/settings/p2p')">
+        <template #right-icon><van-icon name="arrow" /></template>
+      </van-cell>
+    </van-cell-group>
+
     <van-cell-group inset class="auth-group">
       <van-cell v-if="settings.isLoggedIn" title="退出登录" is-link @click="handleLogout">
         <template #right-icon><van-icon name="warning-o" color="#ee0a24" /></template>
