@@ -88,7 +88,7 @@ docs/
 | `26-分页按钮首尾页方案.md` | v1.1.0 | 方案 | `plans/` | 分页组件增加首页和尾页快捷按钮 | 🏁 |
 | `27-帖子分享功能方案.md` | v1.1.0 | 方案 | `plans/` | 帖子详情页一键复制分享链接 | 🏁 |
 | `28-签到与金额显示方案.md` | v1.0.0 | 方案 | `plans/` | 设置页钱包余额显示 + 签到按钮 | 🏁 |
-| `29-用户主页关注按钮方案.md` | v1.2.0 | 方案 | `plans/` | 用户主页关注/取消关注切换按钮 | 🏁 |
+| `29-关注功能方案.md` | v1.3.0 | 方案 | `plans/` | 用户主页关注按钮 + 关注列表取消关注 | 🏁 |
 | `01-架构概览.md` | v1.1.0 | 架构 | `architecture/` | 系统架构与请求链路 | 🏁 |
 | `01-API 参考.md` | v1.1.0 | 参考 | `references/` | 所有 API 端点定义 | 🏁 |
 | `02-数据字典.md` | v1.1.0 | 参考 | `references/` | 核心类型定义 | 🏁 |
@@ -487,15 +487,16 @@ docs/
 | 3 | — | `pnpm run build` 构建验证 | ✅ |
 | 4 | `docs/README.md` | 文档同步 | ✅ |
 
-### 29-用户主页关注按钮方案
+### 29-关注功能方案
 
 | 步骤 | 文件 | 操作 | 状态 |
 |:----:|:-----|:-----|:----:|
 | 1 | `src/types/index.ts` | 添加 `FollowStatus` 类型 | ✅ |
 | 2 | `src/api/request.ts` | 新增 `addFollow` / `cancelFollow` / `checkFollow` API | ✅ |
-| 3 | `src/views/UserHomeView.vue` | 关注按钮 UI + 交互逻辑 | ✅ |
-| 4 | — | `pnpm run build` 构建验证 | ✅ |
-| 5 | `docs/README.md` | 文档同步 | ✅ |
+| 3 | `src/views/UserHomeView.vue` | 关注按钮 UI + 交互逻辑（含确认弹窗） | ✅ |
+| 4 | `src/views/FollowView.vue` | 取消关注按钮（含确认弹窗） | ✅ |
+| 5 | — | `pnpm run build` 构建验证 | ✅ |
+| 6 | `docs/README.md` | 文档同步 | ✅ |
 
 ## 参考代码
 

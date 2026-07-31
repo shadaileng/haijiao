@@ -2,7 +2,7 @@
 defineOptions({ name: 'UserHomeView' })
 import { ref, reactive, onMounted, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { showToast } from 'vant'
+import { showToast, showConfirmDialog } from 'vant'
 import { api } from '@/api/request'
 import type { User, LiteTopic } from '@/types'
 import UserInfo from '@/components/UserInfo.vue'
@@ -122,6 +122,18 @@ const toggleFollow = async () => {
     return
   }
   if (followLoading.value) return
+
+  if (isFollowing.value) {
+    try {
+      await showConfirmDialog({
+        title: '取消关注',
+        message: `确定要取消关注「${userInfo.value?.nickname || '该用户'}」吗？`,
+      })
+    } catch {
+      return
+    }
+  }
+
   followLoading.value = true
   try {
     if (isFollowing.value) {

@@ -2,7 +2,7 @@
 defineOptions({ name: 'FollowView' })
 import { ref, reactive, onMounted, onDeactivated } from 'vue'
 import { useRouter } from 'vue-router'
-import { showToast } from 'vant'
+import { showToast, showConfirmDialog } from 'vant'
 import { api } from '@/api/request'
 import { useSettingsStore } from '@/stores/settings'
 import type { FollowUser } from '@/types'
@@ -15,6 +15,7 @@ const skeletonLoading = ref(true)
 const username = ref('')
 const itemsAll = reactive<FollowUser[]>([])
 const items = reactive<FollowUser[]>([])
+const unfollowLoading = ref<number | null>(null)
 
 onMounted(async () => {
   if (!settings.isLoggedIn) return
@@ -42,6 +43,33 @@ const usernameFilter = () => {
     items.length,
     ...itemsAll.filter(item => item.nickname?.includes(username.value))
   )
+}
+
+const handleUnfollow = async (item: FollowUser) => {
+  try {
+    await showConfirmDialog({
+      title: '取消关注',
+      message: `确定要取消关注「${item.nickname}」吗？`,
+    })
+  } catch {
+    return
+  }
+  unfollowLoading.value = item.userId
+  try {
+    const resp = await api.cancelFollow({ params: { userId: item.userId } })
+    if (resp.success) {
+      showToast('已取消关注')
+      const idx = itemsAll.findIndex(i => i.userId === item.userId)
+      if (idx !== -1) itemsAll.splice(idx, 1)
+      usernameFilter()
+    } else {
+      showToast(resp.message || '操作失败')
+    }
+  } catch {
+    showToast('操作失败')
+  } finally {
+    unfollowLoading.value = null
+  }
 }
 </script>
 
@@ -83,7 +111,15 @@ const usernameFilter = () => {
                   <div class="follow-body">
                     <div class="follow-top">
                       <a class="hv-link" @click="$router.push(`/homepage/${item.userId}`)">{{ item.nickname }}</a>
-                      <van-tag plain type="primary">{{ item.fansCount }}</van-tag>
+                      <van-button
+                        size="small"
+                        type="danger"
+                        plain
+                        :loading="unfollowLoading === item.userId"
+                        @click="handleUnfollow(item)"
+                      >
+                        取消关注
+                      </van-button>
                     </div>
                     <div class="follow-sign">签名:{{ item.description || '这家伙很懒什么也没留下' }}</div>
                   </div>

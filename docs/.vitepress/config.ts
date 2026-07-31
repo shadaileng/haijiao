@@ -97,7 +97,7 @@ export default defineConfig({
         { text: '分页按钮首尾页方案', link: '/plans/26-分页按钮首尾页方案/' },
         { text: '帖子分享功能方案', link: '/plans/27-帖子分享功能方案/' },
         { text: '签到与金额显示方案', link: '/plans/28-签到与金额显示方案/' },
-        { text: '用户主页关注按钮方案', link: '/plans/29-用户主页关注按钮方案/' },
+        { text: '关注功能方案', link: '/plans/29-关注功能方案/' },
       ],
       '/references/': [
         { text: 'API 参考', link: '/references/01-API 参考/' },
