@@ -101,6 +101,13 @@ async function handlePasteCredentials() {
     if (data.uid && data.token) {
       settings.setCredentials(data.uid, data.token)
       showSuccessToast('Token 已粘贴')
+      loadingUser.value = true
+      try {
+        await Promise.all([loadCurrentUser(), loadWealth(), loadSignInStatus()])
+      } catch (e) {
+        console.warn('load data failed:', e)
+      }
+      loadingUser.value = false
     } else {
       showToast('剪贴板内容格式无效')
     }
@@ -118,6 +125,15 @@ async function handlePasteCredentials() {
       <UserInfo v-if="currentUser" :userInfo="currentUser" :wealth="settings.isLoggedIn ? wealth : undefined" />
     </van-skeleton>
 
+    <van-cell-group v-if="settings.isLoggedIn" inset class="signin-group">
+      <van-cell
+        :title="signedIn ? '今日已签到' : '立即签到'"
+        :is-link="!signedIn"
+        :loading="signInLoading"
+        @click="handleSignIn"
+      />
+    </van-cell-group>
+
     <van-cell-group v-if="settings.isLoggedIn" inset class="history-group">
       <van-cell title="收藏" is-link @click="router.push('/favorites')">
         <template #right-icon><van-icon name="arrow" /></template>
@@ -129,16 +145,6 @@ async function handlePasteCredentials() {
         <template #right-icon><van-icon name="arrow" /></template>
       </van-cell>
     </van-cell-group>
-
-    <van-cell
-      v-if="settings.isLoggedIn"
-      :title="signedIn ? '今日已签到' : '立即签到'"
-      :is-link="!signedIn"
-      :loading="signInLoading"
-      inset
-      class="signin-cell"
-      @click="handleSignIn"
-    />
 
     <van-cell-group inset class="auth-group">
       <van-cell v-if="settings.isLoggedIn" title="退出登录" is-link @click="handleLogout">
@@ -198,7 +204,7 @@ async function handlePasteCredentials() {
 .history-group {
   margin: 12px;
 }
-.signin-cell {
+.signin-group {
   margin: 12px;
 }
 .auth-group {
