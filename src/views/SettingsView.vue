@@ -27,7 +27,7 @@ const signInLoading = ref(false)
 onMounted(async () => {
   if (settings.isLoggedIn) {
     try {
-      await Promise.all([loadCurrentUser(), loadWealth()])
+      await Promise.all([loadCurrentUser(), loadWealth(), loadSignInStatus()])
     } catch (e) {
       console.warn('load data failed:', e)
     }
@@ -47,20 +47,28 @@ const loadWealth = async () => {
   }
 }
 
+const loadSignInStatus = async () => {
+  const resp = await api.getTaskStatus()
+  if (resp.success && resp.data) {
+    signedIn.value = !resp.data.goldSignIn.status
+  }
+}
+
 const handleSignIn = async () => {
   if (signInLoading.value || signedIn.value) return
   signInLoading.value = true
   try {
-    const resp = await api.signIn()
-    if (resp.success) {
+    await api.signIn()
+    signedIn.value = true
+    showToast('签到成功')
+    await loadWealth()
+  } catch (e: any) {
+    if (e.message?.includes('已签到') || e.message?.includes('already')) {
       signedIn.value = true
-      showToast('签到成功')
-      await loadWealth()
+      showToast('今日已签到')
     } else {
-      showToast(resp.message || '签到失败')
+      showToast(e.message || '签到失败')
     }
-  } catch (e) {
-    showToast('签到失败')
   } finally {
     signInLoading.value = false
   }

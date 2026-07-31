@@ -5,18 +5,19 @@
 > | 项目 | 内容 |
 > |------|------|
 > | 文档编号 | 04 |
-> | 文档版本 | v1.1.0 |
+> | 文档版本 | v1.2.0 |
 > | 文档状态 | 🏁 已完成 |
-> | 最后更新 | 2026-07-12 |
+> | 最后更新 | 2026-07-31 |
 > | 对应内容 | 所有 API 端点定义、参数、响应 |
 >
 > **变更历史**
 >
 > | 日期 | 版本 | 说明 |
 > |------|:----:|------|
+> | 2026-07-31 | v1.2.0 | 添加 getTaskStatus API，修正签到状态判断逻辑 |
 > | 2026-07-12 | v1.1.0 | 移除 proxy-image 引用、添加 toCamelCase 说明、修复重复章节 |
 > | 2026-07-10 | v1.0.0 | 初版，基于代码和参考分析整理 |
-
+>
 > **关联文档**：[01-架构概览.md](../architecture/01-架构概览.md)（请求流程）· [02-数据字典.md](./02-数据字典.md)（类型定义）· [01-登录功能实施方案.md](../plans/01-登录功能实施方案.md)（登录流程）
 
 ---
@@ -138,9 +139,28 @@ Sign = MD5(Username + Password + navigator.userAgent)
 
 ---
 
-## 4. 用户/关注 API
+## 4. 任务 API
 
-### 4.1 获取关注列表
+### 4.1 获取任务状态
+
+| 项目 | 值 |
+|------|-----|
+| **函数** | `getTaskStatus()` |
+| **URL** | `GET /api/task/getTaskStatus` |
+| **认证** | 否 |
+| **响应** | `TaskStatus`（含 `goldSignIn.status` 等） |
+
+**状态语义：**
+- `status: true` = 可以执行（任务未完成，按钮可点击）
+- `status: false` = 已完成（任务已完成，按钮禁用）
+
+**注意：** `goldSignIn.status` 字段语义与其他任务（如 `vipChat`）相反，是设计特性，不是 bug。
+
+---
+
+## 5. 用户/关注 API
+
+### 5.1 获取关注列表
 
 | 项目 | 值 |
 |------|-----|
@@ -151,9 +171,9 @@ Sign = MD5(Username + Password + navigator.userAgent)
 
 ---
 
-## 5. 视频 API
+## 6. 视频 API
 
-### 5.1 加载视频源
+### 6.1 加载视频源
 
 | 项目 | 值 |
 |------|-----|
@@ -166,9 +186,9 @@ Sign = MD5(Username + Password + navigator.userAgent)
 
 ---
 
-## 6. 图片 API
+## 7. 图片 API
 
-### 6.1 处理图片
+### 7.1 处理图片
 
 | 项目 | 值 |
 |------|-----|
@@ -179,7 +199,7 @@ Sign = MD5(Username + Password + navigator.userAgent)
 
 ---
 
-## 7. 未实现端点（参考代码中发现）
+## 8. 未实现端点（参考代码中发现）
 
 以下端点已在 `app.js` 模块 `1f24` 和 `21e4` 中发现，尚未在当前项目中实现：
 
@@ -209,7 +229,7 @@ Sign = MD5(Username + Password + navigator.userAgent)
 
 ---
 
-## 8. 环境变量
+## 9. 环境变量
 
 | 变量 | 类型 | 默认值 | 说明 |
 |-----|:----:|:------:|------|
@@ -217,7 +237,7 @@ Sign = MD5(Username + Password + navigator.userAgent)
 
 ---
 
-## 9. 代理配置
+## 10. 代理配置
 
 ### Cloudflare Worker（worker.ts）
 

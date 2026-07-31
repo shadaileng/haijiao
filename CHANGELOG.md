@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.34.1] - 2026-07-31
+
+### Fixed
+
+- 修复签到状态显示逻辑
+  - `src/types/index.ts`：新增 `TaskStatus` 类型定义
+  - `src/api/request.ts`：新增 `getTaskStatus()` API 方法
+  - `src/views/SettingsView.vue`：使用 `getTaskStatus` 获取签到状态，修正状态判断逻辑（`status: false` 表示已签到）
+  - 文档更新：API 参考、数据字典、签到方案文档同步更新
+
 ## [1.34.0] - 2026-07-31
 
 ### Added

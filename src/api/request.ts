@@ -1,7 +1,7 @@
 import { md5 } from 'js-md5'
 import { useSettingsStore } from '@/stores/settings'
 import { toCamelCase } from '@/utils/transform'
-import type { ApiResult, LoginParams, LoginResponse, VideoLine, SignInResult, UserWealth, FollowStatus } from '@/types'
+import type { ApiResult, LoginParams, LoginResponse, VideoLine, SignInResult, UserWealth, FollowStatus, TaskStatus } from '@/types'
 import { showToast } from 'vant'
 
 function utf8Decode(binary: string): string {
@@ -313,6 +313,7 @@ export interface Api {
   favoriteTopics(params: { params: { page: number; limit?: number; folderId?: number; total?: number } }): Promise<ApiResult>
   signIn(): Promise<ApiResult<SignInResult>>
   wealth(): Promise<ApiResult<UserWealth>>
+  getTaskStatus(): Promise<ApiResult<TaskStatus>>
   addFollow(params: { params: { userId: string | number } }): Promise<ApiResult>
   cancelFollow(params: { params: { userId: string | number } }): Promise<ApiResult>
   checkFollow(params: { params: { userId: string | number } }): Promise<ApiResult<FollowStatus>>
@@ -483,6 +484,14 @@ export const api: Api = {
   async wealth() {
     try {
       const data = await request<UserWealth>({ url: '/user/wealth' })
+      return { success: true, data }
+    } catch (e: any) {
+      return { success: false, message: e.message }
+    }
+  },
+  async getTaskStatus() {
+    try {
+      const data = await request<TaskStatus>({ url: '/task/getTaskStatus' })
       return { success: true, data }
     } catch (e: any) {
       return { success: false, message: e.message }

@@ -197,3 +197,11 @@ export interface UserWealth {
 export interface FollowStatus {
   isFollow: boolean
 }
+
+export interface TaskStatus {
+  goldSignIn: {
+    open: boolean
+    status: boolean
+    num: number
+  }
+}
