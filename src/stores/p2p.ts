@@ -23,17 +23,17 @@ export const useP2PStore = defineStore(
   'p2p',
   () => {
     const status = ref<'disconnected' | 'connecting' | 'connected'>('disconnected')
-    const devices = ref<Map<string, PeerDevice>>(new Map())
+    const devices = ref<Record<string, PeerDevice>>({})
     const sharedItems = ref<SharedItem[]>([])
     const receivedItems = ref<SharedItem[]>([])
 
     const onlineDevices = computed(() => {
-      return Array.from(devices.value.values())
+      return Object.values(devices.value)
         .filter(d => d.status === 'online')
     })
 
     const sortedDevices = computed(() => {
-      return Array.from(devices.value.values())
+      return Object.values(devices.value)
         .sort((a, b) => {
           if (a.status === 'online' && b.status !== 'online') return -1
           if (a.status !== 'online' && b.status === 'online') return 1
@@ -48,26 +48,33 @@ export const useP2PStore = defineStore(
     }
 
     function updateDeviceStatus(deviceId: string, deviceStatus: 'online' | 'offline', nickname?: string): void {
-      const existing = devices.value.get(deviceId)
+      const existing = devices.value[deviceId]
 
       if (existing) {
-        existing.status = deviceStatus
-        if (deviceStatus === 'online') {
-          existing.lastHeartbeat = Date.now()
-          existing.activityScore += 10
-        }
-        if (nickname) {
-          existing.nickname = nickname
-        }
-      } else {
-        devices.value.set(deviceId, {
-          id: deviceId,
-          nickname: nickname || `设备 ${deviceId.slice(0, 8)}`,
+        devices.value[deviceId] = {
+          ...existing,
           status: deviceStatus,
           lastHeartbeat: Date.now(),
-          activityScore: deviceStatus === 'online' ? 10 : 0,
-        })
+          activityScore: deviceStatus === 'online' ? existing.activityScore + 10 : existing.activityScore,
+          nickname: nickname || existing.nickname,
+        }
+      } else {
+        devices.value = {
+          ...devices.value,
+          [deviceId]: {
+            id: deviceId,
+            nickname: nickname || `设备 ${deviceId.slice(0, 8)}`,
+            status: deviceStatus,
+            lastHeartbeat: Date.now(),
+            activityScore: deviceStatus === 'online' ? 10 : 0,
+          },
+        }
       }
+    }
+
+    function removeDevice(deviceId: string): void {
+      const { [deviceId]: _, ...rest } = devices.value
+      devices.value = rest
     }
 
     function addSharedItem(item: SharedItem): void {
@@ -101,7 +108,7 @@ export const useP2PStore = defineStore(
     }
 
     function clearDevices(): void {
-      devices.value.clear()
+      devices.value = {}
     }
 
     function clearSharedItems(): void {
@@ -122,6 +129,7 @@ export const useP2PStore = defineStore(
       onlineCount,
       setStatus,
       updateDeviceStatus,
+      removeDevice,
       addSharedItem,
       addReceivedItem,
       clearDevices,

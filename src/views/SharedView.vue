@@ -22,7 +22,7 @@ const sharedRecommendations = computed(() =>
 )
 
 const getDeviceLabel = (deviceId: string) => {
-  const device = p2pStore.devices.get(deviceId)
+  const device = p2pStore.devices[deviceId]
   return device?.nickname || `设备 ${deviceId.slice(0, 8)}...`
 }
 
