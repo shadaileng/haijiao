@@ -274,6 +274,6 @@ defineExpose({ startLoad, endLoad, finishLoad })
 .pagination-wrapper {
   display: flex;
   justify-content: center;
-  padding: 16px 0 60px;
+  padding: 16px 0;
 }
 </style>

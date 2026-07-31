@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 统一处理各页面底部间距，避免内容贴底
   - `src/App.vue`：添加动态 class `has-tabbar`，TabBar 页面底部间距 66px，非 TabBar 页面 16px
   - `src/views/SettingsView.vue`：移除重复的 `padding-bottom: 50px`
+  - `src/components/Topics.vue`：移除分页模式多余的 `padding-bottom: 60px`，由 App.vue 统一管理
 
 ## [1.32.0] - 2026-07-29
 
