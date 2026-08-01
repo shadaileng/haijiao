@@ -4,40 +4,36 @@ import { readFileSync } from 'fs';
 
 interface Env {
   HAIJIAO_API_BASE: string;
+  P2P_DB?: D1Database;  // 可选，D1 未绑定时为 undefined
+  ASSETS: { fetch: typeof fetch };
 }
 
-interface PeerRecord {
-  id: string;
-  nickname: string;
-  lastSeen: number;
-}
-
-// P2P 信令服务器内存存储
-const p2pPeers = new Map<string, PeerRecord>();
 const PEER_TIMEOUT = 30 * 60 * 1000; // 30分钟
-let lastCleanup = Date.now();
+let dbInitialized = false;
 
-function cleanupPeers(): void {
-  const now = Date.now();
-  if (now - lastCleanup < 60 * 1000) return;
-
-  for (const [id, peer] of p2pPeers) {
-    if (now - peer.lastSeen > PEER_TIMEOUT) {
-      p2pPeers.delete(id);
-    }
-  }
-  lastCleanup = now;
+// 自动建表（幂等，仅 D1 可用时执行）
+async function ensureTable(db: D1Database): Promise<void> {
+  if (dbInitialized) return;
+  await db.prepare(`
+    CREATE TABLE IF NOT EXISTS p2p_peers (
+      id TEXT PRIMARY KEY,
+      nickname TEXT NOT NULL DEFAULT '',
+      last_seen INTEGER NOT NULL DEFAULT 0
+    )
+  `).run();
+  dbInitialized = true;
+  console.log('[P2P] D1 database initialized');
 }
 
-function handleP2P(request: Request): Promise<Response> {
+function handleP2P(request: Request, env: Env): Promise<Response> {
   const url = new URL(request.url);
   const path = url.pathname.replace('/api/p2p', '');
 
   if (path === '/register' && request.method === 'POST') {
-    return handleRegister(request);
+    return handleRegister(request, env);
   }
   if (path === '/unregister' && request.method === 'POST') {
-    return handleUnregister(request);
+    return handleUnregister(request, env);
   }
   if (path === '/offer' && request.method === 'POST') {
     return handleOffer(request);
@@ -49,7 +45,7 @@ function handleP2P(request: Request): Promise<Response> {
     return handleCandidate(request);
   }
   if (path === '/heartbeat' && request.method === 'POST') {
-    return handleHeartbeat(request);
+    return handleHeartbeat(request, env);
   }
 
   return Promise.resolve(Response.json(
@@ -58,28 +54,46 @@ function handleP2P(request: Request): Promise<Response> {
   ));
 }
 
-async function handleRegister(request: Request): Promise<Response> {
+async function handleRegister(request: Request, env: Env): Promise<Response> {
+  if (!env.P2P_DB) {
+    console.log('[P2P] D1 not bound, P2P unavailable');
+    return Response.json(
+      { success: false, error: 'P2P unavailable: D1 not configured' },
+      { status: 503 }
+    );
+  }
+
   const body = await request.json() as { peerId: string; nickname?: string };
   const { peerId, nickname } = body;
 
-  cleanupPeers();
+  await ensureTable(env.P2P_DB);
 
-  const peers = Array.from(p2pPeers.values())
-    .filter(p => p.id !== peerId)
-    .map(p => p.id);
+  // 写入/更新设备信息
+  await env.P2P_DB.prepare(
+    'INSERT OR REPLACE INTO p2p_peers (id, nickname, last_seen) VALUES (?, ?, ?)'
+  ).bind(peerId, nickname || `设备 ${peerId.slice(0, 8)}`, Date.now()).run();
 
-  p2pPeers.set(peerId, {
-    id: peerId,
-    nickname: nickname || `设备 ${peerId.slice(0, 8)}`,
-    lastSeen: Date.now(),
-  });
+  // 清理超时节点
+  await env.P2P_DB.prepare(
+    'DELETE FROM p2p_peers WHERE last_seen < ?'
+  ).bind(Date.now() - PEER_TIMEOUT).run();
 
-  return Response.json({ success: true, peers });
+  // 查询其他在线设备
+  const { results } = await env.P2P_DB.prepare(
+    'SELECT id, nickname FROM p2p_peers WHERE id != ? AND last_seen > ?'
+  ).bind(peerId, Date.now() - PEER_TIMEOUT).all();
+
+  console.log('[P2P] Register:', peerId, 'Peers:', results.length);
+  return Response.json({ success: true, peers: results });
 }
 
-async function handleUnregister(request: Request): Promise<Response> {
+async function handleUnregister(request: Request, env: Env): Promise<Response> {
+  if (!env.P2P_DB) {
+    return Response.json({ success: true });
+  }
+
   const body = await request.json() as { peerId: string };
-  p2pPeers.delete(body.peerId);
+  await env.P2P_DB.prepare('DELETE FROM p2p_peers WHERE id = ?').bind(body.peerId).run();
 
   return Response.json({ success: true });
 }
@@ -101,21 +115,33 @@ async function handleCandidate(request: Request): Promise<Response> {
   return Response.json({ success: true });
 }
 
-async function handleHeartbeat(request: Request): Promise<Response> {
+async function handleHeartbeat(request: Request, env: Env): Promise<Response> {
+  if (!env.P2P_DB) {
+    return Response.json(
+      { success: false, error: 'P2P unavailable' },
+      { status: 503 }
+    );
+  }
+
   const body = await request.json() as { peerId: string; nickname?: string };
   const { peerId, nickname } = body;
 
-  const peer = p2pPeers.get(peerId);
-  if (peer) {
-    peer.lastSeen = Date.now();
-    if (nickname) {
-      peer.nickname = nickname;
-    }
-  }
+  // 更新心跳时间
+  await env.P2P_DB.prepare(
+    'UPDATE p2p_peers SET last_seen = ?, nickname = COALESCE(?, nickname) WHERE id = ?'
+  ).bind(Date.now(), nickname, peerId).run();
 
-  cleanupPeers();
+  // 清理超时节点
+  await env.P2P_DB.prepare(
+    'DELETE FROM p2p_peers WHERE last_seen < ?'
+  ).bind(Date.now() - PEER_TIMEOUT).run();
 
-  return Response.json({ success: true });
+  // 查询其他在线设备
+  const { results } = await env.P2P_DB.prepare(
+    'SELECT id, nickname FROM p2p_peers WHERE id != ? AND last_seen > ?'
+  ).bind(peerId, Date.now() - PEER_TIMEOUT).all();
+
+  return Response.json({ success: true, peers: results });
 }
 
 export default {
@@ -124,7 +150,7 @@ export default {
 
     // P2P 信令 API
     if (url.pathname.startsWith('/api/p2p/')) {
-      return handleP2P(request);
+      return handleP2P(request, env);
     }
 
     // Proxy API requests to backend

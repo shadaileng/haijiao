@@ -2,7 +2,12 @@ const P2P_API_BASE = '/api/p2p'
 
 interface RegisterResponse {
   success: boolean
-  peers: string[]
+  peers: { id: string; nickname: string }[]  // 返回完整 peer 记录
+}
+
+interface HeartbeatResponse {
+  success: boolean
+  peers: { id: string; nickname: string }[]  // 心跳也返回 peer 列表
 }
 
 interface SignalingResponse {
@@ -10,6 +15,8 @@ interface SignalingResponse {
 }
 
 async function request<T>(path: string, method: string, body?: unknown): Promise<T> {
+  console.log(`[P2P Send] ${method} ${path}`, body)
+
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
   }
@@ -20,16 +27,23 @@ async function request<T>(path: string, method: string, body?: unknown): Promise
     body: body ? JSON.stringify(body) : undefined,
   })
 
+  if (response.status === 503) {
+    console.log('[P2P] Service unavailable: D1 not configured')
+    throw new Error('P2P unavailable')
+  }
+
   if (!response.ok) {
     throw new Error(`Signaling request failed: ${response.statusText}`)
   }
 
-  return response.json()
+  const data = await response.json()
+  console.log(`[P2P Recv] ${path}`, data)
+  return data
 }
 
 export const signalingClient = {
-  async register(peerId: string): Promise<RegisterResponse> {
-    return request<RegisterResponse>('/register', 'POST', { peerId })
+  async register(peerId: string, nickname?: string): Promise<RegisterResponse> {
+    return request<RegisterResponse>('/register', 'POST', { peerId, nickname })
   },
 
   async unregister(peerId: string): Promise<void> {
@@ -48,7 +62,7 @@ export const signalingClient = {
     await request<SignalingResponse>('/candidate', 'POST', { from, to, candidate })
   },
 
-  async heartbeat(peerId: string, nickname: string): Promise<void> {
-    await request<SignalingResponse>('/heartbeat', 'POST', { peerId, nickname })
+  async heartbeat(peerId: string, nickname: string): Promise<HeartbeatResponse> {
+    return request<HeartbeatResponse>('/heartbeat', 'POST', { peerId, nickname })
   },
 }

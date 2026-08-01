@@ -22,7 +22,7 @@ export interface PeerDevice {
 export const useP2PStore = defineStore(
   'p2p',
   () => {
-    const status = ref<'disconnected' | 'connecting' | 'connected'>('disconnected')
+    const status = ref<'disconnected' | 'connecting' | 'connected' | 'unavailable'>('disconnected')
     const devices = ref<Record<string, PeerDevice>>({})
     const sharedItems = ref<SharedItem[]>([])
     const receivedItems = ref<SharedItem[]>([])
@@ -43,7 +43,7 @@ export const useP2PStore = defineStore(
 
     const onlineCount = computed(() => onlineDevices.value.length)
 
-    function setStatus(newStatus: 'disconnected' | 'connecting' | 'connected'): void {
+    function setStatus(newStatus: 'disconnected' | 'connecting' | 'connected' | 'unavailable'): void {
       status.value = newStatus
     }
 

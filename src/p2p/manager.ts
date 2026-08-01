@@ -32,16 +32,25 @@ export class P2PManager {
     }
 
     try {
-      const response = await signalingClient.register(this.identity!.id)
+      const response = await signalingClient.register(
+        this.identity!.id,
+        this.identity!.nickname
+      )
       const p2pStore = useP2PStore()
       p2pStore.setStatus('connected')
 
-      // 添加当前设备到设备列表
+      // 立即添加当前设备到设备列表
       p2pStore.updateDeviceStatus(this.identity!.id, 'online', this.identity!.nickname)
 
-      for (const peerId of response.peers) {
-        if (!this.peers.has(peerId)) {
-          await this.initiateConnection(peerId)
+      // 立即填充所有已在线设备到设备列表（不等 WebRTC 连上）
+      for (const peer of response.peers) {
+        p2pStore.updateDeviceStatus(peer.id, 'online', peer.nickname)
+      }
+
+      // 发起 WebRTC 连接
+      for (const peer of response.peers) {
+        if (!this.peers.has(peer.id)) {
+          await this.initiateConnection(peer.id)
         }
       }
 
@@ -49,7 +58,11 @@ export class P2PManager {
     } catch (error) {
       console.error('P2P connect failed:', error)
       const p2pStore = useP2PStore()
-      p2pStore.setStatus('disconnected')
+      if (error instanceof Error && error.message === 'P2P unavailable') {
+        p2pStore.setStatus('unavailable')
+      } else {
+        p2pStore.setStatus('disconnected')
+      }
     }
   }
 
@@ -221,9 +234,21 @@ export class P2PManager {
 
   private startHeartbeat(): void {
     this.stopHeartbeat()
-    this.heartbeatTimer = setInterval(() => {
+    this.heartbeatTimer = setInterval(async () => {
       if (this.identity) {
-        signalingClient.heartbeat(this.identity.id, this.identity.nickname).catch(console.error)
+        try {
+          const response = await signalingClient.heartbeat(
+            this.identity.id,
+            this.identity.nickname
+          )
+          // 心跳响应中可能有新设备，更新设备列表
+          const p2pStore = useP2PStore()
+          for (const peer of response.peers) {
+            p2pStore.updateDeviceStatus(peer.id, 'online', peer.nickname)
+          }
+        } catch (error) {
+          console.error('P2P heartbeat failed:', error)
+        }
       }
     }, HEARTBEAT_INTERVAL)
   }

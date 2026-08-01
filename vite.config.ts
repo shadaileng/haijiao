@@ -30,17 +30,17 @@ function dynamicProxyPlugin() {
               p2pPeers.delete(id)
             }
           }
-          // 返回其他节点列表
+          // 返回其他节点列表（完整记录）
           const peers = Array.from(p2pPeers.values())
             .filter(p => p.id !== peerId)
-            .map(p => p.id)
+            .map(p => ({ id: p.id, nickname: p.nickname }))
           // 添加当前节点
           p2pPeers.set(peerId, {
             id: peerId,
             nickname: nickname || `设备 ${peerId.slice(0, 8)}`,
             lastSeen: now,
           })
-          console.log('[P2P] Register:', peerId, 'Peers:', peers)
+          console.log('[P2P] Register:', peerId, 'Peers:', peers.length)
           res.writeHead(200, { 'Content-Type': 'application/json' })
           res.end(JSON.stringify({ success: true, peers }))
           return
@@ -62,8 +62,12 @@ function dynamicProxyPlugin() {
             peer.lastSeen = Date.now()
             if (nickname) peer.nickname = nickname
           }
+          // 返回其他节点列表（完整记录）
+          const peers = Array.from(p2pPeers.values())
+            .filter(p => p.id !== peerId)
+            .map(p => ({ id: p.id, nickname: p.nickname }))
           res.writeHead(200, { 'Content-Type': 'application/json' })
-          res.end(JSON.stringify({ success: true }))
+          res.end(JSON.stringify({ success: true, peers }))
           return
         }
 

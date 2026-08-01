@@ -1,0 +1,6 @@
+-- P2P 设备列表表
+CREATE TABLE IF NOT EXISTS p2p_peers (
+  id TEXT PRIMARY KEY,
+  nickname TEXT NOT NULL DEFAULT '',
+  last_seen INTEGER NOT NULL DEFAULT 0
+);
