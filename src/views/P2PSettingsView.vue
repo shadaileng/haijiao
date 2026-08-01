@@ -43,6 +43,14 @@ const onlineCount = computed(() => p2pStore.onlineCount)
 const toggleP2P = async (enabled: boolean) => {
   if (enabled) {
     await p2pManager.connect()
+    // 连接后更新设备信息（identity 在 connect 中初始化）
+    const identity = p2pManager.getIdentity()
+    if (identity) {
+      deviceId.value = identity.id
+      if (!deviceNickname.value) {
+        deviceNickname.value = identity.nickname
+      }
+    }
   } else {
     p2pManager.disconnect()
   }
