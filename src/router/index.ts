@@ -75,17 +75,6 @@ const routes = [
     name: 'Favorites',
     component: () => import('@/views/FavoritesView.vue'),
   },
-  {
-    path: '/settings/p2p',
-    name: 'P2PSettings',
-    component: () => import('@/views/P2PSettingsView.vue'),
-  },
-  {
-    path: '/shared',
-    name: 'Shared',
-    component: () => import('@/views/SharedView.vue'),
-    meta: { showTabBar: true },
-  },
 ]
 
 const publicPages = ['Login', 'Settings', 'ImageViewer', 'History']
