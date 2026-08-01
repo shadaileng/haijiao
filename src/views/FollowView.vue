@@ -1,6 +1,6 @@
 <script setup lang="ts">
 defineOptions({ name: 'FollowView' })
-import { ref, reactive, onMounted, onDeactivated } from 'vue'
+import { ref, reactive, onMounted, onActivated, onDeactivated, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast, showConfirmDialog } from 'vant'
 import { api } from '@/api/request'
@@ -35,6 +35,16 @@ onMounted(async () => {
 
 onDeactivated(() => {
   sessionStorage.setItem('scrollPos_SettingsFollow', String(window.scrollY))
+})
+
+onActivated(() => {
+  const saved = Number(sessionStorage.getItem('scrollPos_SettingsFollow') || '0')
+  sessionStorage.removeItem('scrollPos_SettingsFollow')
+  if (saved > 0) {
+    nextTick(() => {
+      window.scrollTo(0, saved)
+    })
+  }
 })
 
 const usernameFilter = () => {
