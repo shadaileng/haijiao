@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useAppStore } from '@/stores/app'
 
 const routes = [
   {
@@ -114,11 +115,19 @@ const router = createRouter({
 })
 
 router.beforeEach((to, _from, next) => {
+  const appStore = useAppStore()
+  appStore.show()
+
   if (isLoggedIn() || publicPages.includes(to.name as string)) {
     next()
   } else {
     next({ name: 'Login' })
   }
+})
+
+router.afterEach(() => {
+  const appStore = useAppStore()
+  appStore.hide()
 })
 
 ;(window as any).__router__ = router

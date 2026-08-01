@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.37.0] - 2026-08-01
+
+### Added
+
+- 新增全局 Loading 指示器功能
+  - `src/stores/app.ts`：app store，loading 计数器 + show/hide 方法（300ms 最短显示时间）
+  - `src/components/common/GlobalLoading.vue`：全局 loading 组件，fixed 定位 + van-loading + fade 动画
+  - `src/App.vue`：导入并挂载 `<GlobalLoading />` 组件
+  - `src/router/index.ts`：路由守卫自动触发（beforeEach show + afterEach hide）
+
 ## [1.36.0] - 2026-08-01
 
 ### Added
@@ -13,6 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `src/views/NotFoundView.vue`：404 页面组件，使用 Vant Empty 组件展示错误提示
   - `src/router/index.ts`：添加通配符路由 `/:pathMatch(.*)*` 捕获所有未定义路径
   - 404 页面加入 publicPages，未登录用户也可访问
+- 新增页面结构与操作规范文档
+  - `docs/guides/04-页面结构与操作规范.md`：主页面和子页面的结构、操作、路由配置规范
 
 ## [1.35.2] - 2026-07-31
 

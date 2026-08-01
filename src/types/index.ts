@@ -43,15 +43,20 @@ export interface UserCurrent {
 }
 
 export interface FollowUser {
-  id: number
   userId: number
   nickname: string
   avatar: string
   description: string
-  topicCount: number
-  videoCount: number
   fansCount: number
-  favoriteCount: number
+  isFavorite: boolean
+  tagNames: string[] | null
+  vip: number
+  certified: boolean
+  certVideo: boolean
+  certProfessor: boolean
+  famous: boolean
+  status: number
+  title: { id: number; name: string; consume: number; consumeEnd: number; icon: string }
 }
 
 export interface Page {

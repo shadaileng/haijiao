@@ -2,6 +2,7 @@
 import { RouterView, useRoute } from 'vue-router'
 import { ref, reactive, watch, provide } from 'vue'
 import TabBar from '@/components/common/TabBar.vue'
+import GlobalLoading from '@/components/common/GlobalLoading.vue'
 
 const route = useRoute()
 const active = ref('hot')
@@ -51,6 +52,7 @@ watch(() => overlay.show, (val) => {
       </keep-alive>
     </RouterView>
     <TabBar v-if="route.meta?.showTabBar" />
+    <GlobalLoading />
     <van-back-top />
     <van-overlay :show="overlay.show" @click="overlay.show = false">
       <div class="overlay-wrapper">

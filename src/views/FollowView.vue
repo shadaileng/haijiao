@@ -118,21 +118,22 @@ const handleUnfollow = async (item: FollowUser) => {
                   v-headicon="item.avatar?.startsWith('http') ? item.avatar + '.txt' : item.avatar"
                   class="follow-avatar"
                 />
-                  <div class="follow-body">
-                    <div class="follow-top">
-                      <a class="hv-link" @click="$router.push(`/homepage/${item.userId}`)">{{ item.nickname }}</a>
-                      <van-button
-                        size="small"
-                        type="danger"
-                        plain
-                        :loading="unfollowLoading === item.userId"
-                        @click="handleUnfollow(item)"
-                      >
-                        取消关注
-                      </van-button>
-                    </div>
-                    <div class="follow-sign">签名:{{ item.description || '这家伙很懒什么也没留下' }}</div>
-                  </div>
+                <div class="follow-body">
+                  <a class="hv-link" @click="$router.push(`/homepage/${item.userId}`)">{{ item.nickname }}</a>
+                  <div class="follow-sign">{{ item.description || '这家伙很懒什么也没留下' }}</div>
+                </div>
+                <div class="follow-actions">
+                  <van-button
+                    size="small"
+                    type="danger"
+                    plain
+                    :loading="unfollowLoading === item.userId"
+                    @click="handleUnfollow(item)"
+                  >
+                    取消关注
+                  </van-button>
+                  <div class="follow-count">粉丝: {{ item.fansCount }}</div>
+                </div>
               </div>
             </div>
           </template>
@@ -149,7 +150,7 @@ const handleUnfollow = async (item: FollowUser) => {
 }
 .follow-item {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 12px;
 }
 .follow-avatar {
@@ -160,17 +161,24 @@ const handleUnfollow = async (item: FollowUser) => {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  align-items: flex-start;
+  gap: 4px;
 }
-.follow-top {
+.follow-actions {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.follow-count {
+  font-size: 0.8rem;
+  color: #999;
+  white-space: nowrap;
 }
 .follow-sign {
   font-size: 0.85rem;
   color: #999;
-  text-align: left;
 }
 .hv-link {
   text-decoration: none;
