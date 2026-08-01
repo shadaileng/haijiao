@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.36.0] - 2026-08-01
+
+### Added
+
+- 新增 404 页面处理未定义路由
+  - `src/views/NotFoundView.vue`：404 页面组件，使用 Vant Empty 组件展示错误提示
+  - `src/router/index.ts`：添加通配符路由 `/:pathMatch(.*)*` 捕获所有未定义路径
+  - 404 页面加入 publicPages，未登录用户也可访问
+
 ## [1.35.2] - 2026-07-31
 
 ### Fixed

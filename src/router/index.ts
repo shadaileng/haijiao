@@ -75,9 +75,14 @@ const routes = [
     name: 'Favorites',
     component: () => import('@/views/FavoritesView.vue'),
   },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    component: () => import('@/views/NotFoundView.vue'),
+  },
 ]
 
-const publicPages = ['Login', 'Settings', 'ImageViewer', 'History']
+const publicPages = ['Login', 'Settings', 'ImageViewer', 'History', 'NotFound']
 
 function isLoggedIn(): boolean {
   try {
