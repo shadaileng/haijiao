@@ -67,6 +67,7 @@ export default defineConfig({
         { text: '开发指南', link: '/guides/01-开发指南/' },
         { text: '用户手册', link: '/guides/02-用户手册/' },
         { text: 'E2E 代理踩坑排查', link: '/guides/03-E2E代理踩坑排查/' },
+        { text: '页面结构与操作规范', link: '/guides/04-页面结构与操作规范/' },
       ],
       '/plans/': [
         { text: '登录功能实施方案', link: '/plans/01-登录功能实施方案/' },
@@ -100,6 +101,7 @@ export default defineConfig({
         { text: '关注功能方案', link: '/plans/29-关注功能方案/' },
         { text: '设置页布局优化方案', link: '/plans/30-设置页布局优化方案/' },
         { text: 'P2P 共享功能方案', link: '/plans/31-P2P共享功能方案/' },
+        { text: '全局 Loading 指示器方案', link: '/plans/32-全局Loading指示器方案/' },
       ],
       '/references/': [
         { text: 'API 参考', link: '/references/01-API 参考/' },
