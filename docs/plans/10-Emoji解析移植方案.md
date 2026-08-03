@@ -14,8 +14,8 @@
 >
 > | 日期 | 版本 | 说明 |
 > |------|:----:|------|
+> | 2026-07-14 | v1.0.0 | 实施完成：emoji.ts + content.ts + ReplyList/Comment CSS + main.ts 全局挂载 |
 > | 2026-07-14 | v1.0.0 | 初版 |
-| 2026-07-14 | v1.0.0 | 实施完成：emoji.ts + content.ts + ReplyList/Comment CSS + main.ts 全局挂载 |
 >
 > **关联文档**：[02-功能新增与改善方案.md](./02-功能新增与改善方案.md)（总览） · [03-Origin 代码剖析.md](../references/03-Origin%20代码剖析.md)（原始代码分析）
 

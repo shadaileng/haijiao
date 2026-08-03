@@ -14,8 +14,8 @@
 >
 > | 日期 | 版本 | 说明 |
 > |------|:----:|------|
+> | 2026-07-10 | v1.1.0 | 实施完成：新增类型/路由/组件/HotTopics/UserHomeView，调整 Topic/Follow/Search/Settings，添加 IntersectionObserver 懒加载 |
 > | 2026-07-10 | v1.0.0 | 初版 |
-| 2026-07-10 | v1.1.0 | 实施完成：新增类型/路由/组件/HotTopics/UserHomeView，调整 Topic/Follow/Search/Settings，添加 IntersectionObserver 懒加载 |
 
 > **关联文档**：[01-架构概览.md](../architecture/01-架构概览.md) · [02-功能新增与改善方案.md](./02-功能新增与改善方案.md)
 
