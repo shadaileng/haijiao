@@ -212,6 +212,16 @@ pnpm run build
 # 上传 dist/ 到你的 CDN/服务器
 ```
 
+### GitHub Pages（文档站）
+
+文档站（VitePress）通过 GitHub Actions 自动部署到 GitHub Pages：
+
+1. 在仓库设置中启用 GitHub Pages（Source 选择 "GitHub Actions"）
+2. 推送 `main` 分支且 `docs/**` 目录有变更时自动触发
+3. 工作流文件：`.github/workflows/docs.yml`
+
+踩坑记录详见 [docs/guides/05-GitHubActions部署踩坑记录.md](docs/guides/05-GitHubActions部署踩坑记录.md)
+
 ## 开发规范
 
 - 使用 TypeScript 严格模式

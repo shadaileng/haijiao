@@ -19,6 +19,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - 移除未使用的 `src/views/UserView.vue` 及其路由
 - 更新 docs-manage skill：强调文档创建时必须同步侧边栏配置
+- 添加 GitHub Actions 文档自动部署说明到开发指南
+- 新增 GitHub Actions 部署踩坑记录文档
+
+### Fixed
+
+- 统一 pnpm 版本至 10.28.2，修复 CI 构建错误
 
 ## [1.37.1] - 2026-08-03
 

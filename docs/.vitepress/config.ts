@@ -68,6 +68,7 @@ export default defineConfig({
         { text: '用户手册', link: '/guides/02-用户手册/' },
         { text: 'E2E 代理踩坑排查', link: '/guides/03-E2E代理踩坑排查/' },
         { text: '页面结构与操作规范', link: '/guides/04-页面结构与操作规范/' },
+        { text: 'GitHub Actions 部署踩坑记录', link: '/guides/05-GitHubActions部署踩坑记录/' },
       ],
       '/plans/': [
         { text: '登录功能实施方案', link: '/plans/01-登录功能实施方案/' },

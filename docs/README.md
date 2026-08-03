@@ -53,7 +53,8 @@ docs/
 │   ├── 01-开发指南.md
 │   ├── 02-用户手册.md
 │   ├── 03-E2E代理踩坑排查.md
-│   └── 04-页面结构与操作规范.md
+│   ├── 04-页面结构与操作规范.md
+│   └── 05-GitHubActions部署踩坑记录.md
 └── reference/                       # 参考代码（.gitignore，不纳入版本管理）
     ├── origin/                      # 原始 Webpack 编译产物
     │   ├── app.js
@@ -108,6 +109,7 @@ docs/
 | `02-用户手册.md` | v1.1.0 | 手册 | `guides/` | 功能使用说明 | 🏁 |
 | `03-E2E代理踩坑排查.md` | v1.0.0 | 指南 | `guides/` | Vite 6 + http-proxy-3 动态代理踩坑记录 | 🏁 |
 | `04-页面结构与操作规范.md` | v1.0.0 | 指南 | `guides/` | 主页面和子页面的结构、操作、路由配置规范 | 🏁 |
+| `05-GitHubActions部署踩坑记录.md` | v1.0.0 | 指南 | `guides/` | GitHub Actions 部署文档站踩坑记录 | 🏁 |
 
 **文档类型说明**：
 
