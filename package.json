@@ -2,6 +2,7 @@
   "name": "haijiao-web",
   "private": true,
   "version": "1.38.0",
+  "packageManager": "pnpm@10.28.2",
   "type": "module",
   "scripts": {
     "dev": "vite",
