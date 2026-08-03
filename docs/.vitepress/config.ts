@@ -103,6 +103,7 @@ export default defineConfig({
         { text: 'P2P 共享功能方案', link: '/plans/31-P2P共享功能方案/' },
         { text: '全局 Loading 指示器方案', link: '/plans/32-全局Loading指示器方案/' },
         { text: '首页更新横幅提示方案', link: '/plans/33-首页更新横幅提示方案/' },
+        { text: 'Worker 静态资源 MIME 类型修复方案', link: '/plans/34-Worker静态资源MIME类型修复方案/' },
       ],
       '/references/': [
         { text: 'API 参考', link: '/references/01-API 参考/' },

@@ -16,7 +16,13 @@ export default {
       return proxyApi(request, env);
     }
 
-    // SPA fallback: non-API requests return index.html
+    // Try to serve static assets first
+    const assetResponse = await env.ASSETS.fetch(request);
+    if (assetResponse.status === 200) {
+      return assetResponse;
+    }
+
+    // SPA fallback: non-API, non-asset requests return index.html
     return env.ASSETS.fetch(new Request(`${url.origin}/index.html`, request));
   },
 };

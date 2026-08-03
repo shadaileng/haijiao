@@ -41,7 +41,8 @@ docs/
 │   ├── 30-设置页布局优化方案.md
 │   ├── 31-P2P共享功能方案.md
 │   ├── 32-全局Loading指示器方案.md
-│   └── 33-首页更新横幅提示方案.md
+│   ├── 33-首页更新横幅提示方案.md
+│   └── 34-Worker静态资源MIME类型修复方案.md
 ├── architecture/                    # 架构类（持续维护）
 │   └── 01-架构概览.md
 ├── references/                      # 参考类（持续维护）
@@ -98,6 +99,7 @@ docs/
 | `31-P2P共享功能方案.md` | v1.5.0 | 方案 | `plans/` | 用户设备加入 P2P 网络，实时共享足迹和推荐内容 | 🚧 |
 | `32-全局Loading指示器方案.md` | v1.3.0 | 方案 | `plans/` | 全局 Loading 指示器：路由切换自动触发 + 手动控制 + 最短显示时间 | 🏁 |
 | `33-首页更新横幅提示方案.md` | v1.2.0 | 方案 | `plans/` | 帖子列表有新内容时顶部显示更新横幅 | 🏁 |
+| `34-Worker静态资源MIME类型修复方案.md` | v1.0.0 | 方案 | `plans/` | 修复 Cloudflare Worker 静态资源 MIME 类型错误 | 🏁 |
 | `01-架构概览.md` | v1.1.0 | 架构 | `architecture/` | 系统架构与请求链路 | 🏁 |
 | `01-API 参考.md` | v1.2.0 | 参考 | `references/` | 所有 API 端点定义 | 🏁 |
 | `02-数据字典.md` | v1.2.0 | 参考 | `references/` | 核心类型定义 | 🏁 |
@@ -571,6 +573,15 @@ docs/
 | 6 | `src/views/UserHomeView.vue` | 添加首条 ID 记录，传递 prop | ✅ |
 | 7 | `src/views/UserView.vue` | 移除（未使用） | ✅ |
 | 8 | — | 功能测试验证 | ✅ |
+
+### 34-Worker静态资源MIME类型修复方案
+
+| 步骤 | 文件 | 操作 | 状态 |
+|:----:|:-----|:-----|:----:|
+| 1 | `docs/plans/34-Worker静态资源MIME类型修复方案.md` | 创建方案文档 | ✅ |
+| 2 | `worker.ts` | 修改 fetch handler，静态资源优先 | ✅ |
+| 3 | — | `pnpm run build` 构建验证 | ✅ |
+| 4 | `docs/README.md` | 文档同步 | ✅ |
 
 ## 参考代码
 
