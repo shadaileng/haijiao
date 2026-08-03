@@ -5,7 +5,7 @@
 > | 项目 | 内容 |
 > |------|------|
 > | 文档编号 | 04 |
-> | 文档版本 | v1.3.0 |
+> | 文档版本 | v1.4.0 |
 > | 文档状态 | 🏁 已完成 |
 > | 最后更新 | 2026-08-03 |
 > | 对应内容 | 所有 API 端点定义、参数、响应 |
@@ -14,6 +14,7 @@
 >
 > | 日期 | 版本 | 说明 |
 > |------|:----:|------|
+> | 2026-08-03 | v1.4.0 | 修复 getFollowList 参数、signIn 描述、补充已实现端点清单 |
 > | 2026-08-03 | v1.3.0 | 修复 signIn 错误静默问题，更新已实现端点清单 |
 > | 2026-07-31 | v1.2.0 | 添加 getTaskStatus API，修正签到状态判断逻辑 |
 > | 2026-07-12 | v1.1.0 | 移除 proxy-image 引用、添加 toCamelCase 说明、修复重复章节 |
@@ -165,9 +166,8 @@ Sign = MD5(Username + Password + navigator.userAgent)
 | **URL** | `POST /api/user/user_sign_in` |
 | **认证** | 是（X-User-Id + X-User-Token） |
 | **响应** | `SignInResult` |
-| **异常** | 未登录时 API 返回 `success: false` + `"请先登录"`，**直接抛出 Error**（不静默） |
 
-> 注意：`api.signIn()` 不再捕获异常，调用方需自行 try/catch 处理错误。
+> 注意：`api.signIn()` 不捕获异常，调用方需自行 try/catch 处理错误。
 
 ---
 
@@ -177,9 +177,9 @@ Sign = MD5(Username + Password + navigator.userAgent)
 
 | 项目 | 值 |
 |------|-----|
-| **函数** | `getFollowList(token, uid)` |
+| **函数** | `getFollowList()` |
 | **URL** | `GET /api/user/favorite/users` |
-| **请求头** | `X-User-Id: {uid}`、`X-User-Token: {token}` |
+| **认证** | 自动（X-User-Id + X-User-Token 由 getAuthHeaders 注入） |
 | **响应** | `FollowUser[]` |
 
 ---
@@ -212,31 +212,32 @@ Sign = MD5(Username + Password + navigator.userAgent)
 
 ---
 
-## 8. 已实现端点（参考代码中发现，现已全部实现）
+## 8. 已实现端点
 
-以下端点已在 `app.js` 模块 `1f24` 和 `21e4` 中发现，当前项目已实现：
+以下端点已在 `src/api/request.ts` 中实现：
 
 | 端点 | 方法 | 用途 | 实现位置 |
 |:-----|:----:|------|:---------|
-| `/user/user_sign_in` | POST | 每日签到 | §4.2 `signIn()` |
-| `/user/current` | GET | 获取当前用户信息 | `api.current()` |
-| `/user/fans` | GET | 粉丝列表 | — |
-| `/favorite/add` | GET | 收藏帖子 | `api.addFavorite()` |
-| `/favorite/delete` | GET | 取消收藏 | `api.delFavorite()` |
-| `/user/favorite` | GET | 收藏列表 | `api.checkFavorite()` |
-| `/tag/tags` | GET | 获取标签 | `api.tags()` |
-| `/captcha/request` | GET | 获取验证码 | — |
-| `/captcha/isNeed` | GET | 检查是否需要验证码 | — |
-| `/login/signup` | POST | 注册 | — |
-| `/user/password/find` | POST | 找回密码 | — |
-| `/user/password/reset` | POST | 重置密码 | — |
-| `/vip/querySaleTopicStatus` | GET | VIP 销售状态 | — |
-| `/vip/getNumber` | GET | VIP 数量 | — |
-| `/vip/queryFreeNum` | GET | 免费 VIP 数量 | — |
-| `/vip/queryDisCardNum` | GET | 丢弃卡数量 | — |
-| `/chat/message` | POST | 发送私信 | — |
-| `/topic/create` | POST | 创建帖子 | — |
-| `/topic/edit` | POST | 编辑帖子 | — |
+| `/topic/{topicId}` | GET | 获取帖子详情 | `getTopic()` |
+| `/topic/node/topics` | GET | 获取用户帖子列表 | `getUserTopics()` |
+| `/topic/searchV2` | GET | 搜索帖子 | `searchTopics()` |
+| `/topic/nodes_by_ver/v2` | GET | 获取板块列表 | `getNodes()` |
+| `/tag/tags` | GET | 获取标签 | `getTags()` |
+| `/attachment` | POST | 获取视频资源地址 | `loadVideoSrc()` |
+| `/comment/reply_list` | GET | 获取评论列表 | `getComments()` |
+| `/user/current` | GET | 获取当前用户信息 | `getCurrentUser()` |
+| `/user/user_sign_in` | POST | 每日签到 | `signIn()` |
+| `/user/wealth` | GET | 获取用户财富信息 | `wealth()` |
+| `/user/favorite/users` | GET | 获取关注列表 | `getFollowList()` |
+| `/user/favorite` | POST | 关注用户 | `addFollow()` |
+| `/user/favorite` | DELETE | 取消关注 | `cancelFollow()` |
+| `/favorite/v2/add` | GET | 收藏帖子 | `addFavorite()` |
+| `/favorite/v2/delete` | GET | 取消收藏 | `delFavorite()` |
+| `/favorite/v2/check` | GET | 检查收藏状态 | `checkFavorite()` |
+| `/favorite/v2/folderList` | GET | 获取收藏夹列表 | `getFavoriteFolders()` |
+| `/favorite/v2/topics` | GET | 获取收藏帖子列表 | `getFavoriteTopics()` |
+| `/task/getTaskStatus` | GET | 获取任务状态 | `getTaskStatus()` |
+| `/login/signin` | POST | 用户登录 | `login()` |
 
 > 详见 [02-功能新增与改善方案.md](../plans/02-功能新增与改善方案.md)
 
