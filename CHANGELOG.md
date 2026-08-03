@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.37.1] - 2026-08-03
+
+### Fixed
+
+- 修复签到接口静默错误问题：`api.signIn()` 不再捕获异常，token 失效时正确提示"请先登录"
+- 修复设置页 `/api/user/current` 静默失败：加载用户信息失败时显示错误提示
+
 ## [1.37.0] - 2026-08-01
 
 ### Added

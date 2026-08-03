@@ -34,8 +34,12 @@ onMounted(async () => {
 })
 
 const loadCurrentUser = async () => {
-  const data = await userStore.fetchCurrent()
-  if (data) currentUser.value = data
+  const resp = await api.current()
+  if (resp.success && resp.data) {
+    currentUser.value = resp.data?.user || resp.data
+  } else {
+    showToast(resp.message || '获取用户信息失败')
+  }
 }
 
 const loadWealth = async () => {

@@ -474,12 +474,8 @@ export const api: Api = {
     }
   },
   async signIn() {
-    try {
-      const data = await request<SignInResult>({ url: '/user/user_sign_in', method: 'POST' })
-      return { success: true, data }
-    } catch (e: any) {
-      return { success: false, message: e.message }
-    }
+    const data = await request<SignInResult>({ url: '/user/user_sign_in', method: 'POST' })
+    return { success: true, data }
   },
   async wealth() {
     try {
