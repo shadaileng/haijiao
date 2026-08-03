@@ -24,6 +24,8 @@ const topicsMap: Record<number, LiteTopic[]> = {}
 const pageMap: Record<number, number> = {}
 const totalMap: Record<number, number> = {}
 const scrollMap: Record<number, number> = {}
+const lastFirstTopicIdMap: Record<number, string | number> = {}
+const latest = ref<{ topics: LiteTopic[]; total: number }>()
 const loading = ref(true)
 const pageSize = 20
 const loaded = ref(false)
@@ -50,15 +52,50 @@ const loadPage = async (page: number) => {
     topicsMap[tab] = resp.data.results || []
     pageMap[tab] = page
     totalMap[tab] = resp.data.page?.total || 0
+    if (page === 1 && resp.data.results && resp.data.results.length > 0) {
+      lastFirstTopicIdMap[tab] = resp.data.results[0].topicId
+    }
   } else {
     showToast(resp.message || '加载失败')
   }
   loading.value = false
 }
 
+const checkUpdate = async () => {
+  const tab = activeFolderIndex.value
+  const folder = folders.value[tab]
+  if (!folder || !lastFirstTopicIdMap[tab]) return
+  const resp = await api.favoriteTopics({
+    params: { page: 1, limit: pageSize, folderId: folder.id, total: folder.count }
+  })
+  if (!resp.success || !resp.data.results?.length) return
+  const latestFirstId = resp.data.results[0].topicId
+  if (latestFirstId !== lastFirstTopicIdMap[tab]) {
+    latest.value = {
+      topics: resp.data.results,
+      total: resp.data.page?.total || 0
+    }
+  }
+}
+
+const onApply = () => {
+  const tab = activeFolderIndex.value
+  if (latest.value) {
+    topicsMap[tab] = latest.value.topics
+    lastFirstTopicIdMap[tab] = latest.value.topics[0].topicId
+    pageMap[tab] = 1
+    totalMap[tab] = latest.value.total
+    latest.value = undefined
+  } else {
+    loadPage(1)
+  }
+  nextTick(() => { window.scrollTo({ top: 0 }) })
+}
+
 const onFolderChange = (newIndex: number) => {
   scrollMap[activeFolderIndex.value] = window.scrollY
   activeFolderIndex.value = newIndex
+  latest.value = undefined
   if (!topicsMap[newIndex]) {
     loadPage(1)
   } else {
@@ -75,6 +112,8 @@ onActivated(async () => {
       loaded.value = true
       await loadPage(1)
     }
+  } else {
+    checkUpdate()
   }
   nextTick(() => {
     window.scrollTo({ top: scrollMap[activeFolderIndex.value] || 0 })
@@ -105,7 +144,10 @@ const onPageChange = (p: number) => loadPage(p)
       :page-index="pageMap[activeFolderIndex] || 1"
       :total-items="totalMap[activeFolderIndex] || 0"
       :page-size="pageSize"
+      :baseline-first-id="lastFirstTopicIdMap[activeFolderIndex]"
+      :latest="latest"
       @page-change="onPageChange"
+      @apply="onApply"
     />
   </div>
 </template>

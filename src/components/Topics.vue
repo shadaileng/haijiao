@@ -1,4 +1,7 @@
 <template>
+  <div v-if="newCount > 0" class="new-banner" @click="onBannerClick">
+    有 {{ newCount >= 20 ? '20+' : newCount }} 条新内容，点击查看
+  </div>
   <van-empty v-if="!skeletonLoading && (mode === 'scroll' ? !loading : true) && topics.length === 0" description="暂无内容" />
   <van-skeleton v-else title avatar :row="3" :loading="skeletonLoading">
     <template v-if="mode === 'scroll'">
@@ -141,7 +144,7 @@
 <script setup lang="ts">
 import { LiteTopic } from '@/types'
 import { LOADING_URL } from '@/utils/constant'
-import { ref, type PropType } from 'vue'
+import { ref, watch, type PropType } from 'vue'
 import Pagination from './Pagination.vue'
 
 const props = defineProps({
@@ -169,11 +172,55 @@ const props = defineProps({
     type: Number,
     default: 20,
   },
+  baselineFirstId: {
+    type: [String, Number],
+    default: undefined,
+  },
+  latest: {
+    type: Object as PropType<{ topics: LiteTopic[]; total: number }>,
+    default: undefined,
+  },
 })
 
-const emit = defineEmits(['load', 'pageChange'])
+const emit = defineEmits(['load', 'pageChange', 'apply'])
 const finished = ref(false)
 const loading = ref(true)
+const newCount = ref(0)
+const lastFirstId = ref<string | number>()
+
+const onBannerClick = () => {
+  emit('apply')
+  lastFirstId.value = undefined
+  newCount.value = 0
+}
+
+watch(() => props.topics, (newTopics) => {
+  if (props.pageIndex !== 1 || !props.baselineFirstId || newTopics.length === 0) {
+    newCount.value = 0
+    return
+  }
+  const currentFirstId = newTopics[0].topicId
+  if (!lastFirstId.value) {
+    lastFirstId.value = currentFirstId
+    if (currentFirstId === props.baselineFirstId) {
+      newCount.value = 0
+      return
+    }
+  }
+  if (currentFirstId === props.baselineFirstId) {
+    newCount.value = 0
+    lastFirstId.value = currentFirstId
+    return
+  }
+  const oldIndex = newTopics.findIndex(t => t.topicId === props.baselineFirstId)
+  const count = oldIndex === -1 ? newTopics.length : oldIndex
+  newCount.value = count > props.pageSize ? props.pageSize : count
+}, { immediate: true })
+
+watch(() => props.baselineFirstId, () => {
+  lastFirstId.value = undefined
+  newCount.value = 0
+})
 
 const onLoad = () => {
   if (!loading.value && props.topics.length > 0) {
@@ -197,6 +244,18 @@ defineExpose({ startLoad, endLoad, finishLoad })
 </script>
 
 <style scoped>
+.new-banner {
+  position: sticky;
+  top: 44px;
+  z-index: 98;
+  background: #fff;
+  text-align: center;
+  padding: 10px 0;
+  color: #1989fa;
+  font-size: 14px;
+  border-bottom: 1px solid #ebedf0;
+  cursor: pointer;
+}
 .card {
   text-align: left;
   cursor: pointer;

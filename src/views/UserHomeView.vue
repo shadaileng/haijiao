@@ -1,6 +1,6 @@
 <script setup lang="ts">
 defineOptions({ name: 'UserHomeView' })
-import { ref, reactive, onMounted, watch, computed } from 'vue'
+import { ref, reactive, onMounted, watch, computed, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import { showToast, showConfirmDialog } from 'vant'
 import { api } from '@/api/request'
@@ -26,6 +26,8 @@ const pageIndex = ref(1)
 const totalItems = ref(0)
 const pageSize = 15
 const loading = ref(true)
+const lastFirstTopicId = ref<string | number>()
+const latest = ref<{ topics: LiteTopic[]; total: number }>()
 
 const isFollowing = ref(false)
 const followLoading = ref(false)
@@ -59,6 +61,8 @@ watch(() => route.params.userId, async (newId) => {
     pageIndex.value = 1
     totalItems.value = 0
     isFollowing.value = false
+    lastFirstTopicId.value = undefined
+    latest.value = undefined
     try {
       await loadUserInfo(userId.value)
       if (!isSelf.value && settings.isLoggedIn) {
@@ -94,12 +98,29 @@ const loadPage = async (page: number) => {
   if (data?.results) {
     topics.length = 0
     topics.push(...data.results)
+    if (page === 1 && data.results.length > 0) {
+      lastFirstTopicId.value = data.results[0].topicId
+    }
   }
   if (data?.page) {
     totalItems.value = data.page.total
     pageIndex.value = page
   }
   loading.value = false
+}
+
+const onApply = () => {
+  if (latest.value) {
+    topics.length = 0
+    topics.push(...latest.value.topics)
+    lastFirstTopicId.value = latest.value.topics[0].topicId
+    pageIndex.value = 1
+    totalItems.value = latest.value.total
+    latest.value = undefined
+  } else {
+    loadPage(1)
+  }
+  nextTick(() => { window.scrollTo({ top: 0 }) })
 }
 
 const checkFollowStatus = async () => {
@@ -184,7 +205,10 @@ const toggleFollow = async () => {
     :pageIndex="pageIndex"
     :totalItems="totalItems"
     :pageSize="pageSize"
+    :baselineFirstId="lastFirstTopicId"
+    :latest="latest"
     @pageChange="loadPage"
+    @apply="onApply"
   />
 </template>
 

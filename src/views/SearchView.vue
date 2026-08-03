@@ -1,6 +1,6 @@
 <script setup lang="ts">
 defineOptions({ name: 'SearchView' })
-import { ref, reactive, onMounted, watch } from 'vue'
+import { ref, reactive, onMounted, watch, nextTick } from 'vue'
 import { showToast } from 'vant'
 import type { LiteTopic } from '@/types'
 import { api } from '@/api/request'
@@ -15,6 +15,8 @@ const topics: LiteTopic[] = reactive([])
 const pageIndex = ref(1)
 const totalItems = ref(0)
 const pageSize = 20
+const lastFirstTopicId = ref<string | number>()
+const latest = ref<{ topics: LiteTopic[]; total: number }>()
 
 const tags = reactive<any[]>([])
 
@@ -33,6 +35,8 @@ const onClear = () => {
   topics.splice(0, topics.length)
   pageIndex.value = 1
   totalItems.value = 0
+  lastFirstTopicId.value = undefined
+  latest.value = undefined
 }
 
 watch(key, (val) => {
@@ -50,6 +54,7 @@ const search = async (tag?: string) => {
     return
   }
   hasSearched.value = true
+  latest.value = undefined
   await loadPage(1)
 }
 
@@ -64,12 +69,29 @@ const loadPage = async (page: number) => {
   if (result.data?.results) {
     topics.length = 0
     topics.push(...result.data.results)
+    if (page === 1 && result.data.results.length > 0) {
+      lastFirstTopicId.value = result.data.results[0].topicId
+    }
   }
   if (result.data?.page) {
     totalItems.value = result.data.page.total
     pageIndex.value = page
   }
   loading.value = false
+}
+
+const onApply = () => {
+  if (latest.value) {
+    topics.length = 0
+    topics.push(...latest.value.topics)
+    lastFirstTopicId.value = latest.value.topics[0].topicId
+    pageIndex.value = 1
+    totalItems.value = latest.value.total
+    latest.value = undefined
+  } else {
+    loadPage(1)
+  }
+  nextTick(() => { window.scrollTo({ top: 0 }) })
 }
 </script>
 
@@ -109,7 +131,10 @@ const loadPage = async (page: number) => {
     :pageIndex="pageIndex"
     :totalItems="totalItems"
     :pageSize="pageSize"
+    :baselineFirstId="lastFirstTopicId"
+    :latest="latest"
     @pageChange="loadPage"
+    @apply="onApply"
   />
 </template>
 

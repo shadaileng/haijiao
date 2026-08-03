@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.38.0] - 2026-08-03
+
+### Added
+
+- 首页新内容横幅提示功能
+  - Topics 组件改为纯展示组件，移除内部 `fetchApi`，新增 `latest` prop 和 `apply` emit
+  - 5 个 keep-alive 视图（Hot、Node、Favorites、Search、UserHome）在 `onActivated` 中主动检测更新
+  - 检测到新数据时显示横幅提示（≤20 条：`有 X 条新内容，点击查看`，>20 条：`有 20+ 条新内容，点击查看`）
+  - 父组件通过 `latest` prop 传递预加载数据，用户点击横幅时直接应用
+
+### Changed
+
+- 移除未使用的 `src/views/UserView.vue` 及其路由
+- 更新 docs-manage skill：强调文档创建时必须同步侧边栏配置
+
 ## [1.37.1] - 2026-08-03
 
 ### Fixed

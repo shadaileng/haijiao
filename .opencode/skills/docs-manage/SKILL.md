@@ -210,7 +210,21 @@ docs/ 目录的 README.md 必须包含以下章节：
 - [ ] 5. 编写正文内容
 - [ ] 6. 添加「关联文档」交叉引用
 - [ ] 7. 更新 `docs/README.md`（目录结构 + 文档一览 + 执行进度）
-- [ ] 8. 更新 `docs/.vitepress/config.ts` 侧边栏（sidebar 对应子目录数组追加条目）
+- [ ] 8. 更新 `docs/.vitepress/config.ts` 侧边栏（**必须同步，不可遗漏**）
+
+#### 侧边栏同步示例
+
+在 `config.ts` 的 `sidebar` 对象中，找到对应子目录的数组，追加新条目：
+
+```typescript
+'/plans/': [
+  // ... 已有条目
+  { text: '旧方案名称', link: '/plans/32-旧方案名称/' },
+  { text: '新方案名称', link: '/plans/33-新方案名称/' },  // ← 追加到末尾
+],
+```
+
+**注意**：侧边栏条目的 `text` 应使用文档标题（去掉序号前缀），`link` 格式为 `/{子目录}/{文件名去掉.md}/`。
 
 ### 更新现有文档
 
@@ -238,7 +252,7 @@ docs/ 目录的 README.md 必须包含以下章节：
 - [ ] `docs/README.md` 目录结构树已更新
 - [ ] `docs/README.md` 文档一览表已更新
 - [ ] `docs/README.md` 执行进度已更新（方案类）
-- [ ] `docs/.vitepress/config.ts` 侧边栏已更新
+- [ ] `docs/.vitepress/config.ts` 侧边栏已更新（**必须检查，容易遗漏**）
 - [ ] 交叉引用链接正确
 - [ ] `pnpm run docs:build` 构建通过（如有 VitePress 变更）
 

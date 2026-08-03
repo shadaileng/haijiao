@@ -40,11 +40,6 @@ const routes = [
     component: () => import('@/views/UserHomeView.vue'),
   },
   {
-    path: '/user/:userId?',
-    name: 'User',
-    component: () => import('@/views/UserView.vue'),
-  },
-  {
     path: '/settings/follow',
     name: 'SettingsFollow',
     component: () => import('@/views/FollowView.vue'),

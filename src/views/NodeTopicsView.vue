@@ -1,6 +1,6 @@
 <script setup lang="ts">
 defineOptions({ name: 'NodeTopicsView' })
-import { ref, reactive, onMounted, onActivated, watch } from 'vue'
+import { ref, reactive, onMounted, onActivated, watch, nextTick } from 'vue'
 import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router'
 import { showToast } from 'vant'
 import { api } from '@/api/request'
@@ -23,6 +23,8 @@ const pageMap: Record<number, number> = {}
 const totalMap: Record<number, number> = {}
 const nameMap: Record<number, string> = {}
 const scrollCache: Record<number, number> = {}
+const lastFirstTopicIdMap: Record<number, string | number> = {}
+const latest = ref<{ topics: LiteTopic[]; total: number }>()
 
 function syncToReactive(nid: number) {
   topics.length = 0
@@ -48,15 +50,51 @@ async function loadPage(page: number) {
     if (result.data.results.length > 0 && result.data.results[0].node?.name) {
       nameMap[nid] = result.data.results[0].node.name
     }
+    if (page === 1 && result.data.results.length > 0) {
+      lastFirstTopicIdMap[nid] = result.data.results[0].topicId
+    }
     syncToReactive(nid)
   }
   loading.value = false
+}
+
+const checkUpdate = async () => {
+  const nid = currentId.value
+  if (!lastFirstTopicIdMap[nid]) return
+  const result = await api.nodeTopics({ params: { nodeId: nid, page: 1, limit: pageSize } })
+  if (!result.success || !result.data.results?.length) return
+  const latestFirstId = result.data.results[0].topicId
+  if (latestFirstId !== lastFirstTopicIdMap[nid]) {
+    latest.value = {
+      topics: result.data.results,
+      total: result.data.page?.total || 0
+    }
+  }
+}
+
+const onApply = () => {
+  const nid = currentId.value
+  if (latest.value) {
+    topicsMap[nid] = latest.value.topics
+    lastFirstTopicIdMap[nid] = latest.value.topics[0].topicId
+    pageMap[nid] = 1
+    totalMap[nid] = latest.value.total
+    if (latest.value.topics.length > 0 && latest.value.topics[0].node?.name) {
+      nameMap[nid] = latest.value.topics[0].node.name
+    }
+    latest.value = undefined
+    syncToReactive(nid)
+  } else {
+    loadPage(1)
+  }
+  nextTick(() => { window.scrollTo({ top: 0 }) })
 }
 
 function switchNode(nid: number) {
   if (nid === currentId.value) return
   scrollCache[currentId.value] = window.scrollY
   currentId.value = nid
+  latest.value = undefined
   if (topicsMap[nid]) {
     syncToReactive(nid)
     const saved = scrollCache[nid] || 0
@@ -80,8 +118,11 @@ onActivated(() => {
   const nid = Number(route.params.nodeId) || 0
   if (nid !== currentId.value) {
     currentId.value = nid
+    latest.value = undefined
     if (topicsMap[nid]) syncToReactive(nid)
     else loadPage(1)
+  } else {
+    checkUpdate()
   }
   const saved = scrollCache[currentId.value] || 0
   if (saved > 0) {
@@ -108,7 +149,10 @@ onBeforeRouteLeave(() => {
       :pageIndex="pageIndex"
       :totalItems="totalItems"
       :pageSize="pageSize"
+      :baselineFirstId="lastFirstTopicIdMap[currentId]"
+      :latest="latest"
       @pageChange="(p: number) => loadPage(p)"
+      @apply="onApply"
     />
   </div>
 </template>

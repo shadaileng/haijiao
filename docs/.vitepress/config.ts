@@ -102,6 +102,7 @@ export default defineConfig({
         { text: '设置页布局优化方案', link: '/plans/30-设置页布局优化方案/' },
         { text: 'P2P 共享功能方案', link: '/plans/31-P2P共享功能方案/' },
         { text: '全局 Loading 指示器方案', link: '/plans/32-全局Loading指示器方案/' },
+        { text: '首页更新横幅提示方案', link: '/plans/33-首页更新横幅提示方案/' },
       ],
       '/references/': [
         { text: 'API 参考', link: '/references/01-API 参考/' },

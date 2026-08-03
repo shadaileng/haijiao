@@ -40,7 +40,8 @@ docs/
 │   ├── 29-用户主页关注按钮方案.md
 │   ├── 30-设置页布局优化方案.md
 │   ├── 31-P2P共享功能方案.md
-│   └── 32-全局Loading指示器方案.md
+│   ├── 32-全局Loading指示器方案.md
+│   └── 33-首页更新横幅提示方案.md
 ├── architecture/                    # 架构类（持续维护）
 │   └── 01-架构概览.md
 ├── references/                      # 参考类（持续维护）
@@ -96,6 +97,7 @@ docs/
 | `30-设置页布局优化方案.md` | v1.4.0 | 方案 | `plans/` | 设置页布局优化：钱包内嵌用户信息、签到改 cell 独立分组、收藏/足迹/关注上移、登录态显隐、精简登录/退出 cell、移除返回按钮、合并镜像源与数据来源、粘贴Token后加载用户信息 | 🏁 |
 | `31-P2P共享功能方案.md` | v1.5.0 | 方案 | `plans/` | 用户设备加入 P2P 网络，实时共享足迹和推荐内容 | 🚧 |
 | `32-全局Loading指示器方案.md` | v1.3.0 | 方案 | `plans/` | 全局 Loading 指示器：路由切换自动触发 + 手动控制 + 最短显示时间 | 🏁 |
+| `33-首页更新横幅提示方案.md` | v1.2.0 | 方案 | `plans/` | 帖子列表有新内容时顶部显示更新横幅 | 🏁 |
 | `01-架构概览.md` | v1.1.0 | 架构 | `architecture/` | 系统架构与请求链路 | 🏁 |
 | `01-API 参考.md` | v1.2.0 | 参考 | `references/` | 所有 API 端点定义 | 🏁 |
 | `02-数据字典.md` | v1.2.0 | 参考 | `references/` | 核心类型定义 | 🏁 |
@@ -556,6 +558,19 @@ docs/
 | 4 | `src/router/index.ts` | 导入 app store，beforeEach show + afterEach hide | ✅ |
 | 5 | — | `pnpm run build` 构建验证 | ✅ |
 | 6 | `docs/README.md` | 文档同步 | ✅ |
+
+### 33-首页更新横幅提示方案
+
+| 步骤 | 文件 | 操作 | 状态 |
+|:----:|:-----|:-----|:----:|
+| 1 | `src/components/Topics.vue` | 添加 baselineFirstId prop、watch 检测逻辑、横幅 UI | ✅ |
+| 2 | `src/views/HotTopicsView.vue` | 添加首条 ID 记录，传递 prop | ✅ |
+| 3 | `src/views/NodeTopicsView.vue` | 添加首条 ID 记录，传递 prop | ✅ |
+| 4 | `src/views/FavoritesView.vue` | 添加首条 ID 记录，传递 prop | ✅ |
+| 5 | `src/views/SearchView.vue` | 添加首条 ID 记录，传递 prop | ✅ |
+| 6 | `src/views/UserHomeView.vue` | 添加首条 ID 记录，传递 prop | ✅ |
+| 7 | `src/views/UserView.vue` | 移除（未使用） | ✅ |
+| 8 | — | 功能测试验证 | ✅ |
 
 ## 参考代码
 

@@ -13,6 +13,8 @@ const topicsMap: Record<number, LiteTopic[]> = {}
 const pageMap: Record<number, number> = {}
 const totalMap: Record<number, number> = {}
 const scrollMap: Record<number, number> = {}
+const lastFirstTopicIdMap: Record<number, string | number> = {}
+const latest = ref<{ topics: LiteTopic[]; total: number }>()
 const pageSize = 20
 const loading = ref(true)
 
@@ -28,12 +30,44 @@ const loadPage = async (page: number) => {
   topicsMap[tab] = result.data.results
   pageMap[tab] = page
   totalMap[tab] = result.data.page.total
+  if (page === 1 && result.data.results.length > 0) {
+    lastFirstTopicIdMap[tab] = result.data.results[0].topicId
+  }
   loading.value = false
+}
+
+const checkUpdate = async () => {
+  const tab = activeTab.value
+  if (!lastFirstTopicIdMap[tab]) return
+  const result = await api.tabTopics({ params: { tabIndex: tab, page: 1, limit: pageSize } })
+  if (!result.success || !result.data.results?.length) return
+  const latestFirstId = result.data.results[0].topicId
+  if (latestFirstId !== lastFirstTopicIdMap[tab]) {
+    latest.value = {
+      topics: result.data.results,
+      total: result.data.page?.total || 0
+    }
+  }
+}
+
+const onApply = () => {
+  const tab = activeTab.value
+  if (latest.value) {
+    topicsMap[tab] = latest.value.topics
+    lastFirstTopicIdMap[tab] = latest.value.topics[0].topicId
+    pageMap[tab] = 1
+    totalMap[tab] = latest.value.total
+    latest.value = undefined
+  } else {
+    loadPage(1)
+  }
+  nextTick(() => { window.scrollTo({ top: 0 }) })
 }
 
 const onTabChange = (newTab: number) => {
   scrollMap[activeTab.value] = window.scrollY
   activeTab.value = newTab
+  latest.value = undefined
   sessionStorage.setItem('hotActiveTab', String(newTab))
   if (!topicsMap[newTab]) {
     loadPage(1)
@@ -47,6 +81,8 @@ const onTabChange = (newTab: number) => {
 onActivated(() => {
   if (!topicsMap[activeTab.value]) {
     loadPage(1)
+  } else {
+    checkUpdate()
   }
   nextTick(() => {
     window.scrollTo({ top: scrollMap[activeTab.value] || 0 })
@@ -72,7 +108,10 @@ onDeactivated(() => {
       :pageIndex="pageMap[activeTab] || 1"
       :totalItems="totalMap[activeTab] || 0"
       :pageSize="pageSize"
+      :baselineFirstId="lastFirstTopicIdMap[activeTab]"
+      :latest="latest"
       @pageChange="(p: number) => loadPage(p)"
+      @apply="onApply"
     />
   </div>
 </template>
