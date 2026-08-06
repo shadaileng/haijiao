@@ -29,7 +29,7 @@ src/
 ├── composables/   # 组合式函数 (useMirrorConfig 镜像源/数据源配置, useClipboard)
 ├── plugins/       # 指令插件 (headicon 头像解码, content 内容渲染+DPlayer)
 ├── components/    # 通用组件 (Topics/TopicContent/Comment/UserInfo/common/TabBar)
-├── utils/         # 工具 (image 图片解码+loadImg, transform snake→camel, cipher 自定义密码, constant)
+├── utils/         # 工具 (image 图片解码+loadImg, imageLoader 批量队列, transform snake→camel, cipher 自定义密码, constant)
 ├── styles/        # 全局样式 (global.scss)
 ├── views/         # 页面级组件 (Home/Hot/Login/Topic/User/UserHome/Follow/Search/Settings/ImageViewer)
 └── router/        # 路由配置 (index.ts, scrollBehavior)
@@ -90,21 +90,23 @@ src/
 | `src/utils/image.ts` | `loadImg()` 图片加载 + `customDecode()` 自定义 Base64 解码 |
 | `src/plugins/content.ts` | `v-content` 指令：内容渲染 + 图片/视频(DPlayer) |
 | `src/plugins/headicon.ts` | `v-headicon` 指令：头像懒加载与解码 |
+| `src/components/Comment.vue` | 评论区组件：flexbox 紧凑布局（头像+用户名/时间左对齐+楼号推右），内容与回复缩进 `calc(3rem + 10px)`，van-divider 分隔 |
+| `src/components/ReplyList.vue` | 回复列表组件：折叠态显示首条摘要（头像+用户名+正文预览+时间），展开态全部回复，递归嵌套 + 独立折叠状态 |
 | `worker.ts` | Cloudflare Worker 入口，支持 X-Backend 镜像源 |
 | `wrangler.toml` | CF Workers 配置 |
 | `vite.config.ts` | Vite 构建配置（含本地 E2E 自定义中间件代理） |
-| `playwright.config.ts` | Playwright 配置，驱动本机 Chrome，`webServer` 启动 `npm run dev` |
+| `playwright.config.ts` | Playwright 配置，驱动本机 Chrome，`webServer` 启动 `pnpm run dev` |
 | `e2e/` | Playwright 规格：`config.ts`(参数) + `public`/`auth`/`video`/`mirror` 四规格 |
 
 ## 常用命令
 
 ```bash
-npm run dev          # 启动开发服务器
-npm run build        # 类型检查 + 构建
-npm run preview      # 预览构建结果
-npm run test:e2e     # Playwright 端到端测试（驱动本机 Chrome，自动起 dev 服务）
-npm run cf:dev       # 本地 CF Worker 测试
-npm run cf:deploy    # 部署到 Cloudflare Workers
+pnpm run dev          # 启动开发服务器
+pnpm run build        # 类型检查 + 构建
+pnpm run preview      # 预览构建结果
+pnpm run test:e2e     # Playwright 端到端测试（驱动本机 Chrome，自动起 dev 服务）
+pnpm run cf:dev       # 本地 CF Worker 测试
+pnpm run cf:deploy    # 部署到 Cloudflare Workers
 ```
 
 ## 路由表
@@ -115,12 +117,16 @@ npm run cf:deploy    # 部署到 Cloudflare Workers
 | `/hot` | HotTopicsView | 热门 |
 | `/topic/:pid?` | TopicView | 帖子详情（含视频 + 评论） |
 | `/user/:userId?` | UserView | 按 uid 查帖子 |
-| `/homepage/:userId/:nickname?` | UserHomeView | 用户主页 |
+| `/homepage/:userId` | UserHomeView | 用户主页 |
 | `/follow/:userId?` | FollowView | 关注列表 |
 | `/search` | SearchView | 搜索 |
 | `/login` | LoginView | 登录 |
 | `/settings` | SettingsView | 镜像源/uid/token/当前用户 |
 | `/image-viewer` | ImageViewerView | 图片查看 |
+
+## 参考项目
+
+`docs/reference/haijiao-wxt/` 是从 [Gitee - haijiao-wxt](https://gitee.com/shadaileng/haijiao-wxt.git) 下载的原始参考项目源码，用于分析和对比。该目录已加入 `.gitignore`，不纳入版本管理。
 
 ## 操作原则
 

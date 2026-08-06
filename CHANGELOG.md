@@ -5,6 +5,340 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.38.0] - 2026-08-03
+
+### Added
+
+- 首页新内容横幅提示功能
+  - Topics 组件改为纯展示组件，移除内部 `fetchApi`，新增 `latest` prop 和 `apply` emit
+  - 5 个 keep-alive 视图（Hot、Node、Favorites、Search、UserHome）在 `onActivated` 中主动检测更新
+  - 检测到新数据时显示横幅提示（≤20 条：`有 X 条新内容，点击查看`，>20 条：`有 20+ 条新内容，点击查看`）
+  - 父组件通过 `latest` prop 传递预加载数据，用户点击横幅时直接应用
+
+### Changed
+
+- 移除未使用的 `src/views/UserView.vue` 及其路由
+- 更新 docs-manage skill：强调文档创建时必须同步侧边栏配置
+- 添加 GitHub Actions 文档自动部署说明到开发指南
+- 新增 GitHub Actions 部署踩坑记录文档
+
+### Fixed
+
+- 统一 pnpm 版本至 10.28.2，修复 CI 构建错误
+
+## [1.37.1] - 2026-08-03
+
+### Fixed
+
+- 修复签到接口静默错误问题：`api.signIn()` 不再捕获异常，token 失效时正确提示"请先登录"
+- 修复设置页 `/api/user/current` 静默失败：加载用户信息失败时显示错误提示
+
+## [1.37.0] - 2026-08-01
+
+### Added
+
+- 新增全局 Loading 指示器功能
+  - `src/stores/app.ts`：app store，loading 计数器 + show/hide 方法（300ms 最短显示时间）
+  - `src/components/common/GlobalLoading.vue`：全局 loading 组件，fixed 定位 + van-loading + fade 动画
+  - `src/App.vue`：导入并挂载 `<GlobalLoading />` 组件
+  - `src/router/index.ts`：路由守卫自动触发（beforeEach show + afterEach hide）
+
+## [1.36.0] - 2026-08-01
+
+### Added
+
+- 新增 404 页面处理未定义路由
+  - `src/views/NotFoundView.vue`：404 页面组件，使用 Vant Empty 组件展示错误提示
+  - `src/router/index.ts`：添加通配符路由 `/:pathMatch(.*)*` 捕获所有未定义路径
+  - 404 页面加入 publicPages，未登录用户也可访问
+- 新增页面结构与操作规范文档
+  - `docs/guides/04-页面结构与操作规范.md`：主页面和子页面的结构、操作、路由配置规范
+
+## [1.35.2] - 2026-07-31
+
+### Fixed
+
+- 修复 P2P 设备列表显示问题
+  - `src/stores/p2p.ts`：使用 `Record<string, PeerDevice>` 替代 `ref(new Map())` 解决 Vue 响应式追踪问题
+  - `src/views/P2PSettingsView.vue`：刷新页面后自动重连 P2P 网络
+  - `src/views/SharedView.vue`：刷新页面后自动重连 P2P 网络
+  - 移除调试日志
+
+## [1.35.0] - 2026-07-31
+
+### Added
+
+- 设置页布局优化
+  - `src/components/UserInfo.vue`：新增 `wealth` prop，内嵌金币/钻石 inline 显示
+  - `src/views/SettingsView.vue`：
+    - 移除导航栏返回按钮（顶级页面）
+    - 删除钱包 cell-group，金币/钻石移入 UserInfo 组件
+    - 签到 cell 改为独立 `van-cell-group`，移至用户信息下方
+    - 收藏/足迹/关注上移到签到下方，仅登录显示
+    - 精简登录状态：去掉"登录状态"cell，去登录/退出登录独立 `van-cell-group`
+    - 合并镜像源与数据来源为一个 cell-group
+    - 粘贴 Token 后自动加载用户信息并显示 UserInfo 卡片
+  - 文档更新：新增 30-设置页布局优化方案
+
+## [1.34.1] - 2026-07-31
+
+### Fixed
+
+- 修复签到状态显示逻辑
+  - `src/types/index.ts`：新增 `TaskStatus` 类型定义
+  - `src/api/request.ts`：新增 `getTaskStatus()` API 方法
+  - `src/views/SettingsView.vue`：使用 `getTaskStatus` 获取签到状态，修正状态判断逻辑（`status: false` 表示已签到）
+  - 文档更新：API 参考、数据字典、签到方案文档同步更新
+
+## [1.34.0] - 2026-07-31
+
+### Added
+
+- 用户主页添加关注/取消关注切换按钮
+  - `src/types/index.ts`：新增 `FollowStatus` 类型定义
+  - `src/api/request.ts`：新增 `addFollow`、`cancelFollow`、`checkFollow` API 方法
+  - `src/views/UserHomeView.vue`：新增关注按钮，支持关注/取消关注切换
+
+## [1.33.0] - 2026-07-31
+
+### Added
+
+- 设置页添加签到和金币/钻石余额显示功能
+  - `src/types/index.ts`：新增 `SignInResult`、`UserWealth` 类型定义
+  - `src/api/request.ts`：新增 `signIn()`、`wealth()` API 方法
+  - `src/views/SettingsView.vue`：新增钱包卡片（金币/钻石）和签到按钮
+
+## [1.32.1] - 2026-07-31
+
+### Fixed
+
+- 统一处理各页面底部间距，避免内容贴底
+  - `src/App.vue`：添加动态 class `has-tabbar`，TabBar 页面底部间距 66px，非 TabBar 页面 16px
+  - `src/views/SettingsView.vue`：移除重复的 `padding-bottom: 50px`
+  - `src/components/Topics.vue`：移除分页模式多余的 `padding-bottom: 60px`，由 App.vue 统一管理
+  - `src/views/TopicView.vue`：导航栏与标题之间增加 20px 间距，评论区底部增加 32px 间距
+
+## [1.32.0] - 2026-07-29
+
+### Added
+
+- 帖子详情页一键分享功能
+  - `src/views/TopicView.vue`：统计行新增分享按钮，点击复制标题+作者+发布时间+链接+来源文案到剪贴板
+
+### Fixed
+
+- 帖子详情页统计栏布局修复
+  - `src/views/TopicView.vue`：统计栏从 `van-row`/`van-col` 改为 flex `space-around` 布局，5 项不再换行且均匀分布
+
+### Changed
+
+- 文档部署到 GitHub Pages
+  - `docs/.vitepress/config.ts`：添加 `base: '/haijiao/'`
+  - `.github/workflows/docs.yml`：新增自动构建部署工作流
+
+## [1.30.0] - 2026-07-29
+
+### Added
+
+- 帖子收藏功能
+  - `src/types/index.ts`：`Topic` 新增 `isFavorite` 字段
+  - `src/api/request.ts`：新增 `addFavorite()` / `delFavorite()` / `checkFavorite()` / `getFavoriteFolders()` / `getFavoriteTopics()`，使用 v2 收藏 API（`/favorite/v2/add`、`/favorite/v2/delete`、`/favorite/v2/folderList`、`/favorite/v2/topics`）
+  - `src/views/TopicView.vue`：操作栏新增收藏按钮，多收藏夹时弹出 ActionSheet 选择收藏夹
+  - `src/views/FavoritesView.vue`：新建收藏列表页，支持多收藏夹 tab 切换
+  - `src/router/index.ts`：新增 `/favorites` 路由
+  - `src/views/SettingsView.vue`：设置页新增"收藏"入口
+  - `e2e/favorite.spec.ts`：Playwright E2E 测试（收藏按钮渲染、状态切换、API 调用验证、入口可见性）
+
+## [1.27.1] - 2026-07-27
+
+### Added
+
+- 新增「板块」Tab 入口与 NodeView + NodeTopicsView 两级视图
+  - `src/types/index.ts`：补充 `NodePage` 类型定义
+  - `src/api/request.ts`：新增 `getNodes()` / `getNodeTopics()` 及 `api.nodes()` / `api.nodeTopics()`
+  - `src/views/NodeView.vue`：板块列表页（网格卡片布局）
+  - `src/views/NodeTopicsView.vue`：指定板块帖子列表页（复用 Topics 组件）
+  - `src/router/index.ts`：新增 `/node` 与 `/node/:nodeId` 路由
+  - `src/components/common/TabBar.vue`：新增「板块」tab 项（icon: category）
+
+## [1.27.0] - 2026-07-27
+
+### Added
+
+- 首页新增 Tab 系统（热门/最新/全部），对齐原版首页 tab 系统
+  - `src/api/request.ts`：新增 `TAB_CONFIG` 映射表、`getTabTopics()`、`api.tabTopics()`
+  - `src/views/HotTopicsView.vue`：重构为 van-tabs，每个 Tab 独立 `topicsMap`/`pageMap`/`totalMap`/`scrollMap`
+  - CSS `position: sticky` 吸顶（替代 Vant JS sticky 以避免切换竞态）
+  - Tab 切换保留数据和滚动位置，仅在首次访问时请求
+
+## [1.26.1] - 2026-07-25
+
+### Fixed
+
+- 后台请求静默异常处理增强
+  - `src/api/request.ts`：解密失败 showToast 提示用户检查镜像源配置
+  - `src/plugins/content.ts`：sell 视频 catch 加 warn 日志，视频加载失败 showToast + 关闭模态框
+  - `src/utils/image.ts`：图片解码失败加 warn 日志
+  - `src/views/SettingsView.vue` / `src/views/UserHomeView.vue`：生命周期 try/catch 防止 unhandled rejection
+
+## [1.26.0] - 2026-07-25
+
+### Added
+
+- 添加海角图标作为网站 favicon
+  - `public/favicon.svg`：SVG 格式图标，绿色圆角矩形背景 + 白色"海角"文字
+  - `index.html`：修正 favicon 引用，从 `/favicon.ico` 改为 `/favicon.svg`
+
+## [1.25.1] - 2026-07-25
+
+### Fixed
+
+- 修复 KeepAlive 组件中 inject() 上下文丢失导致 safeBack 崩溃
+  - `src/utils/navigation.ts`：将 `safeBack` 改为 composable `useSafeBack`，在 setup 阶段获取 router 实例
+  - 返回上一级，无历史记录时兜底到 `/hot`
+- 修复 router 守卫中直接调用 `useSettingsStore` 导致的 inject 问题
+  - `src/router/index.ts`：改为直接读 localStorage 判断登录状态
+
+## [1.25.0] - 2026-07-22
+
+### Added
+
+- 帖子 1742505 WASM 视频解密支持（m3u8 内联 key 方案）
+  - `src/plugins/content.ts`：新增 `getWasmInstance` / `getWrapKey` / `decryptWasmKey` 函数
+  - `src/plugins/content.ts`：新增 `WasmM3u8Loader` 拦截 m3u8 playlist，内联解密后的 data: URI key
+  - `public/jquery.wasm`：WASM 解密模块（12KB）
+  - `public/hls.legacy.min.js`：hls.js v0.13.2 回退（调试用）
+  - `docs/plans/18-帖子1742505视频播放调试方案.md`：方案文档（v3.0.0 🏁）
+- 更新 docs 索引：README.md / index.md / .vitepress/config.ts 同步文档状态
+  - 移除已不存在的 `02-架构演进.md` 引用
+  - 新增 plan 18 条目和侧边栏链接
+  - 更新 plan 15/16 为 🏁 已完成
+
+### Changed
+
+- `docs/plans/14-移除视频30秒预览限制.md`：更新为 v5.0.0，新增 videoLines/resolveRealUrl/sell 预加载详细说明
+
+## [1.24.1] - 2026-07-22
+
+### Fixed
+
+- 修复 keep-alive 下跨用户主页切换旧内容闪现
+  - `src/views/UserHomeView.vue`：watch 处理器同步阶段添加 `topics.length = 0` 和 `loading.value = true`，消除异步时序间隙中的旧数据渲染
+
+## [1.24.0] - 2026-07-18
+
+### Added
+
+- 主页无限滚动改为分页模式
+  - `src/components/Topics.vue`：新增 `mode` prop（`scroll`/`pagination`），分页模式渲染 `van-pagination`
+  - `src/views/HotTopicsView.vue`：从 `van-list` 无限滚动重构为分页模式，`sessionStorage` 记住页码与滚动位置
+  - `src/router/index.ts`：`scrollBehavior` 支持 `sessionStorage` 保存/恢复滚动位置
+  - `src/types/index.ts`：`Page` 接口新增 `totalPage` 字段
+- 扩展 UserView / UserHomeView / SearchView 无限滚动→分页模式，翻页骨架屏统一管理
+  - `src/views/UserView.vue`：从无限滚动重构为分页模式，`loadPage()` 统一管理骨架屏 loading
+  - `src/views/UserHomeView.vue`：从无限滚动重构为分页模式，移除外层自定义骨架屏，改用 Topics 统一管理
+  - `src/views/SearchView.vue`：从无限滚动重构为分页模式，移除中间自定义骨架屏，改用 Topics 统一管理
+
+## [1.23.0] - 2026-07-15
+
+### Added
+
+- 配置页新增复制/粘贴 Token 功能
+  - `src/views/SettingsView.vue`：新增 `handleCopyCredentials()` / `handlePasteCredentials()` 函数，认证配置区增加复制/粘贴按钮
+  - 剪贴板格式：`JSON.stringify({ uid, token })`
+
+## [1.22.0] - 2026-07-15
+
+### Added
+
+- 视频播放优化：preview.m3u8 自动解析为完整视频
+  - `api/request.ts`：新增 `resolveRealUrl()` 下载 preview m3u8 → 提取 code → 返回完整视频 URL
+  - `plugins/content.ts`：视频播放自动调用 `resolveRealUrl` 转换 remoteUrl；HLS keyPath 片段路径修正（origin 兼容）；`"undefined"` 的 keyPath 值过滤
+  - 移除前端线路按钮和测试按钮（所有 line 均返回 preview，resolveRealUrl 统一解析）
+- sell 内容视频预加载：扫描 sell-btn 内的 `<video data-id>` → 主动调用 `loadVideoSrc` 获取元数据 → 嵌套缩略图
+  - `plugins/content.ts`：sell 处理前先提取 videoId，attachList 中不存在时异步调 API 补全
+
+### Fixed
+
+- 服务端返回 `key-path="undefined"` 导致 HLS 片段 URL 出现 `undefined` 前缀 → 过滤为空字符串
+
+## [1.21.0] - 2026-07-15
+
+### Added
+
+- `v-content` 插件适配 `sell-btn` HTML 渲染购买信息与视频预览
+  - `types/index.ts`：新增 `SaleData` 接口，`Topic.sale` 字段
+  - `utils/transform.ts`：追加 `money_type/buy_index/is_buy` 蛇形→驼峰映射
+  - `plugins/content.ts`：正则替换 `<span class="sell-btn">` 为 `.hjsell-container` 容器，显示售价/购买人数/购买状态；未购买且有视频附件时生成 `data-preview="30"` 视频缩略图；DPlayer `timeupdate`/`ended` 事件超限暂停+弹窗提示购买
+  - `TopicContent.vue`：新增 `sale` prop
+  - `TopicView.vue`：传递 `sale` 给 TopicContent
+  - `global.scss`：`.hjsell-container` / `.hssell-title` / `.hssell-bought` / `.hssell-not-bought` / `.preview-title` 样式
+  - `docs/plans/13-v-content适配Sell标签方案.md`：方案文档，包含基础购买信息展示 + 视频预览实现
+
+## [1.20.0] - 2026-07-15
+
+### Added
+
+- `v-content` 插件适配 `[door]{id}[/door]` 标签，渲染门卡片（标题 + 浏览/评论/购买统计 + 缩略图），点击跳转到目标帖子
+  - `types/index.ts`：新增 `DoorData` 接口，`Topic.doors` 从 `number[]` 改为 `DoorData[]`
+  - `utils/transform.ts`：追加 `dest_valid/view_count/buy_count/img_url` 蛇形→驼峰映射
+  - `utils/imageLoader.ts`：`formatCount` 数字格式化辅助
+  - `plugins/content.ts`：`[door]` 解析渲染 + `imageLoader.observe` 缩略图懒加载 + `router.push` 导航
+  - `TopicContent.vue`：新增 `doors` prop
+  - `TopicView.vue`：`watch(() => route.params.pid)` 替代 `onMounted`，参数变化自动重载；`loadTopic` 开头重置 `topicLocal` 清空旧数据；`:key` 强制子组件重建
+  - `global.scss`：`.door-box` 门卡片系列样式
+
+## [1.19.1] - 2026-07-14
+
+### Fixed
+
+- 移除 IntersectionObserver 的 rootMargin 预加载（300px），恢复为仅在视口内加载，解决页面卡顿问题
+- 补齐 VitePress sidebar 中 plans 目录缺失的 08-11 条目
+- 补齐 docs/index.md features 列表全部 22 篇文档入口
+
+## [1.19.0] - 2026-07-14
+
+### Added
+
+- `src/utils/imageLoader.ts`：多任务异步队列批量图片加载模块
+  - AsyncQueue 并发控制（默认 6 路，3 优先级 bucket：high/medium/low）
+  - 指数退避重试（1s→2s→4s，最多 3 次）
+  - 内存缓存去重（Map<url, result>，加载中并发自动去重）
+  - IntersectionObserver 统一管理
+  - WeakMap 元素追踪，指令 unmounted 自动清理
+- 原 `loadImg()` 标记 `@deprecated`，保留完整代码供回退
+- `v-headicon` / `v-content` 指令改用 `imageLoader.observe()` 统一加载
+- `ImageViewerView` 改用 `imageLoader.load()` 并自动清理
+
+## [1.18.0] - 2026-07-14
+
+### Added
+
+- Emoji 解析渲染：`[emoji]code[/emoji]` 替换为 `<img>` 内联图片，支持 4 组 59 个表情
+- `src/utils/emoji.ts`：映射表 + `renderEmoji()` 纯函数，通过 settings store apiBase 拼接 CDN 路径
+- v-content 指令集成 emoji 渲染，emoji 图片跳过 IntersectionObserver 懒加载
+- ReplyList 折叠预览也渲染 emoji 为图片
+- 全局 `.hv-emoji` 样式控制内联尺寸（1.2em），覆盖组件作用域的宽高强制
+
+## [1.17.0] - 2026-07-14
+
+### Added
+
+- 评论头部重构为 flexbox 紧凑布局：头像固定尺寸，用户名/时间左对齐，楼号 margin-left:auto 推右，间距不随容器宽度伸缩
+- ReplyList 新增折叠/展开功能：折叠态显示首条回复摘要（头像 + 用户名 + 正文预览 + 发布时间），点击展开全部回复，点击箭头收回
+- 回复项与顶层评论样式统一：用户名 + 灰色冒号 + 正文 inline flex-wrap 同行显示，发布时间独立一行居左
+- 正文内容与回复列表缩进对齐（padding-left: calc(3rem + 10px)），与用户名/时间列平齐，形成清晰左对齐层级
+- 评论内容与回复面板之间增加 van-divider 浅灰分隔线
+- App.vue 增加 max-width: 768px 容器约束 + 左右居中，大屏显示不再拉伸
+
+## [1.16.0] - 2026-07-14
+
+### Added
+
+- 评论区回复列表递归渲染组件 ReplyList：支持头像展示、v-content 富内容渲染（图片/视频/音频）、无限嵌套回复
+- 修复 API snake_case 字段 `commend_list` / `reply_id` 未转换导致回复无法显示的问题
+- 修复回复昵称点击误跳至父评论作者的问题
+
 ## [1.13.10] - 2026-07-12
 
 ### Fixed
@@ -144,7 +478,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - 本地端到端测试：新增 `playwright.config.ts` + `e2e/`（public/auth/video/mirror 四规格），驱动本机 Chrome，参数集中于 `e2e/config.ts`
-- 本地 E2E 代理：`vite.config.ts` 新增 `server.proxy['/api']`，`router` 读取请求头 `X-Back-end`（即配置页「数据源字段」）动态转发到镜像源，与生产 `worker.ts` 行为对齐，仅 `npm run dev` 生效
+- 本地 E2E 代理：`vite.config.ts` 新增 `server.proxy['/api']`，`router` 读取请求头 `X-Back-end`（即配置页「数据源字段」）动态转发到镜像源，与生产 `worker.ts` 行为对齐，仅 `pnpm run dev` 生效
 
 ### Changed
 

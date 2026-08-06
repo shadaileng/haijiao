@@ -1,7 +1,8 @@
 import { md5 } from 'js-md5'
 import { useSettingsStore } from '@/stores/settings'
 import { toCamelCase } from '@/utils/transform'
-import type { ApiResult, LoginParams, LoginResponse } from '@/types'
+import type { ApiResult, LoginParams, LoginResponse, VideoLine, SignInResult, UserWealth, FollowStatus, TaskStatus } from '@/types'
+import { showToast } from 'vant'
 
 function utf8Decode(binary: string): string {
   const bytes = new Uint8Array(binary.length)
@@ -83,6 +84,7 @@ export async function request<T = any>(options: RequestOptions): Promise<T> {
       result = JSON.parse(decodeEncrypted(String(data.data))) as T
     } catch (e) {
       console.error('decrypt error:', e)
+      showToast({ message: '数据解密失败，请检查镜像源配置', type: 'fail' })
     }
   }
   return toCamelCase(result) as T
@@ -94,7 +96,7 @@ export async function getTopic(topicId: string | number): Promise<any> {
 }
 
 // 视频地址解析（修复认证来源：统一 settings store 的 uid/token）
-export async function loadVideoSrc(id: string | number, resourceId: string | number): Promise<any> {
+export async function loadVideoSrc(id: string | number, resourceId: string | number, line = 'normal1'): Promise<any> {
   const settings = useSettingsStore()
   const data = await request({
     url: '/attachment',
@@ -103,7 +105,7 @@ export async function loadVideoSrc(id: string | number, resourceId: string | num
       id: Number(id),
       resource_id: Number(resourceId),
       resource_type: 'topic',
-      line: 'normal1',
+      line,
     },
     headers: {
       'X-User-Id': settings.uid,
@@ -111,6 +113,28 @@ export async function loadVideoSrc(id: string | number, resourceId: string | num
     },
   })
   return data
+}
+
+// 获取视频可用线路列表
+export async function getVideoLines(attachmentId: string | number): Promise<VideoLine[]> {
+  return request({ url: '/topic/att/' + attachmentId })
+}
+
+// 解析 preview.m3u8 → 完整视频 URL
+// 参考 haijiao.py:getRealUrl (docs/reference/haijiao_download/haijiao.py:168-180)
+export async function resolveRealUrl(previewUrl: string): Promise<string> {
+  const resp = await fetch(previewUrl)
+  const text = await resp.text()
+  const lines = text.split('\n').filter(l => !l.startsWith('#') && l.trim())
+  if (!lines.length) return previewUrl
+  const firstLine = lines[0]
+  let code: string
+  if (firstLine.startsWith('http')) {
+    code = firstLine.slice(firstLine.lastIndexOf('/') + 1, firstLine.lastIndexOf('.') - 1)
+  } else {
+    code = firstLine.slice(0, firstLine.lastIndexOf('.') - 1)
+  }
+  return previewUrl.replace(/(\d+_i)_preview/, code)
 }
 
 // 帖子详情（含视频附件解析）
@@ -122,7 +146,8 @@ export async function getTopicWithVideo(topicId: string | number): Promise<any> 
       if (item.category === 'video') {
         try {
           return await loadVideoSrc(item.id, topicId)
-        } catch {
+        } catch (e) {
+          console.warn('video parse failed:', e)
           return item
         }
       }
@@ -130,6 +155,17 @@ export async function getTopicWithVideo(topicId: string | number): Promise<any> 
     })
   )
   return data
+}
+
+export const TAB_CONFIG: Record<number, { url: string; label: string }> = {
+  0: { url: '/topic/hot/topics',                    label: '热门' },
+  1: { url: '/topic/node/news',                     label: '最新' },
+  2: { url: '/topic/node/topics?type=1&nodeId=0',   label: '全部' },
+}
+
+export async function getTabTopics(tabIndex: number, page: number, limit = 20): Promise<any> {
+  const cfg = TAB_CONFIG[tabIndex] || TAB_CONFIG[0]
+  return request({ url: cfg.url, params: { page, limit } })
 }
 
 export async function getHotTopics(page: number, limit = 20): Promise<any> {
@@ -161,6 +197,19 @@ export async function getTags(params?: Record<string, any>): Promise<any> {
   return request({ url: '/tag/tags', params })
 }
 
+export async function getNodes(): Promise<any> {
+  return request({ url: '/topic/nodes_by_ver/v2', params: { ver: 0 } })
+}
+
+export async function getNodeTopics(
+  nodeId: number,
+  page: number,
+  type = 2,
+  limit = 20
+): Promise<any> {
+  return request({ url: '/topic/node/topics', params: { nodeId, type, page, limit } })
+}
+
 export async function getUserInfo(uid: string | number): Promise<any> {
   return request({ url: `/user/info/${uid}` })
 }
@@ -176,11 +225,46 @@ export async function getCurrentUser(): Promise<any> {
   })
 }
 
+// 收藏帖子
+export async function addFavorite(topicId: string | number, folderId?: number): Promise<any> {
+  const params: Record<string, any> = { entityType: 'topic', entityId: topicId }
+  if (folderId !== undefined) params.folderId = folderId
+  return request({ url: '/favorite/v2/add', params })
+}
+
+// 取消收藏
+export async function delFavorite(topicId: string | number): Promise<any> {
+  return request({ url: '/favorite/v2/delete', params: { entityType: 'topic', entityIds: topicId } })
+}
+
+// 检查帖子是否已收藏
+export async function checkFavorite(topicId: string | number): Promise<any> {
+  return request({ url: '/favorite/favorite', params: { entityId: topicId, entityType: 'topic' } })
+}
+
+// 收藏夹列表
+export async function getFavoriteFolders(): Promise<any> {
+  return request({ url: '/favorite/v2/folderList', params: {} })
+}
+
+// 收藏夹内帖子列表（分页）
+export async function getFavoriteTopics(
+  page: number,
+  limit = 20,
+  folderId?: number,
+  total?: number
+): Promise<any> {
+  const params: Record<string, any> = { page, limit }
+  if (folderId !== undefined) params.folderId = folderId
+  if (total !== undefined) params.total = total
+  return request({ url: '/favorite/v2/topics', params })
+}
+
 export async function login(params: LoginParams): Promise<LoginResponse> {
   const sign = md5(params.username + params.password + navigator.userAgent)
   const response = await fetch('/api/login/signin', {
     method: 'POST',
-    headers: getAuthHeaders({ pcver: '2' }),
+    headers: getAuthHeaders({ 'Content-Type': 'application/json', pcver: '2' }),
     body: JSON.stringify({
       Username: params.username,
       Password: params.password,
@@ -194,7 +278,7 @@ export async function login(params: LoginParams): Promise<LoginResponse> {
   if (!data.success) {
     throw new Error(data.message || '登录失败')
   }
-  let result: LoginResponse = data.data
+  let result: LoginResponse = data.data!
   if (data.isEncrypted) {
     try {
       result = JSON.parse(decodeEncrypted(String(data.data)))
@@ -207,8 +291,36 @@ export async function login(params: LoginParams): Promise<LoginResponse> {
   return result
 }
 
-// wxt 风格 api 对象（供组件 inject('$api') 使用）
-export const api = {
+export interface Api {
+  topic(params: { params: { topicId: string | number } }): Promise<ApiResult>
+  hot(params: { params: { page: number; limit?: number } }): Promise<ApiResult>
+  tabTopics(params: { params: { tabIndex: number; page: number; limit?: number } }): Promise<ApiResult>
+  search(params: { params: { key: string; page: number; node_id?: number } }): Promise<ApiResult>
+  tags(params?: { params?: any }): Promise<ApiResult>
+  nodes(): Promise<ApiResult>
+  nodeTopics(params: { params: { nodeId: number; page: number; type?: number; limit?: number } }): Promise<ApiResult>
+  follow(): Promise<ApiResult>
+  topics(params: { params: { userId: string; page: number; type: number } }): Promise<ApiResult>
+  userinfo(params: { uid: string | number }): Promise<ApiResult>
+  reply_list(params: { params: { page: number; sort: string; topic_id: number; search_type: number; user_id: number } }): Promise<ApiResult>
+  current(): Promise<ApiResult>
+  login(params: LoginParams): Promise<ApiResult>
+  videoLines(params: { attachmentId: string | number }): Promise<ApiResult>
+  addFavorite(params: { params: { topicId: string | number; folderId?: number } }): Promise<ApiResult>
+  delFavorite(params: { params: { topicId: string | number } }): Promise<ApiResult>
+  checkFavorite(params: { params: { topicId: string | number } }): Promise<ApiResult>
+  favoriteFolders(): Promise<ApiResult>
+  favoriteTopics(params: { params: { page: number; limit?: number; folderId?: number; total?: number } }): Promise<ApiResult>
+  signIn(): Promise<ApiResult<SignInResult>>
+  wealth(): Promise<ApiResult<UserWealth>>
+  getTaskStatus(): Promise<ApiResult<TaskStatus>>
+  addFollow(params: { params: { userId: string | number } }): Promise<ApiResult>
+  cancelFollow(params: { params: { userId: string | number } }): Promise<ApiResult>
+  checkFollow(params: { params: { userId: string | number } }): Promise<ApiResult<FollowStatus>>
+}
+
+// 统一 API 对象，所有视图直接 import 使用
+export const api: Api = {
   async topic({ params }: { params: { topicId: string | number } }) {
     try {
       const data = await getTopicWithVideo(params.topicId)
@@ -225,6 +337,14 @@ export const api = {
       return { success: false, message: e.message }
     }
   },
+  async tabTopics({ params }: { params: { tabIndex: number; page: number; limit?: number } }) {
+    try {
+      const data = await getTabTopics(params.tabIndex, params.page, params.limit)
+      return { success: true, data }
+    } catch (e: any) {
+      return { success: false, message: e.message }
+    }
+  },
   async search({ params }: { params: any }) {
     try {
       const data = await searchTopics(params.key, params.page, params.node_id)
@@ -236,6 +356,22 @@ export const api = {
   async tags({ params }: { params?: any } = {}) {
     try {
       const data = await getTags(params)
+      return { success: true, data }
+    } catch (e: any) {
+      return { success: false, message: e.message }
+    }
+  },
+  async nodes() {
+    try {
+      const data = await getNodes()
+      return { success: true, data }
+    } catch (e: any) {
+      return { success: false, message: e.message }
+    }
+  },
+  async nodeTopics({ params }: { params: { nodeId: number; page: number; type?: number; limit?: number } }) {
+    try {
+      const data = await getNodeTopics(params.nodeId, params.page, params.type, params.limit)
       return { success: true, data }
     } catch (e: any) {
       return { success: false, message: e.message }
@@ -285,6 +421,106 @@ export const api = {
     try {
       const data = await login(params)
       return { success: true, data }
+    } catch (e: any) {
+      return { success: false, message: e.message }
+    }
+  },
+  async videoLines({ attachmentId }: { attachmentId: string | number }) {
+    try {
+      const data = await getVideoLines(attachmentId)
+      return { success: true, data }
+    } catch (e: any) {
+      return { success: false, message: e.message }
+    }
+  },
+  async addFavorite({ params }: { params: { topicId: string | number; folderId?: number } }) {
+    try {
+      const data = await addFavorite(params.topicId, params.folderId)
+      return { success: true, data }
+    } catch (e: any) {
+      return { success: false, message: e.message }
+    }
+  },
+  async delFavorite({ params }: { params: { topicId: string | number } }) {
+    try {
+      const data = await delFavorite(params.topicId)
+      return { success: true, data }
+    } catch (e: any) {
+      return { success: false, message: e.message }
+    }
+  },
+  async checkFavorite({ params }: { params: { topicId: string | number } }) {
+    try {
+      const data = await checkFavorite(params.topicId)
+      return { success: true, data }
+    } catch (e: any) {
+      return { success: false, message: e.message }
+    }
+  },
+  async favoriteFolders() {
+    try {
+      const data = await getFavoriteFolders()
+      return { success: true, data }
+    } catch (e: any) {
+      return { success: false, message: e.message }
+    }
+  },
+  async favoriteTopics({ params }: { params: { page: number; limit?: number; folderId?: number; total?: number } }) {
+    try {
+      const data = await getFavoriteTopics(params.page, params.limit, params.folderId, params.total)
+      return { success: true, data }
+    } catch (e: any) {
+      return { success: false, message: e.message }
+    }
+  },
+  async signIn() {
+    const data = await request<SignInResult>({ url: '/user/user_sign_in', method: 'POST' })
+    return { success: true, data }
+  },
+  async wealth() {
+    try {
+      const data = await request<UserWealth>({ url: '/user/wealth' })
+      return { success: true, data }
+    } catch (e: any) {
+      return { success: false, message: e.message }
+    }
+  },
+  async getTaskStatus() {
+    try {
+      const data = await request<TaskStatus>({ url: '/task/getTaskStatus' })
+      return { success: true, data }
+    } catch (e: any) {
+      return { success: false, message: e.message }
+    }
+  },
+  async addFollow({ params }: { params: { userId: string | number } }) {
+    try {
+      const data = await request({
+        url: '/user/favorite',
+        params: { targetId: params.userId, opt: 'add' }
+      })
+      return { success: true, data }
+    } catch (e: any) {
+      return { success: false, message: e.message }
+    }
+  },
+  async cancelFollow({ params }: { params: { userId: string | number } }) {
+    try {
+      const data = await request({
+        url: '/user/favorite',
+        params: { targetId: params.userId, opt: 'rm' }
+      })
+      return { success: true, data }
+    } catch (e: any) {
+      return { success: false, message: e.message }
+    }
+  },
+  async checkFollow({ params }: { params: { userId: string | number } }) {
+    try {
+      const data = await request({
+        url: '/user/info/' + params.userId
+      })
+      return { success: true, data: { isFollow: !!data?.isFavorite } }
     } catch (e: any) {
       return { success: false, message: e.message }
     }

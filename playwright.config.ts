@@ -12,7 +12,7 @@ export default defineConfig({
     navigationTimeout: 20000,
     actionTimeout: 10000,
     launchOptions: {
-      executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+      executablePath: '/usr/bin/google-chrome',
     },
   },
   webServer: {

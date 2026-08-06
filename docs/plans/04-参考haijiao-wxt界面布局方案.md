@@ -14,8 +14,8 @@
 >
 > | 日期 | 版本 | 说明 |
 > |------|:----:|------|
+> | 2026-07-10 | v1.1.0 | 实施完成：新增类型/路由/组件/HotTopics/UserHomeView，调整 Topic/Follow/Search/Settings，添加 IntersectionObserver 懒加载 |
 > | 2026-07-10 | v1.0.0 | 初版 |
-| 2026-07-10 | v1.1.0 | 实施完成：新增类型/路由/组件/HotTopics/UserHomeView，调整 Topic/Follow/Search/Settings，添加 IntersectionObserver 懒加载 |
 
 > **关联文档**：[01-架构概览.md](../architecture/01-架构概览.md) · [02-功能新增与改善方案.md](./02-功能新增与改善方案.md)
 
@@ -97,7 +97,7 @@ TabBar 4 项：主页(热门) | 搜索 | 关注 | 配置
 |:----|:----|:------|
 | `/` | HomeView | 保留现有首页（或改为重定向到 `/hot`） |
 | `/hot` | **HotTopicsView** | 热门话题列表（TabBar 主页） |
-| `/homepage/:userId/:nickname` | **UserHomeView** | 用户主页 |
+| `/homepage/:userId` | **UserHomeView** | 用户主页 |
 | `/topic/:pid` | TopicView（增强） | 帖子详情 |
 | 其余不变 | Follow/Search/Settings/ImageViewer/Login | — |
 
@@ -119,7 +119,7 @@ TabBar 4 项：主页(热门) | 搜索 | 关注 | 配置
 | 步骤 | 操作 | 涉及文件 |
 |:----:|:-----|:---------|
 | 1 | 补充 Topic、Comment、Attachment、Node、Page 等类型 | `src/types/index.ts` |
-| 2 | 新增路由 `/hot`、`/homepage/:userId/:nickname` | `src/router/index.ts` |
+| 2 | 新增路由 `/hot`、`/homepage/:userId` | `src/router/index.ts` |
 | 3 | MainLayout 添加 `van-back-top` + overlay 浮层 | `src/layouts/MainLayout.vue` |
 | 4 | App.vue 简化容器样式 | `src/App.vue` |
 
@@ -147,7 +147,7 @@ TabBar 4 项：主页(热门) | 搜索 | 关注 | 配置
 
 | 步骤 | 操作 |
 |:----:|:-----|
-| 15 | `npm run build` 构建验证 |
+| 15 | `pnpm run build` 构建验证 |
 | 16 | 确认所有路由/页面/交互一致 |
 
 ---

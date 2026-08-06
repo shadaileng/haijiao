@@ -1,5 +1,8 @@
 node_modules/
 dist/
+doc_view/
+docs/.vitepress/cache/
+docs/.vitepress/dist/
 .wrangler/
 .DS_Store
 *.local
@@ -22,6 +25,12 @@ coverage/
 .nyc_output/
 test-results/
 playwright-report/
+
+# Reference project
+docs/reference/haijiao-wxt/
+
+# Package managers
+package-lock.json
 
 # OS
 Thumbs.db

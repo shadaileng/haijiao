@@ -43,21 +43,27 @@ export interface UserCurrent {
 }
 
 export interface FollowUser {
-  id: number
   userId: number
   nickname: string
   avatar: string
   description: string
-  topicCount: number
-  videoCount: number
   fansCount: number
-  favoriteCount: number
+  isFavorite: boolean
+  tagNames: string[] | null
+  vip: number
+  certified: boolean
+  certVideo: boolean
+  certProfessor: boolean
+  famous: boolean
+  status: number
+  title: { id: number; name: string; consume: number; consumeEnd: number; icon: string }
 }
 
 export interface Page {
   index: number
   size: number
   total: number
+  totalPage?: number
 }
 
 export interface TopicUser {
@@ -72,6 +78,11 @@ export interface Node {
   icon: string
 }
 
+export interface NodePage {
+  results: Node[]
+  page: Page
+}
+
 export interface Attachment {
   id: number
   remoteUrl: string
@@ -80,6 +91,31 @@ export interface Attachment {
   coverUrl: string
   video_time_length: number
   keyPath: string
+}
+
+export interface VideoLine {
+  keyPath: string
+  url: string
+  name: string
+}
+
+export interface DoorData {
+  id: number
+  type: number
+  title: string
+  destValid: boolean
+  viewCount: number
+  commentCount: number
+  buyCount: number
+  imgUrl: string
+}
+
+export interface SaleData {
+  moneyType: number
+  amount: number
+  buyCount: number
+  buyIndex: number
+  isBuy: number
 }
 
 export interface Topic {
@@ -92,7 +128,9 @@ export interface Topic {
   createTime: string
   node: Node | null
   commentCount: number
-  doors: number[]
+  doors: DoorData[]
+  sale?: SaleData
+  isFavorite?: boolean
 }
 
 export interface LiteTopic extends Topic {
@@ -124,11 +162,13 @@ export interface CommentPage {
 
 export interface ApiResult<T = any> {
   success: boolean
-  data: T
+  data?: T
   isEncrypted?: boolean
   message?: string
   errorCode?: number
 }
+
+export type UserInfoProp = Pick<User, 'nickname' | 'avatar' | 'description' | 'topicCount' | 'fansCount' | 'favoriteCount'> & { id?: number; userId?: number }
 
 export interface LoginParams {
   username: string
@@ -147,4 +187,26 @@ export interface LoginResponse {
   ref: string
   type: number
   vip_domain: string
+}
+
+export interface SignInResult {
+  gold: number
+  consecutiveDays?: number
+}
+
+export interface UserWealth {
+  gold: number
+  diamond: number
+}
+
+export interface FollowStatus {
+  isFollow: boolean
+}
+
+export interface TaskStatus {
+  goldSignIn: {
+    open: boolean
+    status: boolean
+    num: number
+  }
 }

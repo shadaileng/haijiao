@@ -6,25 +6,60 @@
 docs/
 ├── README.md                        # 本文件：文档索引与执行总览
 ├── _template.md                     # 文档创建模板
+├── index.md                         # VitePress 首页
+├── .vitepress/                      # VitePress 配置与主题
 ├── plans/                           # 方案类（待执行 → 已完成）
 │   ├── 01-登录功能实施方案.md
 │   ├── 02-功能新增与改善方案.md
 │   ├── 03-配置代理地址功能方案.md
 │   ├── 04-参考haijiao-wxt界面布局方案.md
 │   ├── 05-参考haijiao-wxt重构前端项目方案.md
-│   └── 06-E2E自动化测试方案.md
+│   ├── 06-E2E自动化测试方案.md
+│   ├── 07-Worker代理适配优化方案.md
+│   ├── 08-回复列表渲染方案.md
+│   ├── 09-数据驱动重构方案.md
+│   ├── 10-Emoji解析移植方案.md
+│   ├── 11-批量图片加载模块方案.md
+│   ├── 12-v-content适配Door标签方案.md
+│   ├── 13-v-content适配Sell标签方案.md
+│   ├── 14-移除视频30秒预览限制.md
+│   ├── 15-配置页复制粘贴Token方案.md
+│   ├── 16-主页无限滚动加载修复方案.md
+│   ├── 17-用户主页缓存闪现修复方案.md
+│   ├── 18-帖子1742505视频播放调试方案.md
+│   ├── 19-足迹功能方案.md
+│   ├── 20-后台请求静默异常修复方案.md
+│   ├── 21-首页Tab系统实现方案.md
+│   ├── 22-关注页迁移配置子页面.md
+│   ├── 23-板块页面实施方案.md
+│   ├── 24-帖子详情页内容区布局修复方案.md
+│   ├── 25-帖子收藏功能方案.md
+│   ├── 26-分页按钮首尾页方案.md
+│   ├── 27-帖子分享功能方案.md
+│   ├── 28-签到与金额显示方案.md
+│   ├── 29-用户主页关注按钮方案.md
+│   ├── 30-设置页布局优化方案.md
+│   ├── 31-P2P共享功能方案.md
+│   ├── 32-全局Loading指示器方案.md
+│   ├── 33-首页更新横幅提示方案.md
+│   └── 34-Worker静态资源MIME类型修复方案.md
 ├── architecture/                    # 架构类（持续维护）
 │   └── 01-架构概览.md
 ├── references/                      # 参考类（持续维护）
 │   ├── 01-API 参考.md
-│   └── 02-数据字典.md
+│   ├── 02-数据字典.md
+│   └── 03-Origin 代码剖析.md
 ├── guides/                          # 指南/手册类（持续维护）
 │   ├── 01-开发指南.md
 │   ├── 02-用户手册.md
-│   └── 03-E2E代理踩坑排查.md
-└── reference/                       # 参考代码
-    ├── app.js                       # haijiao.com 主应用 Webpack 包
-    └── chunk-vendors.js             # 第三方依赖包
+│   ├── 03-E2E代理踩坑排查.md
+│   ├── 04-页面结构与操作规范.md
+│   └── 05-GitHubActions部署踩坑记录.md
+└── reference/                       # 参考代码（.gitignore，不纳入版本管理）
+    ├── origin/                      # 原始 Webpack 编译产物
+    │   ├── app.js
+    │   └── chunk-vendors.js
+    └── haijiao-wxt/                 # 参考项目源码（已 gitignore）
 ```
 
 ## 文档一览
@@ -38,12 +73,43 @@ docs/
 | `04-参考haijiao-wxt界面布局方案.md` | v1.1.0 | 方案 | `plans/` | 参考 haijiao-wxt dev 分支布局调整 Web 界面 | 🏁 |
 | `05-参考haijiao-wxt重构前端项目方案.md` | v1.1.0 | 方案 | `plans/` | 彻底重建 src/，移植视频播放与模块化能力，支持镜像源 | 🏁 |
 | `06-E2E自动化测试方案.md` | v1.2.0 | 方案 | `plans/` | Playwright + 本机 Chrome 端到端测试 | 🏁 |
+| `07-Worker代理适配优化方案.md` | v1.1.0 | 方案 | `plans/` | worker.ts 代理层与前端适配问题修复 | 🏁 |
+| `08-回复列表渲染方案.md` | v1.0.0 | 方案 | `plans/` | 评论区回复列表递归渲染，v-content 支持 | 🏁 |
+| `09-数据驱动重构方案.md` | v2.0.0 | 方案 | `plans/` | 消除硬编码、死 Store、缺骨架屏等数据驱动问题 | 🏁 |
+| `10-Emoji解析移植方案.md` | v1.0.0 | 方案 | `plans/` | `[emoji]code[/emoji]` 渲染为 `<img>` 图片 | 🏁 |
+| `11-批量图片加载模块方案.md` | v1.0.0 | 方案 | `plans/` | 多任务异步队列批量处理图片解码 | 🏁 |
+| `12-v-content适配Door标签方案.md` | v1.1.0 | 方案 | `plans/` | v-content 插件解析 `[door]` 标签渲染跳转 | 🏁 |
+| `13-v-content适配Sell标签方案.md` | v1.2.0 | 方案 | `plans/` | v-content 插件解析 `sell-btn` HTML 渲染 + 视频预览 | 🏁 |
+| `14-移除视频30秒预览限制.md` | v5.0.0 | 方案 | `plans/` | preview 解析 + keyPath 修复 + sell 视频预加载 | 🏁 |
+| `15-配置页复制粘贴Token方案.md` | v1.0.0 | 方案 | `plans/` | 配置页复制/粘贴 Token 按钮 | 🏁 |
+| `16-主页无限滚动加载修复方案.md` | v3.1.0 | 方案 | `plans/` | 所有帖子列表视图无限滚动→分页按钮 | 🏁 |
+| `17-用户主页缓存闪现修复方案.md` | v1.0.0 | 方案 | `plans/` | keep-alive 下跨用户主页切换旧内容闪现 | 🏁 |
+| `18-帖子1742505视频播放调试方案.md` | v3.0.0 | 方案 | `plans/` | 帖子 1742505 视频无法播放调试 | 🏁 |
+| `19-足迹功能方案.md` | v1.1.0 | 方案 | `plans/` | 设置页足迹入口 + 独立页面用户/帖子浏览记录 | 🚧 |
+| `20-后台请求静默异常修复方案.md` | v1.2.0 | 方案 | `plans/` | API 调用静默异常处理、用户错误提示、unhandled rejection 防护、视频加载失败关闭模态框 | 🏁 |
+| `21-首页Tab系统实现方案.md` | v1.2.0 | 方案 | `plans/` | HotTopicsView 添加 Tab 切换，对齐原版首页 tab 系统，每个 Tab 独立缓存数据与滚动位置 | 🏁 |
+| `22-关注页迁移配置子页面.md` | v1.0.0 | 方案 | `plans/` | 将 FollowView 从 TabBar 迁移为 /settings 子页面 | 🏁 |
+| `23-板块页面实施方案.md` | v1.6.0 | 方案 | `plans/` | 新增板块导航入口，支持列表页与专题页两级视图 | 🏁 |
+| `24-帖子详情页内容区布局修复方案.md` | v1.0.0 | 方案 | `plans/` | 帖子详情页 `.content` 在 flex 容器中宽度塌陷修复 | 🏁 |
+| `25-帖子收藏功能方案.md` | v1.1.0 | 方案 | `plans/` | 帖子收藏/取消收藏、收藏状态检查、收藏列表查看、设置页入口 | 🏁 |
+| `26-分页按钮首尾页方案.md` | v1.1.0 | 方案 | `plans/` | 分页组件增加首页和尾页快捷按钮 | 🏁 |
+| `27-帖子分享功能方案.md` | v1.1.0 | 方案 | `plans/` | 帖子详情页一键复制分享链接 | 🏁 |
+| `28-签到与金额显示方案.md` | v1.1.0 | 方案 | `plans/` | 设置页钱包余额显示 + 签到按钮 | 🏁 |
+| `29-关注功能方案.md` | v1.3.0 | 方案 | `plans/` | 用户主页关注按钮 + 关注列表取消关注 | 🏁 |
+| `30-设置页布局优化方案.md` | v1.4.0 | 方案 | `plans/` | 设置页布局优化：钱包内嵌用户信息、签到改 cell 独立分组、收藏/足迹/关注上移、登录态显隐、精简登录/退出 cell、移除返回按钮、合并镜像源与数据来源、粘贴Token后加载用户信息 | 🏁 |
+| `31-P2P共享功能方案.md` | v1.5.0 | 方案 | `plans/` | 用户设备加入 P2P 网络，实时共享足迹和推荐内容 | 🚧 |
+| `32-全局Loading指示器方案.md` | v1.3.0 | 方案 | `plans/` | 全局 Loading 指示器：路由切换自动触发 + 手动控制 + 最短显示时间 | 🏁 |
+| `33-首页更新横幅提示方案.md` | v1.2.0 | 方案 | `plans/` | 帖子列表有新内容时顶部显示更新横幅 | 🏁 |
+| `34-Worker静态资源MIME类型修复方案.md` | v1.0.0 | 方案 | `plans/` | 修复 Cloudflare Worker 静态资源 MIME 类型错误 | 🏁 |
 | `01-架构概览.md` | v1.1.0 | 架构 | `architecture/` | 系统架构与请求链路 | 🏁 |
-| `01-API 参考.md` | v1.1.0 | 参考 | `references/` | 所有 API 端点定义 | 🏁 |
-| `02-数据字典.md` | v1.1.0 | 参考 | `references/` | 核心类型定义 | 🏁 |
-| `01-开发指南.md` | v1.1.0 | 指南 | `guides/` | 开发、构建、部署指引 | 🏁 |
+| `01-API 参考.md` | v1.2.0 | 参考 | `references/` | 所有 API 端点定义 | 🏁 |
+| `02-数据字典.md` | v1.2.0 | 参考 | `references/` | 核心类型定义 | 🏁 |
+| `03-Origin 代码剖析.md` | v1.1.0 | 参考 | `references/` | origin/app.js 与 chunk-vendors.js 深度剖析 | 🏁 |
+| `01-开发指南.md` | v1.4.0 | 指南 | `guides/` | 开发、构建、部署指引 | 🏁 |
 | `02-用户手册.md` | v1.1.0 | 手册 | `guides/` | 功能使用说明 | 🏁 |
 | `03-E2E代理踩坑排查.md` | v1.0.0 | 指南 | `guides/` | Vite 6 + http-proxy-3 动态代理踩坑记录 | 🏁 |
+| `04-页面结构与操作规范.md` | v1.0.0 | 指南 | `guides/` | 主页面和子页面的结构、操作、路由配置规范 | 🏁 |
+| `05-GitHubActions部署踩坑记录.md` | v1.0.0 | 指南 | `guides/` | GitHub Actions 部署文档站踩坑记录 | 🏁 |
 
 **文档类型说明**：
 
@@ -95,7 +161,7 @@ docs/
 | 第一波 | 每日签到 | P0 | ⬜ 未开始 |
 | 第一波 | 用户帖子分类展示 | P0 | ⬜ 未开始 |
 | 第一波 | 用户信息展示 | P0 | ⬜ 未开始 |
-| 第一波 | Emoji 解析 | P0 | ⬜ 未开始 |
+| 第一波 | Emoji 解析 | P0 | ✅ 已完成 |
 | 第二波 | 帖子收藏 | P1 | ⬜ 未开始 |
 | 第二波 | 关系扩展（粉丝/好友） | P1 | ⬜ 未开始 |
 | 第二波 | 验证码交互 | P1 | ⬜ 未开始 |
@@ -128,7 +194,7 @@ docs/
 | 三 | 7 | `views/` + `router/` + `App.vue` + `main.ts` | ✅ |
 | 三 | 8 | 镜像源设置 UI（SettingsView/LoginView/useProxyConfig） | ✅ |
 | 四 | 9 | `worker.ts` 支持 `X-Backend` 镜像源 | ✅ |
-| 四 | 10 | 验证（`npm run build` 类型检查 + 打包通过） | ✅ |
+| 四 | 10 | 验证（`pnpm run build` 类型检查 + 打包通过） | ✅ |
 | 四 | 11 | 文档同步（AGENTS/README/CHANGELOG/API 参考） | ✅ |
 
 ### 04-参考haijiao-wxt界面布局方案
@@ -163,6 +229,361 @@ docs/
 | 二 | 6 | `topic.spec.ts` 帖子详情（视频+图片） | ✅ |
 | 二 | 7 | `mirror.spec.ts` 镜像源 X-Backend | ✅ |
 | 三 | 8 | 文档同步 | ✅ |
+
+### 07-Worker代理适配优化方案
+
+| 步骤 | 文件 | 操作 | 状态 |
+|:----:|:-----|:-----|:----:|
+| 1 | `worker.ts` | 删除 `/api/proxy-image` 端点 | ✅ |
+| 2 | `worker.ts` | `origin` 头改用 `backend` 变量 | ✅ |
+| 3 | `vite.config.ts` | 缺少 `X-Backend` 时回退默认后端 | ✅ |
+| 4 | 验证 | `pnpm run build` 构建通过 | ✅ |
+| 5 | 文档 | 更新方案文档状态 | ✅ |
+
+### 08-回复列表渲染方案
+
+| 步骤 | 文件 | 操作 | 状态 |
+|:----:|:-----|:-----|:----:|
+| 1 | `src/components/ReplyList.vue` | 新建递归组件 | ✅ |
+| 2 | `src/components/Comment.vue` | 替换内联回复渲染 | ✅ |
+| 3 | — | 构建验证 | ✅ |
+
+### 09-数据驱动重构方案
+
+| 阶段 | 步骤 | 操作 | 优先级 | 状态 |
+|:----:|:----:|:-----|:-----:|:----:|
+| 一 | 1 | TabBar 配置改为响应式数据驱动 | P1 | ✅ |
+| 一 | 2 | TabBar 按登录态显示/隐藏 | P2 | ✅ |
+| 一 | 3 | FollowView 移除硬编码占位图 | P1 | ✅ |
+| 二 | 4 | 删除 `stores/hot.ts` | P1 | ✅ |
+| 二 | 5 | 删除 `stores/homepage.ts` | P1 | ✅ |
+| 二 | 6 | 构建验证 | P0 | ✅ |
+| 三 | 7 | UserView 新增骨架屏 | P1 | ✅ |
+| 三 | 8 | SettingsView 新增骨架屏 | P2 | ✅ |
+| 四 | 9 | Comment 删除空 onLoad，改用纯分页 | P1 | ✅ |
+| 四 | 10 | SearchView 修复 api 类型 | P2 | ✅ |
+| 四 | 11 | UserInfo 修复 prop 类型 | P2 | ✅ |
+| 五 | 12 | 提取 Api 接口类型 | P3 | ✅ |
+| 五 | 13 | 统一注入模式（统一为`import { api }`，移除`provide('$api')`） | P3 | ✅ |
+
+### 10-Emoji解析移植方案
+
+| 步骤 | 文件 | 操作 | 状态 |
+|:---:|:-----|:-----|:----:|
+| 1 | `src/utils/emoji.ts` | 新建：映射表 + `renderEmoji()` | ✅ |
+| 2 | `src/plugins/content.ts` | 集成渲染 + 修复 CSS 冲突 | ✅ |
+| 3 | `src/main.ts` | 挂载 `$emoji` 全局方法 | ✅ |
+| 4 | `src/components/ReplyList.vue` | 折叠预览渲染 + CSS | ✅ |
+| 5 | `src/components/Comment.vue` | `.hv-emoji` CSS | ✅ |
+| 6 | `src/types/emoji.d.ts` | 新建：类型声明 | ✅ |
+| 7 | 验证 | `pnpm run build` | ✅ |
+| 8 | 文档同步 | 更新状态标记 | ✅ |
+
+### 11-批量图片加载模块方案
+
+| 步骤 | 任务 | 状态 |
+|:---:|------|:----:|
+| 1 | 新建 `src/utils/imageLoader.ts`：AsyncQueue + Cache + Observer + ImageLoader | ✅ |
+| 2 | `image.ts` 添加 `@deprecated` 标记 | ✅ |
+| 3 | 改造 `headicon.ts`：改用 `imageLoader.observe()` | ✅ |
+| 4 | 改造 `content.ts`：改用 `imageLoader.observe()` | ✅ |
+| 5 | 改造 `ImageViewerView.vue`：改用 `imageLoader.load()` | ✅ |
+| 6 | 验证：`pnpm run build` 类型检查 + 构建通过 | ✅ |
+| 7 | 文档同步：更新本方案状态为 🏁，更新 `docs/README.md` | ✅ |
+
+### 12-v-content适配Door标签方案
+
+| 步骤 | 任务 | 状态 |
+|:---:|------|:----:|
+| 1 | `transform.ts` 追加 4 条字段映射 | ✅ |
+| 2 | `types/index.ts` 新增 `DoorData` 接口 | ✅ |
+| 3 | `plugins/content.ts` door 解析渲染 + 点击导航 | ✅ |
+| 4 | `components/TopicContent.vue` 新增 `doors` prop | ✅ |
+| 5 | `views/TopicView.vue` 传递 `doors` 给 TopicContent | ✅ |
+| 6 | `styles/global.scss` 门卡片样式 | ✅ |
+| 7 | 验证：`pnpm run build` 类型检查 + 构建通过 | ✅ |
+| 8 | 文档同步：更新状态标记 + README.md | ✅ |
+
+### 13-v-content适配Sell标签方案
+
+| 步骤 | 任务 | 状态 |
+|:---:|------|:----:|
+| 1 | `types/index.ts` 新增 `SaleData` 接口，`Topic` 添加 `sale` 字段 | ✅ |
+| 2 | `transform.ts` 追加 3 条字段映射 | ✅ |
+| 3 | `plugins/content.ts` 添加 `sell-btn` HTML 正则替换逻辑 | ✅ |
+| 4 | `components/TopicContent.vue` 新增 `sale` prop | ✅ |
+| 5 | `views/TopicView.vue` 传递 `sale` 给 TopicContent | ✅ |
+| 6 | `styles/global.scss` sell 容器/标题/内容样式 | ✅ |
+| 7 | 验证：`pnpm run build` 类型检查 + 构建通过 | ✅ |
+| 8 | 文档同步：更新状态标记 + README.md | ✅ |
+| 9 | `plugins/content.ts` sell 容器内生成 `data-preview="30"` 视频缩略图 | ✅ |
+| 10 | `plugins/content.ts` DPlayer `timeupdate`/`ended` 限时逻辑 | ✅ |
+| 11 | `plugins/content.ts` 导入 `showDialog` + `formatDuration` 辅助函数 | ✅ |
+| 12 | `styles/global.scss` `.preview-title` 样式 | ✅ |
+| 13 | 验证：`pnpm run build` 类型检查 + 构建通过 | ✅ |
+
+### 14-视频线路切换 + preview URL 解析
+
+| 步骤 | 操作 | 状态 |
+|:----:|:-----|:----:|
+| 1 | 新增 `VideoLine` 类型定义 | ✅ |
+| 2 | `loadVideoSrc()` 接受可选 `line` 参数 | ✅ |
+| 3 | 新增 `getVideoLines(attachmentId)` API | ✅ |
+| 4 | 在 api 对象中注册 `videoLines` 方法 | ✅ |
+| 5 | `content.ts` 视频渲染后异步获取线路列表，渲染按钮 | ✅ |
+| 6 | `content.ts` 视频点击时读取选中线路，传入 `loadVideoSrc` | ✅ |
+| 7 | `content.ts` customHls 中加入 keyPath 片段路径修正 | ✅ |
+| 8 | `global.scss` 新增 `.hv-video-lines` / `.hv-line-btn` 样式 | ✅ |
+| 9 | 修复 keyPath 属性值 `"undefined"` 导致 URL 出现 undefined 前缀 | ✅ |
+| 10 | 新增 `resolveRealUrl()` 解析 preview → 完整视频 URL | ✅ |
+| 11 | 视频点击后自动调用 `resolveRealUrl` 转换 remoteUrl | ✅ |
+| 12 | 线路按钮行增加"测试"按钮，点击后解析并打印完整 URL | ✅ |
+| 13 | `pnpm run build` 构建验证 | ✅ |
+| 14 | sell 内容预加载：扫描 `<video data-id>` → 主动调 API 获取元数据 → 生成缩略图 | ✅ |
+| 15 | 移除线路按钮和测试按钮（所有线路均返回 preview，resolveRealUrl 统一解析） | ✅ |
+
+### 15-配置页复制粘贴Token方案
+
+| 步骤 | 任务 | 状态 |
+|:---:|------|:----:|
+| 1 | 创建方案文档 | ✅ |
+| 2 | SettingsView.vue 实现复制/粘贴函数与按钮 | ✅ |
+| 3 | 更新 docs/README.md | ✅ |
+| 4 | `pnpm run build` 构建验证 | ✅ |
+
+### 16-帖子列表分页改造方案
+
+#### 第一阶段（HotTopicsView — 已完成）
+
+| 步骤 | 任务 | 状态 |
+|:---:|------|:----:|
+| 1 | 更新方案文档为 v2.0.0（分页方案） | ✅ |
+| 2 | `src/components/Topics.vue` 新增 `mode` prop 和 pagination 分支模板 | ✅ |
+| 3 | `src/views/HotTopicsView.vue` 重构为分页模式 | ✅ |
+| 4 | `src/types/index.ts` 补充 `totalPage` 字段 | ✅ |
+| 5 | 更新 `docs/README.md` 文档一览和执行进度 | ✅ |
+| 6 | `pnpm run build` 构建验证 | ✅ |
+
+#### 第二阶段（其余视图 — 本次执行）
+
+| 步骤 | 任务 | 状态 |
+|:---:|------|:----:|
+| 1 | 更新方案文档为 v3.0.0，扩展范围 | ✅ |
+| 2 | UserView 改为分页模式 | ✅ |
+| 3 | UserHomeView 改为分页模式 | ✅ |
+| 4 | SearchView 改为分页模式 | ✅ |
+| 5 | 更新 `docs/README.md` 文档一览和执行进度 | ✅ |
+| 6 | `pnpm run build` 构建验证 | ✅ |
+| 7 | `loadPage()` 统一管理 `loading`，翻页时骨架屏生效 | ✅ |
+
+### 17-用户主页缓存闪现修复方案
+
+| 步骤 | 任务 | 状态 |
+|:---:|------|:----:|
+| 1 | 创建方案文档 | ✅ |
+| 2 | 修复 watch 同步清数据 | ✅ |
+| 3 | 更新 docs/README.md | ✅ |
+| 4 | 构建验证 | ✅ |
+
+### 19-足迹功能方案
+
+| 步骤 | 文件 | 操作 | 状态 |
+|:----:|:-----|:-----|:----:|
+| 1 | `src/stores/history.ts` | 新建足迹 store | ✅ |
+| 2 | `src/views/HistoryView.vue` | 新建足迹页面 | ✅ |
+| 3 | `src/router/index.ts` | 新增路由 + publicPages | ✅ |
+| 4 | `src/views/SettingsView.vue` | 足迹入口 cell | ✅ |
+| 5 | `src/views/UserView.vue` | 埋点 | ✅ |
+| 6 | `src/views/UserHomeView.vue` | 埋点 | ✅ |
+| 7 | `src/views/TopicView.vue` | 埋点 | ✅ |
+| 8 | — | 构建验证 | ✅ |
+| 9 | `docs/README.md` | 文档同步 | ✅ |
+
+### 20-后台请求静默异常修复方案
+
+| 步骤 | 文件 | 操作 | 状态 |
+|:----:|:-----|:-----|:----:|
+| 1 | `src/api/request.ts` | 解密失败 + showToast | ✅ |
+| 2 | `src/plugins/content.ts` | 视频加载失败 + showToast | ✅ |
+| 3 | `src/plugins/content.ts` | sell 视频 catch 加日志 | ✅ |
+| 4 | `src/api/request.ts` | 视频解析失败 + warn | ✅ |
+| 5 | `src/utils/image.ts` | 图片解码失败 + warn | ✅ |
+| 6 | `src/plugins/content.ts` | async IIFE 外层 catch | ✅ |
+| 7 | `SettingsView.vue` / `UserHomeView.vue` | 生命周期 try/catch | ✅ |
+| 8 | `src/plugins/content.ts` | 视频加载失败关闭模态背景 | ✅ |
+| 9 | — | 构建验证 | ✅ |
+| 10 | `docs/` | 文档同步 | ✅ |
+
+### 21-首页 Tab 系统实现方案
+
+| 步骤 | 文件 | 操作 | 状态 |
+|:----:|:-----|:-----|:----:|
+| 1 | `src/api/request.ts` | 新增 `TAB_CONFIG` 映射表 | ✅ |
+| 2 | `src/api/request.ts` | 新增 `getTabTopics()` 导出函数 | ✅ |
+| 3 | `src/api/request.ts` | `Api` 接口新增 `tabTopics` | ✅ |
+| 4 | `src/api/request.ts` | `api` 对象新增 `tabTopics` 方法 | ✅ |
+| 5 | `src/views/HotTopicsView.vue` | 重构：`topicsMap`/`pageMap`/`totalMap`/`scrollMap` 四映射 + `van-tabs` + 单个 Topics + `onTabChange` 保存/恢复滚动 | ✅ |
+| 6 | — | `pnpm run build` 类型检查 + 构建验证 | ✅ |
+
+### 22-关注页迁移配置子页面
+
+| 步骤 | 文件 | 操作 | 状态 |
+|:----:|:-----|:-----|:----:|
+| 1 | `src/router/index.ts` | 新增 `/settings/follow` 路由，移除旧 `/follow` 路由 | ✅ |
+| 2 | `src/components/common/TabBar.vue` | 移除 `follow` tab | ✅ |
+| 3 | `src/views/SettingsView.vue` | 新增「关注」cell 入口 | ✅ |
+| 4 | `src/views/FollowView.vue` | 添加 nav-bar + 滚动保存 | ✅ |
+| 5 | `src/App.vue` | keep-alive 保留 `FollowView`（与列表页保持一致） | ✅ |
+| 6 | — | `pnpm run build` 构建验证 | ✅ |
+
+### 23-板块页面实施方案
+
+| 步骤 | 文件 | 操作 | 状态 |
+|:----:|:-----|:-----|:----:|
+| 1 | `src/types/index.ts` | 补充 `NodePage` 类型定义 | ✅ |
+| 2 | `src/api/request.ts` | 新增 `getNodes()` / `getNodeTopics()` + API 注册 | ✅ |
+| 3 | `src/views/NodeView.vue` | 新建板块列表页组件 | ✅ |
+| 4 | `src/views/NodeTopicsView.vue` | 新建板块帖子列表页组件 | ✅ |
+| 5 | `src/router/index.ts` | 新增 `/node` 与 `/node/:nodeId` 路由 | ✅ |
+| 6 | `src/components/common/TabBar.vue` | 新增「板块」tab 项 | ✅ |
+| 7 | — | `pnpm run build` 构建验证 | ✅ |
+| 8 | `src/api/request.ts` | `getNodes()` URL 改为 `/topic/nodes_by_ver/v2?ver=0` | ✅ |
+| 9 | `src/views/NodeView.vue` | 参考首页样式：sticky 标题 + 窗口滚动 + sessionStorage 滚动位置记忆 | ✅ |
+| 10 | `src/views/NodeTopicsView.vue` | onActivated→onMounted 修复加载问题 | ✅ |
+| 11 | `src/router/index.ts` | NodeTopics 路由隐藏 TabBar；scrollBehavior 优先读 sessionStorage | ✅ |
+| 12 | `src/App.vue` | keep-alive include 加入 `'NodeView'` | ✅ |
+| 13 | `e2e/node.spec.ts` | Playwright 端到端测试 | ✅ |
+| 14 | `e2e/node-keepalive.spec.ts` | keep-alive 缓存 + 滚动位置记忆测试 | ✅ |
+| 15 | `src/App.vue` | keep-alive include 加入 `'NodeTopicsView'` | ✅ |
+| 16 | `src/views/NodeTopicsView.vue` | keep-alive 缓存 + 滚动位置记忆（onBeforeRouteLeave + setTimeout） | ✅ |
+| 17 | `e2e/node-topics-keepalive.spec.ts` | NodeTopicsView keep-alive + 滚动位置恢复测试 | ✅ |
+
+### 24-帖子详情页内容区布局修复方案
+
+| 步骤 | 任务 | 状态 |
+|:---:|------|:----:|
+| 1 | Playwright 调试收集 DOM 布局信息 | ✅ |
+| 2 | 定位根因：`.content` flex 宽度塌陷 | ✅ |
+| 3 | `TopicContent.vue` 添加 `width: 100%` | ✅ |
+| 4 | 修复 `topic-debug-full.spec.ts` 测试 bug | ✅ |
+| 5 | 测试验证通过 | ✅ |
+
+### 25-帖子收藏功能方案
+
+| 步骤 | 文件 | 操作 | 状态 |
+|:----:|:-----|:-----|:----:|
+| 1 | `src/types/index.ts` | `Topic` 新增 `isFavorite` 字段 | ✅ |
+| 2 | `src/api/request.ts` | 新增 `addFavorite` / `delFavorite` / `checkFavorite` / `getFavoriteTopics` + Api 接口 + api 对象 | ✅ |
+| 3 | `src/views/TopicView.vue` | 收藏按钮 + 加载时检查状态 + 交互逻辑 | ✅ |
+| 4 | `src/views/FavoritesView.vue` | 新建收藏列表页 | ✅ |
+| 5 | `src/router/index.ts` | 新增 `/favorites` 路由 | ✅ |
+| 6 | `src/views/SettingsView.vue` | 添加"收藏"入口 cell | ✅ |
+| 7 | `e2e/favorite.spec.ts` | Playwright E2E 测试（4 条用例） | ✅ |
+| 8 | — | `pnpm run build` 构建验证 | ✅ |
+| 9 | — | `pnpm run test:e2e` E2E 验证（4 passed） | ✅ |
+| 10 | `docs/README.md` | 文档同步 | ✅ |
+
+### 27-帖子分享功能方案
+
+| 步骤 | 文件 | 操作 | 状态 |
+|:----:|:-----|:-----|:----:|
+| 1 | `docs/plans/27-帖子分享功能方案.md` | 创建方案文档 | ✅ |
+| 2 | `src/views/TopicView.vue` | 添加分享按钮 + 复制逻辑 | ✅ |
+| 3 | — | `pnpm run build` 构建验证 | ✅ |
+| 4 | `docs/README.md` | 文档同步（状态 → 🏁） | ✅ |
+
+### 28-签到与金额显示方案
+
+| 步骤 | 文件 | 操作 | 状态 |
+|:----:|:-----|:-----|:----:|
+| 1 | `src/api/request.ts` | 新增 `signIn()` / `getUserWealth()` / `getTaskStatus()` API | ✅ |
+| 2 | `src/views/SettingsView.vue` | 钱包信息 + 签到按钮 UI | ✅ |
+| 3 | — | `pnpm run build` 构建验证 | ✅ |
+| 4 | `docs/README.md` | 文档同步 | ✅ |
+| 5 | `docs/` | 更新 API 参考、数据字典、方案文档 | ✅ |
+
+### 29-关注功能方案
+
+| 步骤 | 文件 | 操作 | 状态 |
+|:----:|:-----|:-----|:----:|
+| 1 | `src/types/index.ts` | 添加 `FollowStatus` 类型 | ✅ |
+| 2 | `src/api/request.ts` | 新增 `addFollow` / `cancelFollow` / `checkFollow` API | ✅ |
+| 3 | `src/views/UserHomeView.vue` | 关注按钮 UI + 交互逻辑（含确认弹窗） | ✅ |
+| 4 | `src/views/FollowView.vue` | 取消关注按钮（含确认弹窗） | ✅ |
+| 5 | — | `pnpm run build` 构建验证 | ✅ |
+| 6 | `docs/README.md` | 文档同步 | ✅ |
+
+### 30-设置页布局优化方案
+
+| 步骤 | 文件 | 操作 | 状态 |
+|:----:|:-----|:-----|:----:|
+| 1 | `src/components/UserInfo.vue` | 新增 `wealth` prop，内嵌金币/钻石显示 | ✅ |
+| 2 | `src/views/SettingsView.vue` | 移除 nav-bar 返回按钮，删除 useSafeBack | ✅ |
+| 3 | `src/views/SettingsView.vue` | 删除钱包 cell-group | ✅ |
+| 4 | `src/views/SettingsView.vue` | 移动收藏/足迹/关注到 UserInfo 后，添加 `v-if` 登录限制 | ✅ |
+| 5 | `src/views/SettingsView.vue` | 签到改用 van-cell 控件 | ✅ |
+| 6 | `src/views/SettingsView.vue` | 删除 status-group，改为单个登录/退出 cell | ✅ |
+| 7 | `src/views/SettingsView.vue` | 传递 wealth prop 给 UserInfo | ✅ |
+| 8 | `src/views/SettingsView.vue` | 合并 mirror-group + info-group 为 source-group | ✅ |
+| 9 | — | `pnpm run build` 构建验证 | ✅ |
+
+### 31-P2P共享功能方案
+
+| 阶段 | 步骤 | 文件 | 操作 | 状态 |
+|:----:|:----:|:-----|:-----|:----:|
+| 1 | 1 | `src/p2p/identity.ts` | 设备指纹生成与管理 | ✅ |
+| 1 | 2 | `src/p2p/signaling.ts` | 信令服务器通信封装 | ✅ |
+| 1 | 3 | `src/p2p/manager.ts` | P2P 连接管理器 | ✅ |
+| 1 | 4 | `src/stores/p2p.ts` | P2P 状态管理（含设备列表、活跃度排序） | ✅ |
+| 1 | 5 | `worker.ts` | Worker 信令 API | ✅ |
+| 1 | 6 | `src/components/P2PStatus.vue` | P2P 状态指示器 | ✅ |
+| 1 | 7 | `src/views/SettingsView.vue` | 设置页添加 P2P 入口 cell | ✅ |
+| 1 | 8 | — | `pnpm run build` 构建验证 | ✅ |
+| 2 | 9 | `src/p2p/protocol.ts` | 共享数据协议（含昵称同步） | 📋 |
+| 2 | 10 | `src/p2p/broadcaster.ts` | 数据广播器 | 📋 |
+| 2 | 11 | `src/p2p/receiver.ts` | 数据接收器 | 📋 |
+| 2 | 12 | `src/stores/shared.ts` | 共享数据存储（在线无限制，离线按配置限制） | 📋 |
+| 3 | 13 | `src/views/SharedView.vue` | 共享页面（设备/足迹/推荐 Tab） | ✅ |
+| 3 | 14 | `src/components/DeviceList.vue` | 设备列表组件（按活跃度排序） | ✅ |
+| 3 | 15 | `src/components/SharedItem.vue` | 共享条目组件 | 📋 |
+| 3 | 16 | `src/views/P2PSettingsView.vue` | P2P 设置子页面 | ✅ |
+| 3 | 17 | `src/router/index.ts` | 添加 `/settings/p2p` 和 `/shared` 路由 | ✅ |
+| 3 | 18 | `src/App.vue` | TabBar 添加共享标签 | 📋 |
+| 3 | 19 | — | `pnpm run build` 构建验证 | ✅ |
+| — | 20 | `docs/README.md` | 更新文档 | ✅ |
+
+### 32-全局Loading指示器方案
+
+| 步骤 | 文件 | 操作 | 状态 |
+|:----:|:-----|:-----|:----:|
+| 1 | `src/stores/app.ts` | 新建 app store（loading 计数器 + show/hide） | ✅ |
+| 2 | `src/components/common/GlobalLoading.vue` | 新建全局 loading 组件（fixed 定位 + van-loading） | ✅ |
+| 3 | `src/App.vue` | 导入并挂载 `<GlobalLoading />` | ✅ |
+| 4 | `src/router/index.ts` | 导入 app store，beforeEach show + afterEach hide | ✅ |
+| 5 | — | `pnpm run build` 构建验证 | ✅ |
+| 6 | `docs/README.md` | 文档同步 | ✅ |
+
+### 33-首页更新横幅提示方案
+
+| 步骤 | 文件 | 操作 | 状态 |
+|:----:|:-----|:-----|:----:|
+| 1 | `src/components/Topics.vue` | 添加 baselineFirstId prop、watch 检测逻辑、横幅 UI | ✅ |
+| 2 | `src/views/HotTopicsView.vue` | 添加首条 ID 记录，传递 prop | ✅ |
+| 3 | `src/views/NodeTopicsView.vue` | 添加首条 ID 记录，传递 prop | ✅ |
+| 4 | `src/views/FavoritesView.vue` | 添加首条 ID 记录，传递 prop | ✅ |
+| 5 | `src/views/SearchView.vue` | 添加首条 ID 记录，传递 prop | ✅ |
+| 6 | `src/views/UserHomeView.vue` | 添加首条 ID 记录，传递 prop | ✅ |
+| 7 | `src/views/UserView.vue` | 移除（未使用） | ✅ |
+| 8 | — | 功能测试验证 | ✅ |
+
+### 34-Worker静态资源MIME类型修复方案
+
+| 步骤 | 文件 | 操作 | 状态 |
+|:----:|:-----|:-----|:----:|
+| 1 | `docs/plans/34-Worker静态资源MIME类型修复方案.md` | 创建方案文档 | ✅ |
+| 2 | `worker.ts` | 修改 fetch handler，静态资源优先 | ✅ |
+| 3 | — | `pnpm run build` 构建验证 | ✅ |
+| 4 | `docs/README.md` | 文档同步 | ✅ |
 
 ## 参考代码
 

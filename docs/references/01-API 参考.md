@@ -5,18 +5,21 @@
 > | 项目 | 内容 |
 > |------|------|
 > | 文档编号 | 04 |
-> | 文档版本 | v1.1.0 |
+> | 文档版本 | v1.4.0 |
 > | 文档状态 | 🏁 已完成 |
-> | 最后更新 | 2026-07-12 |
+> | 最后更新 | 2026-08-03 |
 > | 对应内容 | 所有 API 端点定义、参数、响应 |
 >
 > **变更历史**
 >
 > | 日期 | 版本 | 说明 |
 > |------|:----:|------|
+> | 2026-08-03 | v1.4.0 | 修复 getFollowList 参数、signIn 描述、补充已实现端点清单 |
+> | 2026-08-03 | v1.3.0 | 修复 signIn 错误静默问题，更新已实现端点清单 |
+> | 2026-07-31 | v1.2.0 | 添加 getTaskStatus API，修正签到状态判断逻辑 |
 > | 2026-07-12 | v1.1.0 | 移除 proxy-image 引用、添加 toCamelCase 说明、修复重复章节 |
 > | 2026-07-10 | v1.0.0 | 初版，基于代码和参考分析整理 |
-
+>
 > **关联文档**：[01-架构概览.md](../architecture/01-架构概览.md)（请求流程）· [02-数据字典.md](./02-数据字典.md)（类型定义）· [01-登录功能实施方案.md](../plans/01-登录功能实施方案.md)（登录流程）
 
 ---
@@ -138,22 +141,52 @@ Sign = MD5(Username + Password + navigator.userAgent)
 
 ---
 
-## 4. 用户/关注 API
+## 4. 任务 API
 
-### 4.1 获取关注列表
+### 4.1 获取任务状态
 
 | 项目 | 值 |
 |------|-----|
-| **函数** | `getFollowList(token, uid)` |
+| **函数** | `getTaskStatus()` |
+| **URL** | `GET /api/task/getTaskStatus` |
+| **认证** | 否 |
+| **响应** | `TaskStatus`（含 `goldSignIn.status` 等） |
+
+**状态语义：**
+- `status: true` = 可以执行（任务未完成，按钮可点击）
+- `status: false` = 已完成（任务已完成，按钮禁用）
+
+**注意：** `goldSignIn.status` 字段语义与其他任务（如 `vipChat`）相反，是设计特性，不是 bug。
+
+### 4.2 每日签到
+
+| 项目 | 值 |
+|------|-----|
+| **函数** | `signIn()` |
+| **URL** | `POST /api/user/user_sign_in` |
+| **认证** | 是（X-User-Id + X-User-Token） |
+| **响应** | `SignInResult` |
+
+> 注意：`api.signIn()` 不捕获异常，调用方需自行 try/catch 处理错误。
+
+---
+
+## 5. 用户/关注 API
+
+### 5.1 获取关注列表
+
+| 项目 | 值 |
+|------|-----|
+| **函数** | `getFollowList()` |
 | **URL** | `GET /api/user/favorite/users` |
-| **请求头** | `X-User-Id: {uid}`、`X-User-Token: {token}` |
+| **认证** | 自动（X-User-Id + X-User-Token 由 getAuthHeaders 注入） |
 | **响应** | `FollowUser[]` |
 
 ---
 
-## 5. 视频 API
+## 6. 视频 API
 
-### 5.1 加载视频源
+### 6.1 加载视频源
 
 | 项目 | 值 |
 |------|-----|
@@ -166,9 +199,9 @@ Sign = MD5(Username + Password + navigator.userAgent)
 
 ---
 
-## 6. 图片 API
+## 7. 图片 API
 
-### 6.1 处理图片
+### 7.1 处理图片
 
 | 项目 | 值 |
 |------|-----|
@@ -179,37 +212,38 @@ Sign = MD5(Username + Password + navigator.userAgent)
 
 ---
 
-## 7. 未实现端点（参考代码中发现）
+## 8. 已实现端点
 
-以下端点已在 `app.js` 模块 `1f24` 和 `21e4` 中发现，尚未在当前项目中实现：
+以下端点已在 `src/api/request.ts` 中实现：
 
-| 端点 | 方法 | 用途 | 方案 |
-|:-----|:----:|------|:----|
-| `/user/user_sign_in` | POST | 每日签到 | 02 §1 |
-| `/user/current` | GET | 获取当前用户信息 | 02 §5 |
-| `/user/fans` | GET | 粉丝列表 | 02 §4 |
-| `/favorite/add` | GET | 收藏帖子 | 02 §3 |
-| `/favorite/delete` | GET | 取消收藏 | 02 §3 |
-| `/user/favorite` | GET | 收藏列表 | 02 §3 |
-| `/tag/tags` | GET | 获取标签 | 02 §7 |
-| `/captcha/request` | GET | 获取验证码 | 02 §6 |
-| `/captcha/isNeed` | GET | 检查是否需要验证码 | 02 §6 |
-| `/login/signup` | POST | 注册 | 02 §11 |
-| `/user/password/find` | POST | 找回密码 | 02 §11 |
-| `/user/password/reset` | POST | 重置密码 | 02 §11 |
-| `/vip/querySaleTopicStatus` | GET | VIP 销售状态 | 02 §10 |
-| `/vip/getNumber` | GET | VIP 数量 | 02 §10 |
-| `/vip/queryFreeNum` | GET | 免费 VIP 数量 | 02 §10 |
-| `/vip/queryDisCardNum` | GET | 丢弃卡数量 | 02 §10 |
-| `/chat/message` | POST | 发送私信 | — |
-| `/topic/create` | POST | 创建帖子 | — |
-| `/topic/edit` | POST | 编辑帖子 | — |
+| 端点 | 方法 | 用途 | 实现位置 |
+|:-----|:----:|------|:---------|
+| `/topic/{topicId}` | GET | 获取帖子详情 | `getTopic()` |
+| `/topic/node/topics` | GET | 获取用户帖子列表 | `getUserTopics()` |
+| `/topic/searchV2` | GET | 搜索帖子 | `searchTopics()` |
+| `/topic/nodes_by_ver/v2` | GET | 获取板块列表 | `getNodes()` |
+| `/tag/tags` | GET | 获取标签 | `getTags()` |
+| `/attachment` | POST | 获取视频资源地址 | `loadVideoSrc()` |
+| `/comment/reply_list` | GET | 获取评论列表 | `getComments()` |
+| `/user/current` | GET | 获取当前用户信息 | `getCurrentUser()` |
+| `/user/user_sign_in` | POST | 每日签到 | `signIn()` |
+| `/user/wealth` | GET | 获取用户财富信息 | `wealth()` |
+| `/user/favorite/users` | GET | 获取关注列表 | `getFollowList()` |
+| `/user/favorite` | POST | 关注用户 | `addFollow()` |
+| `/user/favorite` | DELETE | 取消关注 | `cancelFollow()` |
+| `/favorite/v2/add` | GET | 收藏帖子 | `addFavorite()` |
+| `/favorite/v2/delete` | GET | 取消收藏 | `delFavorite()` |
+| `/favorite/v2/check` | GET | 检查收藏状态 | `checkFavorite()` |
+| `/favorite/v2/folderList` | GET | 获取收藏夹列表 | `getFavoriteFolders()` |
+| `/favorite/v2/topics` | GET | 获取收藏帖子列表 | `getFavoriteTopics()` |
+| `/task/getTaskStatus` | GET | 获取任务状态 | `getTaskStatus()` |
+| `/login/signin` | POST | 用户登录 | `login()` |
 
 > 详见 [02-功能新增与改善方案.md](../plans/02-功能新增与改善方案.md)
 
 ---
 
-## 8. 环境变量
+## 9. 环境变量
 
 | 变量 | 类型 | 默认值 | 说明 |
 |-----|:----:|:------:|------|
@@ -217,7 +251,7 @@ Sign = MD5(Username + Password + navigator.userAgent)
 
 ---
 
-## 9. 代理配置
+## 10. 代理配置
 
 ### Cloudflare Worker（worker.ts）
 
@@ -232,6 +266,6 @@ Sign = MD5(Username + Password + navigator.userAgent)
 
 ### 开发代理（vite.config.ts）
 
-生产不使用 vite `server.proxy`：`npm run dev` 默认仅作静态页面服务，后端经已部署 Worker 或 `npm run cf:dev` 本地代理。本地 E2E 测试（`npm run test:e2e`）会临时启用 `vite.config.ts` 的自定义中间件插件，读取请求头 `X-Backend`（即配置页「数据源字段」）动态转发到镜像源，与生产 Worker 行为对齐，且仅 `npm run dev` 生效、不进入 `dist/` 产物。
+生产不使用 vite `server.proxy`：`pnpm run dev` 默认仅作静态页面服务，后端经已部署 Worker 或 `pnpm run cf:dev` 本地代理。本地 E2E 测试（`pnpm run test:e2e`）会临时启用 `vite.config.ts` 的自定义中间件插件，读取请求头 `X-Backend`（即配置页「数据源字段」）动态转发到镜像源，与生产 Worker 行为对齐，且仅 `pnpm run dev` 生效、不进入 `dist/` 产物。
 
 本地 E2E 代理通过 Vite 插件的 `configureServer` 钩子注入自定义中间件，直接用 `node:https` 模块发请求，完全控制代理行为。

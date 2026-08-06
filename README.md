@@ -108,6 +108,10 @@ haijiao/
 └── dist/                  # 构建产物
 ```
 
+## 参考项目
+
+`docs/reference/haijiao-wxt/` 是从 [Gitee - haijiao-wxt](https://gitee.com/shadaileng/haijiao-wxt.git) 下载的原始参考项目源码，用于分析和对比。该目录已加入 `.gitignore`，不纳入版本管理。
+
 ## API 接口
 
 应用通过 Cloudflare Worker 代理请求到后端（代码默认 `https://haijiao.com`，但**该官方域名在国内被屏蔽**，实际须填写后台提供的可用镜像/数据源域名）。配置了镜像源时，请求携带 `X-Backend` 头告知 Worker 代理目标。
@@ -153,39 +157,39 @@ X-User-Token: {token}
 
 ```bash
 # 安装依赖
-npm install
+pnpm install
 
 # 启动开发服务器
-npm run dev
+pnpm run dev
 
 # 预览构建结果
-npm run preview
+pnpm run preview
 ```
 
 ### 构建部署
 
 ```bash
 # 类型检查 + 构建
-npm run build
+pnpm run build
 
 # 部署到 Cloudflare Workers
-npm run cf:deploy
+pnpm run cf:deploy
 ```
 
 ### 本地 Worker 测试
 
 ```bash
-npm run cf:dev
+pnpm run cf:dev
 ```
 
 ### 本地自动化测试（Playwright + 本机 Chrome）
 
-使用 Playwright 驱动本机已安装的 Google Chrome，对应用做端到端测试。本地代理通过 Vite 插件自定义中间件，读取请求头 `X-Back-end`（即配置页「数据源字段」）动态转发到镜像源，与 `worker.ts` 行为对齐；该配置仅 `npm run dev` 生效，不影响生产。
+使用 Playwright 驱动本机已安装的 Google Chrome，对应用做端到端测试。本地代理通过 Vite 插件自定义中间件，读取请求头 `X-Back-end`（即配置页「数据源字段」）动态转发到镜像源，与 `worker.ts` 行为对齐；该配置仅 `pnpm run dev` 生效，不影响生产。
 
 ```bash
 # 1. 在 e2e/config.ts 填入 mirrorDomain（必填）、uid/token 或 username/password、videoPid
-# 2. 运行（会自动启动 npm run dev 于 3000 端口）
-npm run test:e2e
+# 2. 运行（会自动启动 pnpm run dev 于 3000 端口）
+pnpm run test:e2e
 ```
 
 > 缺少 `mirrorDomain` 时公开页与镜像源规格不可达；缺少登录凭据或 `videoPid` 时对应 `auth`/`video` 规格自动 `test.skip`，详见 `docs/plans/06-E2E自动化测试方案.md`。
@@ -195,18 +199,28 @@ npm run test:e2e
 ### Cloudflare Workers
 
 1. 注册 [Cloudflare](https://cloudflare.com) 账号
-2. 安装 Wrangler CLI: `npm install -g wrangler`
+2. 安装 Wrangler CLI: `pnpm install -g wrangler`
 3. 登录: `wrangler login`
-4. 部署: `npm run cf:deploy`
+4. 部署: `pnpm run cf:deploy`
 
 ### 静态托管
 
 构建后的 `dist/` 目录可直接部署到任何静态托管服务：
 
 ```bash
-npm run build
+pnpm run build
 # 上传 dist/ 到你的 CDN/服务器
 ```
+
+### GitHub Pages（文档站）
+
+文档站（VitePress）通过 GitHub Actions 自动部署到 GitHub Pages：
+
+1. 在仓库设置中启用 GitHub Pages（Source 选择 "GitHub Actions"）
+2. 推送 `main` 分支且 `docs/**` 目录有变更时自动触发
+3. 工作流文件：`.github/workflows/docs.yml`
+
+踩坑记录详见 [docs/guides/05-GitHubActions部署踩坑记录.md](docs/guides/05-GitHubActions部署踩坑记录.md)
 
 ## 开发规范
 
@@ -215,7 +229,7 @@ npm run build
 - 使用 Pinia 进行状态管理
 - 使用 Vant 4 移动端组件库
 - CSS 使用 Tailwind CSS + SCSS 混合方案
-- 包管理器使用 npm
+- 包管理器使用 pnpm
 
 ## 许可证
 

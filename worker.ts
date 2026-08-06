@@ -4,27 +4,26 @@ import { readFileSync } from 'fs';
 
 interface Env {
   HAIJIAO_API_BASE: string;
+  ASSETS: { fetch: typeof fetch };
 }
 
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
 
-    // Proxy API requests to haijiao.com
+    // Proxy API requests to backend
     if (url.pathname.startsWith('/api/')) {
       return proxyApi(request, env);
     }
 
-    // Serve static assets
-    try {
-      const asset = await env.ASSETS.fetch(request);
-      if (asset.ok) {
-        return asset;
-      }
-    } catch {}
+    // Try to serve static assets first
+    const assetResponse = await env.ASSETS.fetch(request);
+    if (assetResponse.status === 200) {
+      return assetResponse;
+    }
 
-    // Fallback to index.html for SPA routing
-    return env.ASSETS?.fetch(new Request(`${url.origin}/index.html`, request)) || new Response('Not Found', { status: 404 });
+    // SPA fallback: non-API, non-asset requests return index.html
+    return env.ASSETS.fetch(new Request(`${url.origin}/index.html`, request));
   },
 };
 
@@ -48,50 +47,12 @@ async function proxyApi(request: Request, env: Env): Promise<Response> {
   const url = new URL(request.url);
   const backend = resolveBackend(request, env);
 
-  // 图片代理端点：用于获取 .txt 文件并解码
-  if (url.pathname === '/api/proxy-image') {
-    let targetUrl = url.searchParams.get('url');
-    if (!targetUrl) {
-      return Response.json({ success: false, message: 'Missing url parameter' }, { status: 400 });
-    }
-    // 支持镜像源：若传入的是相对路径，则拼接到镜像源
-    if (!targetUrl.startsWith('http')) {
-      targetUrl = backend.replace(/\/$/, '') + (targetUrl.startsWith('/') ? targetUrl : '/' + targetUrl);
-    }
-
-    try {
-      const response = await fetch(targetUrl, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        },
-      });
-
-      if (!response.ok) {
-        return Response.json({ success: false, message: 'Image fetch failed' }, { status: response.status });
-      }
-
-      const text = await response.text();
-      return new Response(text, {
-        status: 200,
-        headers: {
-          'Content-Type': 'text/plain; charset=utf-8',
-          'Access-Control-Allow-Origin': '*',
-        },
-      });
-    } catch (error) {
-      return Response.json(
-        { success: false, message: 'Proxy error', error: String(error) },
-        { status: 502 }
-      );
-    }
-  }
-
-  const apiPath = url.pathname.replace(/^\/api/, '')
-  const apiUrl = `${backend}${apiPath}${url.search}`;
+  const apiUrl = `${backend}${url.pathname}${url.search}`;
 
   const headers = new Headers(request.headers);
   headers.delete('host');
-  headers.set('origin', env.HAIJIAO_API_BASE);
+  headers.delete('x-backend');
+  headers.set('origin', backend);
 
   // Preserve auth cookies
   const cookieHeader = request.headers.get('cookie');

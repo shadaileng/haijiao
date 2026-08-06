@@ -14,6 +14,8 @@ const username = ref('')
 const password = ref('')
 const loading = ref(false)
 const showPassword = ref(false)
+const customApiBase = ref(settings.apiBase)
+const apiBaseEditing = ref(false)
 
 async function handleLogin() {
   if (!username.value.trim()) {
@@ -23,6 +25,10 @@ async function handleLogin() {
   if (!password.value) {
     showToast('请输入密码')
     return
+  }
+  // 保存数据源配置
+  if (customApiBase.value.trim()) {
+    settings.setApiBase(customApiBase.value.trim())
   }
   loading.value = true
   const resp = await api.login({
@@ -39,6 +45,26 @@ async function handleLogin() {
     userStore.loginFromApi(resp.data)
   }
   router.replace('/hot')
+}
+
+function toggleApiBaseEdit() {
+  apiBaseEditing.value = !apiBaseEditing.value
+  if (!apiBaseEditing.value) {
+    customApiBase.value = settings.apiBase
+  }
+}
+
+function saveApiBase() {
+  if (customApiBase.value.trim()) {
+    settings.setApiBase(customApiBase.value.trim())
+    showToast('数据源已保存')
+  }
+  apiBaseEditing.value = false
+}
+
+function resetApiBase() {
+  customApiBase.value = settings.apiBase
+  apiBaseEditing.value = false
 }
 
 function goToSettings() {
@@ -79,6 +105,32 @@ function goToSettings() {
             <van-icon :name="showPassword ? 'eye-o' : 'closed-eye'" size="20" @click="showPassword = !showPassword" />
           </template>
         </van-field>
+        <van-cell-group inset class="api-base-section">
+          <van-field
+            v-model="customApiBase"
+            :readonly="!apiBaseEditing"
+            label="数据源"
+            placeholder="请输入数据源地址"
+            clearable
+            left-icon="globe-o"
+          >
+            <template #button>
+              <div class="api-base-actions">
+                <van-icon
+                  v-if="!apiBaseEditing"
+                  name="edit"
+                  size="18"
+                  color="#1989fa"
+                  @click="toggleApiBaseEdit()"
+                />
+                <template v-else>
+                  <van-icon name="check" size="18" color="#07c160" @click="saveApiBase()" />
+                  <van-icon name="close" size="18" color="#ee0a24" @click="resetApiBase()" style="margin-left: 8px;" />
+                </template>
+              </div>
+            </template>
+          </van-field>
+        </van-cell-group>
       </van-cell-group>
 
       <van-button type="primary" block round class="login-btn" :loading="loading" loading-text="登录中..." @click="handleLogin">
@@ -91,7 +143,7 @@ function goToSettings() {
 
       <div class="tips">
         <p>如已有 UID 和 Token，可跳过登录直接在配置页填写</p>
-        <p>当前镜像源：{{ settings.apiBase }}</p>
+        <p>当前数据源：{{ settings.apiBase }}</p>
       </div>
     </div>
   </div>
@@ -135,5 +187,12 @@ function goToSettings() {
   margin: 0;
   font-size: 12px;
   color: #969799;
+}
+.api-base-section {
+  margin-bottom: 16px;
+}
+.api-base-actions {
+  display: flex;
+  align-items: center;
 }
 </style>

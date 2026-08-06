@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useSettingsStore } from '@/stores/settings'
+import { useAppStore } from '@/stores/app'
 
 const routes = [
   {
@@ -13,6 +13,18 @@ const routes = [
     meta: { showTabBar: true },
   },
   {
+    path: '/node',
+    name: 'Node',
+    component: () => import('@/views/NodeView.vue'),
+    meta: { showTabBar: true },
+  },
+  {
+    path: '/node/:nodeId',
+    name: 'NodeTopics',
+    component: () => import('@/views/NodeTopicsView.vue'),
+    meta: {},
+  },
+  {
     path: '/login',
     name: 'Login',
     component: () => import('@/views/LoginView.vue'),
@@ -23,20 +35,14 @@ const routes = [
     component: () => import('@/views/TopicView.vue'),
   },
   {
-    path: '/homepage/:userId/:nickname?',
+    path: '/homepage/:userId',
     name: 'Homepage',
     component: () => import('@/views/UserHomeView.vue'),
   },
   {
-    path: '/user/:userId?',
-    name: 'User',
-    component: () => import('@/views/UserView.vue'),
-  },
-  {
-    path: '/follow/:userId?',
-    name: 'Follow',
+    path: '/settings/follow',
+    name: 'SettingsFollow',
     component: () => import('@/views/FollowView.vue'),
-    meta: { showTabBar: true },
   },
   {
     path: '/search',
@@ -55,14 +61,47 @@ const routes = [
     name: 'ImageViewer',
     component: () => import('@/views/ImageViewerView.vue'),
   },
+  {
+    path: '/history',
+    name: 'History',
+    component: () => import('@/views/HistoryView.vue'),
+  },
+  {
+    path: '/favorites',
+    name: 'Favorites',
+    component: () => import('@/views/FavoritesView.vue'),
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    component: () => import('@/views/NotFoundView.vue'),
+  },
 ]
 
-const publicPages = ['Login', 'Settings', 'ImageViewer']
+const publicPages = ['Login', 'Settings', 'ImageViewer', 'History', 'NotFound']
+
+function isLoggedIn(): boolean {
+  try {
+    const raw = localStorage.getItem('settings')
+    if (!raw) return false
+    const cfg = JSON.parse(raw)
+    return !!cfg.uid && !!cfg.token
+  } catch {
+    return false
+  }
+}
 
 const router = createRouter({
   history: createWebHistory(),
   routes,
-  scrollBehavior(_to, _from, savedPosition) {
+  scrollBehavior(to, _from, savedPosition) {
+    // 优先从 sessionStorage 恢复 keep-alive 组件的滚动位置
+    const scrollKey = `scrollPos_${String(to.name)}`
+    const saved = sessionStorage.getItem(scrollKey)
+    if (saved) {
+      sessionStorage.removeItem(scrollKey)
+      return { top: parseInt(saved) }
+    }
     if (savedPosition) {
       return savedPosition
     }
@@ -71,12 +110,21 @@ const router = createRouter({
 })
 
 router.beforeEach((to, _from, next) => {
-  const settings = useSettingsStore()
-  if (settings.isLoggedIn || publicPages.includes(to.name as string)) {
+  const appStore = useAppStore()
+  appStore.show()
+
+  if (isLoggedIn() || publicPages.includes(to.name as string)) {
     next()
   } else {
     next({ name: 'Login' })
   }
 })
+
+router.afterEach(() => {
+  const appStore = useAppStore()
+  appStore.hide()
+})
+
+;(window as any).__router__ = router
 
 export default router

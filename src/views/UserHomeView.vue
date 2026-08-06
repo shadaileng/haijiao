@@ -1,45 +1,77 @@
 <script setup lang="ts">
 defineOptions({ name: 'UserHomeView' })
-import { ref, reactive, onMounted, watch } from 'vue'
+import { ref, reactive, onMounted, watch, computed, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
-import { showToast } from 'vant'
+import { showToast, showConfirmDialog } from 'vant'
 import { api } from '@/api/request'
-import type { User, LiteTopicPage } from '@/types'
+import type { User, LiteTopic } from '@/types'
 import UserInfo from '@/components/UserInfo.vue'
 import Topics from '@/components/Topics.vue'
+import { useSafeBack } from '@/utils/navigation'
+import { useHistoryStore } from '@/stores/history'
+import { useSettingsStore } from '@/stores/settings'
+import { useUserStore } from '@/stores/user'
 
 const route = useRoute()
+const safeBack = useSafeBack()
+const historyStore = useHistoryStore()
+const settings = useSettingsStore()
+const userStore = useUserStore()
 
 const userId = ref((route.params.userId as string) || '')
-const nickname = ref((route.params.nickname as string) || '')
 const userInfo = ref<User | null>(null)
-const topicsDom = ref()
-const skeletonLoading = ref(true)
 
-const liteTopics: LiteTopicPage = reactive({ results: [], page: { index: 1, size: 10, total: 0 } })
+const topics: LiteTopic[] = reactive([])
+const pageIndex = ref(1)
+const totalItems = ref(0)
+const pageSize = 15
+const loading = ref(true)
+const lastFirstTopicId = ref<string | number>()
+const latest = ref<{ topics: LiteTopic[]; total: number }>()
 
-const onClickLeft = () => history.back()
+const isFollowing = ref(false)
+const followLoading = ref(false)
+
+const isSelf = computed(() => {
+  return settings.isLoggedIn && String(settings.uid) === String(userId.value)
+})
+
+const onClickLeft = () => safeBack()
 
 onMounted(async () => {
-  if (userId.value) {
-    await loadUserInfo(userId.value)
+  try {
+    if (userId.value) {
+      await loadUserInfo(userId.value)
+      if (!isSelf.value && settings.isLoggedIn) {
+        await checkFollowStatus()
+      }
+    }
+    await loadPage(1)
+  } catch (e) {
+    console.warn('user home init failed:', e)
   }
-  await pageto(1)
-  skeletonLoading.value = false
 })
 
 watch(() => route.params.userId, async (newId) => {
   if (newId && newId !== userId.value) {
-    skeletonLoading.value = true
     userId.value = newId as string
-    nickname.value = (route.params.nickname as string) || ''
     userInfo.value = null
-    liteTopics.results.splice(0, liteTopics.results.length)
-    liteTopics.page.index = 1
-    liteTopics.page.total = 0
-    await loadUserInfo(userId.value)
-    await pageto(1)
-    skeletonLoading.value = false
+    topics.length = 0
+    loading.value = true
+    pageIndex.value = 1
+    totalItems.value = 0
+    isFollowing.value = false
+    lastFirstTopicId.value = undefined
+    latest.value = undefined
+    try {
+      await loadUserInfo(userId.value)
+      if (!isSelf.value && settings.isLoggedIn) {
+        await checkFollowStatus()
+      }
+      await loadPage(1)
+    } catch (e) {
+      console.warn('user home watch failed:', e)
+    }
   }
 })
 
@@ -49,61 +81,146 @@ const loadUserInfo = async (id: string) => {
     const u = resp.data.user
     u.userId = u.id
     userInfo.value = u
+    historyStore.addRecord('user', id, u.nickname || '用户 ' + id)
   }
 }
 
-const pageto = async (index: number) => {
-  if (!userId.value) return
-  const resp = await api.topics({ params: { userId: userId.value, page: index, type: 1 } })
+const loadPage = async (page: number) => {
+  loading.value = true
+  if (!userId.value) { loading.value = false; return }
+  const resp = await api.topics({ params: { userId: userId.value, page, type: 1 } })
   if (!resp.success) {
     showToast(resp.message || '获取主题失败')
+    loading.value = false
     return
   }
   const data = resp.data
   if (data?.results) {
-    liteTopics.results.splice(0, liteTopics.results.length, ...data.results)
+    topics.length = 0
+    topics.push(...data.results)
+    if (page === 1 && data.results.length > 0) {
+      lastFirstTopicId.value = data.results[0].topicId
+    }
   }
   if (data?.page) {
-    liteTopics.page.index = data.page.page
-    liteTopics.page.size = data.page.limit
-    liteTopics.page.total = data.page.total
+    totalItems.value = data.page.total
+    pageIndex.value = page
+  }
+  loading.value = false
+}
+
+const onApply = () => {
+  if (latest.value) {
+    topics.length = 0
+    topics.push(...latest.value.topics)
+    lastFirstTopicId.value = latest.value.topics[0].topicId
+    pageIndex.value = 1
+    totalItems.value = latest.value.total
+    latest.value = undefined
+  } else {
+    loadPage(1)
+  }
+  nextTick(() => { window.scrollTo({ top: 0 }) })
+}
+
+const checkFollowStatus = async () => {
+  if (!userId.value) return
+  const cached = userStore.getFollow()
+  const cachedFollow = cached.some(u => String(u.userId) === String(userId.value))
+  if (cachedFollow) {
+    isFollowing.value = true
+    return
+  }
+  const resp = await api.checkFollow({ params: { userId: userId.value } })
+  if (resp.success && resp.data) {
+    isFollowing.value = resp.data.isFollow
   }
 }
 
-const loadMore = () => {
-  if (liteTopics.page.index < Math.ceil(liteTopics.page.total / liteTopics.page.size)) {
-    pageto(liteTopics.page.index + 1)
+const toggleFollow = async () => {
+  if (!settings.isLoggedIn) {
+    showToast('请先登录')
+    return
+  }
+  if (followLoading.value) return
+
+  if (isFollowing.value) {
+    try {
+      await showConfirmDialog({
+        title: '取消关注',
+        message: `确定要取消关注「${userInfo.value?.nickname || '该用户'}」吗？`,
+      })
+    } catch {
+      return
+    }
+  }
+
+  followLoading.value = true
+  try {
+    if (isFollowing.value) {
+      const resp = await api.cancelFollow({ params: { userId: userId.value } })
+      if (resp.success) {
+        isFollowing.value = false
+        showToast('已取消关注')
+      } else {
+        showToast(resp.message || '操作失败')
+      }
+    } else {
+      const resp = await api.addFollow({ params: { userId: userId.value } })
+      if (resp.success) {
+        isFollowing.value = true
+        showToast('关注成功')
+      } else {
+        showToast(resp.message || '操作失败')
+      }
+    }
+  } catch (e) {
+    showToast('操作失败')
+  } finally {
+    followLoading.value = false
   }
 }
 </script>
 
 <template>
-  <van-nav-bar :title="nickname || '用户主页'" left-text="返回" left-arrow @click-left="onClickLeft" :fixed="true" :placeholder="true" />
-  <template v-if="skeletonLoading">
-    <div class="skeleton-card van-hairline--bottom">
-      <van-row>
-        <van-col span="6">
-          <van-skeleton-avatar :row="0" />
-        </van-col>
-        <van-col span="16">
-          <van-skeleton-title :row="1" />
-          <van-skeleton-title :row="1" style="width: 60%;" />
-          <van-skeleton-title :row="1" style="width: 40%;" />
-        </van-col>
-      </van-row>
-    </div>
-    <div v-for="i in 3" :key="i" class="skeleton-card">
-      <van-skeleton title avatar :row="2" :loading="true" />
-    </div>
-  </template>
-  <template v-else>
+  <van-nav-bar :title="userInfo?.nickname || '用户主页'" left-text="返回" left-arrow @click-left="onClickLeft" :fixed="true" :placeholder="true" />
+  <div class="user-info-wrapper">
     <UserInfo v-if="userInfo" :userInfo="userInfo" />
-    <Topics ref="topicsDom" :topics="liteTopics.results" :skeletonLoading="false" @load="loadMore()" />
-  </template>
+    <van-button
+      v-if="!isSelf && settings.isLoggedIn"
+      class="follow-btn"
+      :type="isFollowing ? 'default' : 'primary'"
+      size="small"
+      :loading="followLoading"
+      @click="toggleFollow"
+    >
+      {{ isFollowing ? '已关注' : '关注' }}
+    </van-button>
+  </div>
+  <van-divider v-if="userInfo" />
+  <Topics
+    mode="pagination"
+    :topics="topics"
+    :skeletonLoading="loading"
+    :pageIndex="pageIndex"
+    :totalItems="totalItems"
+    :pageSize="pageSize"
+    :baselineFirstId="lastFirstTopicId"
+    :latest="latest"
+    @pageChange="loadPage"
+    @apply="onApply"
+  />
 </template>
 
 <style scoped>
-.skeleton-card {
-  padding: 15px;
+.user-info-wrapper {
+  position: relative;
+}
+.follow-btn {
+  position: absolute;
+  top: 50%;
+  right: 16px;
+  transform: translateY(-50%);
+  z-index: 1;
 }
 </style>
